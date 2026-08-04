@@ -392,6 +392,24 @@
     color:var(--ink);direction:ltr;text-align:left;line-height:1.8;
   }
   .warmup-live.empty{color:#A79FB0;}
+
+  /* ===== Phase 2 (round 2) additions: calibration + text fallback ===== */
+  .calibration-note{
+    display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;
+    background:rgba(139,123,192,0.12);border:1px solid rgba(139,123,192,0.3);
+    border-radius:12px;padding:11px 14px;font-family:var(--f-body);font-size:12.5px;
+    color:var(--offwhite);line-height:1.8;
+  }
+  .text-fallback{
+    width:100%;min-height:110px;margin-top:6px;
+    background:var(--card-tint);border:1.5px solid var(--line-warm);border-radius:14px;
+    padding:14px 15px;font-family:var(--f-body);font-size:14px;
+    color:var(--ink);direction:ltr;text-align:left;line-height:1.8;resize:vertical;
+  }
+  .text-fallback:focus{outline:none;border-color:var(--violet);}
+  .fallback-note{
+    display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;
+  }
 </style>
 </head>
 <body>
@@ -400,6 +418,7 @@
 <script>
 const LEVELS = ['A1','A2','B1','B2','C1','C2'];
 const LEVEL_AR = {A1:'مبتدئ',A2:'مبتدئ متقدم',B1:'متوسط',B2:'متوسط متقدم',C1:'متقدم',C2:'محترف'};
+const LEVEL_INDEX = {A1:0,A2:1,B1:2,B2:3,C1:4,C2:5};
 
 const INTRO_QUESTION = {
   en:"Let's start simple. Tell me your name, where you're from, and one thing you enjoy doing in your free time.",
@@ -424,9 +443,15 @@ const MAX_TURNS_DEFAULT = 9;
 const EXTRA_ROUND_TURNS = 3;
 const IMAGE_TURN_POSITIONS = [1, 5];
 
+// Phase 2: first N adaptively-fetched questions are used to CALIBRATE the
+// starting level, rather than to escalate/de-escalate via the normal
+// two-consecutive-signal rule. Prevents beginner intimidation / advanced boredom.
+const CALIBRATION_TURNS = 2;
+
 const ICON_MIC = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>';
 const ICON_STOP = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>';
 const ICON_SPEAKER = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>';
+const ICON_KEYBOARD = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="6" y1="9" x2="6" y2="9.01"></line><line x1="10" y1="9" x2="10" y2="9.01"></line><line x1="14" y1="9" x2="14" y2="9.01"></line><line x1="18" y1="9" x2="18" y2="9.01"></line><line x1="6" y1="13" x2="18" y2="13"></line></svg>';
 
 const SAVED_SESSION_KEY = 'volish_saved_session';
 
@@ -440,7 +465,8 @@ function saveSession(){
       history: s.history, turnLevels: s.turnLevels, turnIndex: s.turnIndex,
       maxTurns: s.maxTurns, currentLevelIndex: s.currentLevelIndex,
       directionHistory: s.directionHistory, currentQuestion: s.currentQuestion,
-      imagePointer: s.imagePointer, extraRoundOffered: s.extraRoundOffered
+      imagePointer: s.imagePointer, extraRoundOffered: s.extraRoundOffered,
+      calibrationEstimates: s.calibrationEstimates, calibrationDone: s.calibrationDone
     }));
   }catch(e){}
 }
@@ -467,6 +493,7 @@ let state = {
   imagePointer: 0,
   quickReply:null,
   recognitionSupported: !!(window.SpeechRecognition || window.webkitSpeechRecognition),
+  micDenied:false,
   isRecording:false,
   interim:'',
   finalText:'',
@@ -480,6 +507,9 @@ let state = {
   extraRoundOffered:false,
   pendingAction:null,
   errorMsg:'',
+  /* level calibration — first 1-2 adaptive questions */
+  calibrationEstimates: [],
+  calibrationDone: false,
   /* warmup */
   warmupDone:false,
   warmupText:'',
@@ -527,11 +557,11 @@ function renderIntro(){
       <ul class="feature-list">
         <li><span class="dot">١</span>حوالي ٨-٩ أسئلة تتكيّف مع مستواك أثناء المحادثة — تصعب لو جوابك قوي، وتسهل لو تحتاج وقت أكثر.</li>
         <li><span class="dot">٢</span>كل سؤال مكتوب ومترجم بالعربي، وتسمعه بصوت إنجليزي أصلي.</li>
-        <li><span class="dot">٣</span>تجاوب بالتحدث مباشرة عبر الميكروفون فقط — بدون كتابة.</li>
+        <li><span class="dot">٣</span>تجاوب بالتحدث مباشرة عبر الميكروفون — ولو تعذّر الميكروفون تقدر تكتب إجابتك بدل التسجيل.</li>
         <li><span class="dot">٤</span>بالنهاية تحصل على مستواك بالضبط مع تقدير IELTS تقريبي، وتفصيل ٤ فئات، ونقاط قوتك وأخطاء تحتاج تصحيح.</li>
       </ul>
       <button class="btn" id="startBtn">ابدأ الاختبار</button>
-      <p class="mic-note">${state.recognitionSupported ? 'بيطلب المتصفح صلاحية الميكروفون عند أول تسجيل — وافق حتى تقدر تجاوب صوتيًا.' : 'تنبيه: هذا المتصفح لا يدعم التعرف الصوتي، يُفضّل فتح الموقع من متصفح Chrome على جهاز كمبيوتر أو أندرويد.'}</p>
+      <p class="mic-note">${state.recognitionSupported ? 'بيطلب المتصفح صلاحية الميكروفون عند أول تسجيل — وافق حتى تقدر تجاوب صوتيًا. لو رفضت الصلاحية بالغلط، تقدر تكتب إجاباتك بدل ذلك.' : 'تنبيه: هذا المتصفح لا يدعم التعرف الصوتي — بترد على الأسئلة كتابة بدل التسجيل الصوتي.'}</p>
     </div>
   `;
 }
@@ -539,6 +569,22 @@ function renderIntro(){
 function renderWarmup(){
   const micText = (state.warmupText + (state.warmupInterim ? ' ' + state.warmupInterim : '')).trim();
   const done = state.warmupDone;
+  const fallbackMode = !state.recognitionSupported || state.micDenied;
+
+  if(fallbackMode){
+    return `
+      <div class="eyebrow">تجهيز الاختبار</div>
+      <div class="card">
+        <p class="warmup-title">جاهز تبدأ</p>
+        <p class="warmup-sub">${!state.recognitionSupported
+          ? 'متصفحك الحالي لا يدعم التعرف الصوتي، فبترد على أسئلة الاختبار كتابة بدل التسجيل — هذا ما يأثر على تقييم مستواك.'
+          : 'ما قدرنا نوصل لميكروفونك (يمكن رفضت الصلاحية). لا مشكلة — بترد على أسئلة الاختبار كتابة بدل التسجيل الصوتي.'}</p>
+        <button class="btn" id="warmupNextBtn" style="margin-top:10px;">ابدأ الاختبار الآن</button>
+        ${state.recognitionSupported ? `<button class="listen-btn" id="retryMicWarmupBtn" style="margin-top:14px;width:100%;justify-content:center;">${ICON_MIC} جرب الميكروفون مرة ثانية</button>` : ''}
+      </div>
+    `;
+  }
+
   return `
     <div class="eyebrow">تجهيز الميكروفون</div>
     <div class="card">
@@ -579,14 +625,13 @@ function renderWarmup(){
       ${micText ? `<div class="warmup-live">${micText}</div>` : (state.warmupRecording ? `<div class="warmup-live empty">سيظهر كلامك هنا...</div>` : '')}
 
       <button class="btn" id="warmupNextBtn" style="margin-top:22px;" ${done ? '' : 'disabled'}>ابدأ الاختبار الآن</button>
-      <p class="mic-note" style="margin-top:12px;">
-        ${!state.recognitionSupported ? 'تنبيه: متصفحك لا يدعم التعرف الصوتي — افتح الموقع من Chrome.' : 'لو ما ظهر كلامك، تأكد إنك سمحت للمتصفح بالميكروفون.'}
-      </p>
+      <p class="mic-note" style="margin-top:12px;">لو ما ظهر كلامك، تأكد إنك سمحت للمتصفح بالميكروفون — أو تقدر تكمل وترد كتابة.</p>
     </div>
   `;
 }
 
-function getPhaseLabel(turnIndex, maxTurns){
+function getPhaseLabel(turnIndex, maxTurns, calibrationDone){
+  if(!calibrationDone) return { ar:'تحديد المستوى', en:'Calibrating' };
   const pct = turnIndex / maxTurns;
   if(pct < 0.35) return { ar:'بداية', en:'Warmup' };
   if(pct < 0.7)  return { ar:'استكشاف', en:'Exploring' };
@@ -599,9 +644,10 @@ function renderQuestion(){
   const pct = Math.round((state.turnIndex/total)*100);
   const transcriptText = (state.finalText + (state.interim?(' '+state.interim):'')).trim();
   const canGoNext = transcriptText.length>0 && !state.isRecording;
-  const phase = getPhaseLabel(state.turnIndex, total);
+  const phase = getPhaseLabel(state.turnIndex, total, state.calibrationDone);
+  const showTextFallback = !state.recognitionSupported || state.micDenied;
 
-  // Short-answer hint: show if stopped recording, has some text, but very short
+  // Short-answer hint: show if stopped recording/typing, has some text, but very short
   const wordCount = transcriptText.trim().split(/\s+/).filter(Boolean).length;
   const showShortHint = !state.isRecording && wordCount > 0 && wordCount < 4;
 
@@ -610,6 +656,10 @@ function renderQuestion(){
       <span class="qr-dot"></span>
       <span class="qr-text"><b>${state.quickReply.en}</b><br>${state.quickReply.ar}</span>
     </div>
+  ` : '';
+
+  const calibrationNoteHtml = (!state.calibrationDone && state.turnIndex>=1) ? `
+    <div class="calibration-note">🎯 أول سؤالين نحدد فيها مستواك التقريبي، وبعدها الأسئلة تتكيّف بدقة أكثر.</div>
   ` : '';
 
   return `
@@ -629,10 +679,16 @@ function renderQuestion(){
       </div>
       <button class="listen-btn" id="listenBtn">${ICON_SPEAKER} استمع للسؤال</button>
 
+      ${calibrationNoteHtml}
       ${state.errorMsg ? `<div class="warn">${state.errorMsg}</div>` : ''}
 
-      ${!state.recognitionSupported ? `
-        <div class="warn">التعرف الصوتي غير مدعوم في هذا المتصفح، فما تقدر تجاوب على هذا السؤال هنا. افتح الموقع من متصفح Chrome، أو اضغط "تخطي" للمتابعة.</div>
+      ${showTextFallback ? `
+        <div class="fallback-note">
+          ${ICON_KEYBOARD}
+          <span style="font-family:var(--f-body);font-size:12.5px;color:var(--ink-muted);line-height:1.8;">${!state.recognitionSupported ? 'متصفحك لا يدعم التعرف الصوتي — اكتب إجابتك بالأسفل.' : 'ما قدرنا نوصل للميكروفون — اكتب إجابتك بالأسفل بدل التسجيل.'}</span>
+        </div>
+        <textarea id="textAnswer" class="text-fallback" placeholder="Write your answer in English here...">${state.finalText||''}</textarea>
+        ${state.recognitionSupported ? `<button class="listen-btn" id="retryMicBtn" style="margin-top:14px;">${ICON_MIC} جرب الميكروفون مرة ثانية</button>` : ''}
       ` : `
         <div class="rec-zone">
           <button class="mic-btn ${state.isRecording?'recording':''}" id="micBtn">
@@ -692,8 +748,6 @@ function renderErrorScreen(){
     </div>
   `;
 }
-
-const LEVEL_INDEX = {A1:0,A2:1,B1:2,B2:3,C1:4,C2:5};
 
 function renderResults(){
   const r = state.result;
@@ -805,11 +859,13 @@ function startRecording(){
     };
     rec.onerror = (e)=>{
       if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){
-        state.errorMsg = 'تم رفض إذن الميكروفون. فعّل صلاحية الميكروفون للموقع من إعدادات المتصفح وحاول مرة ثانية.';
+        // Phase 2: clear alternative path — fall back to a text answer instead of a dead end
+        state.micDenied = true;
+        state.errorMsg = 'تم رفض إذن الميكروفون. تقدر تفعّل الصلاحية من إعدادات المتصفح لاحقًا، وبالوقت الحالي تكتب إجابتك بدل التسجيل.';
       } else if(e.error === 'no-speech'){
         // ignore
       } else {
-        state.errorMsg = 'صار خطأ بالتسجيل الصوتي (' + e.error + '). جرب مرة ثانية.';
+        state.errorMsg = 'صار خطأ بالتسجيل الصوتي (' + e.error + '). جرب مرة ثانية أو اكتب إجابتك.';
       }
       stopRecordingInternal();
       render();
@@ -840,7 +896,7 @@ function startRecording(){
     rec.start();
     render();
   }catch(err){
-    state.errorMsg = 'ما قدرنا نبدأ التسجيل. حاول مرة ثانية.';
+    state.errorMsg = 'ما قدرنا نبدأ التسجيل. حاول مرة ثانية أو اكتب إجابتك.';
     render();
   }
 }
@@ -880,7 +936,13 @@ function startWarmupRecording(){
       render();
     };
     rec.onerror = (e)=>{
-      if(e.error!=='no-speech') state.warmupDone=true; // allow proceeding on error
+      if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){
+        // Phase 2: clear alternative path — skip mic entirely and use text answers
+        state.micDenied = true;
+        state.warmupDone = true;
+      } else if(e.error!=='no-speech'){
+        state.warmupDone=true; // allow proceeding on other errors
+      }
       stopWarmupRecording();
     };
     rec.onend = ()=>{
@@ -945,6 +1007,8 @@ function attachHandlers(){
     state.currentQuestion = saved.currentQuestion || INTRO_QUESTION;
     state.imagePointer = saved.imagePointer || 0;
     state.extraRoundOffered = saved.extraRoundOffered || false;
+    state.calibrationEstimates = saved.calibrationEstimates || [];
+    state.calibrationDone = saved.calibrationDone || false;
     clearSession();
     state.screen = 'question';
     resetQuestionState();
@@ -959,6 +1023,13 @@ function attachHandlers(){
   if(warmupMicBtn) warmupMicBtn.onclick = ()=>{
     if(state.warmupRecording){ stopWarmupRecording(); }
     else { startWarmupRecording(); }
+  };
+
+  const retryMicWarmupBtn = document.getElementById('retryMicWarmupBtn');
+  if(retryMicWarmupBtn) retryMicWarmupBtn.onclick = ()=>{
+    state.micDenied = false;
+    state.warmupDone = false;
+    render();
   };
 
   const warmupNextBtn = document.getElementById('warmupNextBtn');
@@ -984,6 +1055,22 @@ function attachHandlers(){
     }
   };
 
+  const textAnswer = document.getElementById('textAnswer');
+  if(textAnswer){
+    textAnswer.oninput = (e)=>{
+      state.finalText = e.target.value;
+      const nextBtn = document.getElementById('nextBtn');
+      if(nextBtn) nextBtn.disabled = state.finalText.trim().length===0;
+    };
+  }
+
+  const retryMicBtn = document.getElementById('retryMicBtn');
+  if(retryMicBtn) retryMicBtn.onclick = ()=>{
+    state.micDenied = false;
+    state.errorMsg = '';
+    render();
+  };
+
   const skipBtn = document.getElementById('skipBtn');
   if(skipBtn) skipBtn.onclick = ()=> advance('(no answer given)');
 
@@ -1001,9 +1088,11 @@ function attachHandlers(){
       directionHistory:[], turnLevels:[], history:[], currentQuestion:INTRO_QUESTION,
       imagePointer:0, quickReply:null,
       recognitionSupported: state.recognitionSupported,
+      micDenied:false,
       isRecording:false, interim:'', finalText:'', timerSeconds:0, timerHandle:null,
       silenceHandle:null, lastSpeechTime:0, showSilencePrompt:false,
       recognition:null, result:null, extraRoundOffered:false, pendingAction:null, errorMsg:'',
+      calibrationEstimates:[], calibrationDone:false,
       warmupDone:false, warmupText:'', warmupInterim:'', warmupRecording:false,
       warmupCounter:0, warmupCounterHandle:null, warmupRecognition:null
     };
@@ -1072,16 +1161,33 @@ function applyDirectionSignal(direction){
   }
 }
 
+// Phase 2: apply the first CALIBRATION_TURNS estimates directly as the
+// starting level (fast, decisive), instead of the slow two-in-a-row rule.
+function applyCalibration(turnCefrEstimate){
+  state.calibrationEstimates.push(turnCefrEstimate);
+  if(state.calibrationEstimates.length >= CALIBRATION_TURNS){
+    const idxs = state.calibrationEstimates.map(l => LEVEL_INDEX[l] ?? 2);
+    const avg = Math.round(idxs.reduce((a,b)=>a+b,0) / idxs.length);
+    state.currentLevelIndex = Math.max(0, Math.min(5, avg));
+    state.calibrationDone = true;
+    state.directionHistory = [];
+  }
+}
+
 async function fetchNextTurn(){
   try{
+    const turnNumber = state.turnIndex + 1; // the turn we're about to fetch a question for
+    const isCalibration = !state.calibrationDone && turnNumber <= CALIBRATION_TURNS;
+
     const resp = await fetch('/api/turn', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         history: state.history,
         currentLevelIndex: state.currentLevelIndex,
-        turnNumber: state.turnIndex + 1,
-        maxTurns: state.maxTurns
+        turnNumber: turnNumber,
+        maxTurns: state.maxTurns,
+        isCalibration: isCalibration
       })
     });
     const parsed = await resp.json();
@@ -1090,7 +1196,12 @@ async function fetchNextTurn(){
     }
 
     if(parsed.turnCefrEstimate) state.turnLevels.push(parsed.turnCefrEstimate);
-    if(parsed.direction) applyDirectionSignal(parsed.direction);
+
+    if(isCalibration){
+      if(parsed.turnCefrEstimate) applyCalibration(parsed.turnCefrEstimate);
+    } else if(parsed.direction){
+      applyDirectionSignal(parsed.direction);
+    }
 
     state.turnIndex++;
     state.quickReply = { en: parsed.quickReplyEn||'', ar: parsed.quickReplyAr||'' };
