@@ -310,6 +310,88 @@
 
   .footer-note{font-family:var(--f-thin);text-align:center;color:var(--muted-on-dark);font-size:12px;margin-top:24px;line-height:1.9;}
   .hidden{display:none !important;}
+
+  /* ===== Phase 2 additions ===== */
+
+  /* Phase label instead of question count */
+  .phase-badge{
+    display:inline-flex;align-items:center;gap:7px;
+    font-family:var(--f-thin);font-size:11.5px;letter-spacing:.1em;
+    color:var(--gold-soft);text-transform:uppercase;
+    background:rgba(198,162,94,0.08);border:1px solid rgba(198,162,94,0.22);
+    border-radius:99px;padding:4px 12px;
+  }
+  .phase-badge .phase-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);}
+  .progress-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-family:var(--f-thin);font-size:12px;color:var(--muted-on-dark);}
+
+  /* Short-answer hint */
+  .short-hint{
+    display:flex;align-items:flex-start;gap:8px;margin-top:14px;
+    background:rgba(137,169,146,0.1);border:1px solid rgba(137,169,146,0.28);
+    border-radius:12px;padding:10px 13px;font-family:var(--f-body);font-size:12.5px;
+    color:#4A7D5C;line-height:1.8;
+  }
+  .short-hint .sh-icon{flex:none;font-size:14px;margin-top:1px;}
+
+  /* Silence prompt */
+  .silence-prompt{
+    margin-top:14px;padding:11px 14px;border-radius:12px;
+    background:rgba(139,123,192,0.08);border:1px solid rgba(139,123,192,0.25);
+    font-family:var(--f-body);font-size:12.5px;color:var(--muted-on-dark);line-height:1.8;text-align:center;
+  }
+
+  /* Session restore banner */
+  .restore-banner{
+    background:rgba(198,162,94,0.1);border:1px solid rgba(198,162,94,0.3);
+    border-radius:16px;padding:15px 18px;margin-bottom:20px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  }
+  .restore-banner p{margin:0;font-family:var(--f-body);font-size:13.5px;color:var(--gold-soft);line-height:1.7;flex:1;}
+  .restore-banner .restore-btns{display:flex;gap:8px;}
+  .restore-banner .btn-restore{
+    appearance:none;border:none;cursor:pointer;
+    font-family:var(--f-semibold);font-size:13px;
+    padding:9px 16px;border-radius:12px;min-height:38px;
+    background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:#2A2010;
+    box-shadow:0 8px 18px -8px rgba(198,162,94,0.5);white-space:nowrap;
+  }
+  .restore-banner .btn-discard{
+    appearance:none;border:1.5px solid rgba(198,162,94,0.3);background:transparent;cursor:pointer;
+    font-family:var(--f-body);font-size:12.5px;color:var(--muted-on-dark);
+    padding:9px 14px;border-radius:12px;white-space:nowrap;
+  }
+
+  /* Warmup screen */
+  .warmup-title{font-family:var(--f-heading);font-size:22px;color:var(--ink);margin:0 0 8px;}
+  .warmup-sub{font-family:var(--f-body);font-size:14px;color:var(--ink-muted);line-height:1.9;margin:0 0 24px;}
+  .warmup-step{
+    display:flex;align-items:center;gap:11px;padding:11px 14px;
+    background:var(--card-tint);border-radius:12px;margin-bottom:10px;
+    font-family:var(--f-body);font-size:13.5px;color:var(--ink);
+  }
+  .warmup-step .ws-num{
+    flex:none;width:26px;height:26px;border-radius:8px;
+    background:var(--card-tint-2);color:var(--gold);
+    font-family:var(--f-semibold);font-size:12px;
+    display:flex;align-items:center;justify-content:center;border:1px solid var(--line-warm);
+  }
+  .warmup-ok{
+    display:flex;align-items:center;gap:9px;padding:13px 15px;border-radius:14px;
+    background:rgba(137,169,146,0.12);border:1.5px solid rgba(137,169,146,0.35);
+    font-family:var(--f-semibold);font-size:13.5px;color:#3E7050;margin:16px 0 20px;
+  }
+  .warmup-ok svg{color:#5C9A6A;flex:none;}
+  .warmup-counter{
+    font-family:var(--f-thin);font-size:12px;color:var(--violet-deep);
+    text-align:center;margin-top:4px;min-height:18px;
+  }
+  .warmup-live{
+    width:100%;margin-top:16px;min-height:52px;
+    background:var(--card-tint);border:1.5px dashed var(--line-warm);border-radius:12px;
+    padding:13px 14px;font-family:var(--f-body);font-size:13px;
+    color:var(--ink);direction:ltr;text-align:left;line-height:1.8;
+  }
+  .warmup-live.empty{color:#A79FB0;}
 </style>
 </head>
 <body>
@@ -346,6 +428,33 @@ const ICON_MIC = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" st
 const ICON_STOP = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>';
 const ICON_SPEAKER = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>';
 
+const SAVED_SESSION_KEY = 'volish_saved_session';
+
+function hasSavedSession(){
+  try{ return !!localStorage.getItem(SAVED_SESSION_KEY); }catch(e){ return false; }
+}
+function saveSession(){
+  try{
+    const s = state;
+    localStorage.setItem(SAVED_SESSION_KEY, JSON.stringify({
+      history: s.history, turnLevels: s.turnLevels, turnIndex: s.turnIndex,
+      maxTurns: s.maxTurns, currentLevelIndex: s.currentLevelIndex,
+      directionHistory: s.directionHistory, currentQuestion: s.currentQuestion,
+      imagePointer: s.imagePointer, extraRoundOffered: s.extraRoundOffered
+    }));
+  }catch(e){}
+}
+function loadSession(){
+  try{
+    const raw = localStorage.getItem(SAVED_SESSION_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
+}
+function clearSession(){
+  try{ localStorage.removeItem(SAVED_SESSION_KEY); }catch(e){}
+}
+
 let state = {
   screen:'intro',
   turnIndex:0,
@@ -363,11 +472,22 @@ let state = {
   finalText:'',
   timerSeconds:0,
   timerHandle:null,
+  silenceHandle:null,
+  lastSpeechTime:0,
+  showSilencePrompt:false,
   recognition:null,
   result:null,
   extraRoundOffered:false,
   pendingAction:null,
-  errorMsg:''
+  errorMsg:'',
+  /* warmup */
+  warmupDone:false,
+  warmupText:'',
+  warmupInterim:'',
+  warmupRecording:false,
+  warmupCounter:0,
+  warmupCounterHandle:null,
+  warmupRecognition:null
 };
 
 function renderBrand(){
@@ -378,6 +498,7 @@ function render(){
   const app = document.getElementById('app');
   let body = '';
   if(state.screen==='intro') body = renderIntro();
+  else if(state.screen==='warmup') body = renderWarmup();
   else if(state.screen==='question') body = renderQuestion();
   else if(state.screen==='loading-turn') body = renderLoading('جارٍ تجهيز السؤال التالي حسب إجابتك...');
   else if(state.screen==='loading-final') body = renderLoading('جارٍ تحليل إجاباتك وتحديد مستواك...');
@@ -388,7 +509,17 @@ function render(){
 }
 
 function renderIntro(){
+  const restoreHtml = hasSavedSession() ? `
+    <div class="restore-banner">
+      <p>عندك جلسة غير مكتملة — تبي تكمّل من وين وقفت؟</p>
+      <div class="restore-btns">
+        <button class="btn-restore" id="resumeBtn">كمّل الجلسة</button>
+        <button class="btn-discard" id="discardBtn">ابدأ من جديد</button>
+      </div>
+    </div>
+  ` : '';
   return `
+    ${restoreHtml}
     <div class="eyebrow">تقييم صوتي تكيّفي</div>
     <h1>وش مستواك بالإنجليزي؟</h1>
     <p class="sub">محادثة قصيرة تكتشف مستواك الحقيقي حسب معيار CEFR العالمي (A1 إلى C2) — الأسئلة تتغيّر تلقائيًا حسب أدائك، وتسمعها وتشوفها مكتوبة بالإنجليزي والعربي، وتجاوب بصوتك.</p>
@@ -405,12 +536,74 @@ function renderIntro(){
   `;
 }
 
+function renderWarmup(){
+  const micText = (state.warmupText + (state.warmupInterim ? ' ' + state.warmupInterim : '')).trim();
+  const done = state.warmupDone;
+  return `
+    <div class="eyebrow">تجهيز الميكروفون</div>
+    <div class="card">
+      <p class="warmup-title">جهّز ميكروفونك قبل ما تبدأ</p>
+      <p class="warmup-sub">قبل الاختبار، تأكد إن صوتك يوصل صح — قول أي جملة بالإنجليزي لمدة ٥ ثوانٍ.</p>
+
+      <div class="warmup-step"><span class="ws-num">١</span>اضغط الزر واسمح للمتصفح بالوصول للميكروفون</div>
+      <div class="warmup-step"><span class="ws-num">٢</span>تكلّم بالإنجليزي لمدة ٥ ثوانٍ — أي جملة تجي ببالك</div>
+      <div class="warmup-step"><span class="ws-num">٣</span>اضغط إيقاف، وبعدين ابدأ الاختبار</div>
+
+      ${done ? `
+        <div class="warmup-ok">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          ميكروفونك يشتغل — كلامك وصل بوضوح
+        </div>
+      ` : ''}
+
+      ${state.warmupRecording ? `
+        <div class="rec-zone">
+          <button class="mic-btn recording" id="warmupMicBtn">
+            <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+            <span style="position:relative;z-index:2;display:flex;">${ICON_STOP}</span>
+          </button>
+          <div class="mic-label">اضغط للإيقاف</div>
+          <div class="warmup-counter">${state.warmupCounter > 0 ? formatTime(state.warmupCounter) : ''}</div>
+        </div>
+      ` : `
+        <div class="rec-zone">
+          <button class="mic-btn" id="warmupMicBtn">
+            <span class="ring"></span><span class="ring"></span><span class="ring"></span>
+            <span style="position:relative;z-index:2;display:flex;">${ICON_MIC}</span>
+          </button>
+          <div class="mic-label">${done ? 'سجّل مرة ثانية' : 'اضغط وتكلّم بالإنجليزي'}</div>
+          <div class="warmup-counter"></div>
+        </div>
+      `}
+
+      ${micText ? `<div class="warmup-live">${micText}</div>` : (state.warmupRecording ? `<div class="warmup-live empty">سيظهر كلامك هنا...</div>` : '')}
+
+      <button class="btn" id="warmupNextBtn" style="margin-top:22px;" ${done ? '' : 'disabled'}>ابدأ الاختبار الآن</button>
+      <p class="mic-note" style="margin-top:12px;">
+        ${!state.recognitionSupported ? 'تنبيه: متصفحك لا يدعم التعرف الصوتي — افتح الموقع من Chrome.' : 'لو ما ظهر كلامك، تأكد إنك سمحت للمتصفح بالميكروفون.'}
+      </p>
+    </div>
+  `;
+}
+
+function getPhaseLabel(turnIndex, maxTurns){
+  const pct = turnIndex / maxTurns;
+  if(pct < 0.35) return { ar:'بداية', en:'Warmup' };
+  if(pct < 0.7)  return { ar:'استكشاف', en:'Exploring' };
+  return { ar:'تعمق', en:'Deep Dive' };
+}
+
 function renderQuestion(){
   const q = state.currentQuestion;
   const total = state.maxTurns;
   const pct = Math.round((state.turnIndex/total)*100);
   const transcriptText = (state.finalText + (state.interim?(' '+state.interim):'')).trim();
   const canGoNext = transcriptText.length>0 && !state.isRecording;
+  const phase = getPhaseLabel(state.turnIndex, total);
+
+  // Short-answer hint: show if stopped recording, has some text, but very short
+  const wordCount = transcriptText.trim().split(/\s+/).filter(Boolean).length;
+  const showShortHint = !state.isRecording && wordCount > 0 && wordCount < 4;
 
   const quickReplyHtml = state.quickReply ? `
     <div class="quick-reply">
@@ -420,7 +613,10 @@ function renderQuestion(){
   ` : '';
 
   return `
-    <div class="progress-wrap"><span>السؤال ${state.turnIndex+1} من ${total}</span><span>${pct}%</span></div>
+    <div class="progress-wrap">
+      <span class="phase-badge"><span class="phase-dot"></span>${phase.ar}</span>
+      <span>${pct}%</span>
+    </div>
     <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
     ${quickReplyHtml}
     <div class="card">
@@ -446,8 +642,16 @@ function renderQuestion(){
           <div class="mic-label">${state.isRecording? 'اضغط للإيقاف' : (transcriptText? 'اضغط لإعادة التسجيل' : 'اضغط وابدأ الكلام بالإنجليزي')}</div>
           <div class="timer">${state.isRecording? formatTime(state.timerSeconds) : ''}</div>
           <div class="live-transcript ${transcriptText? '' : 'empty'}">${transcriptText || 'سيظهر كلامك مكتوبًا هنا أثناء التسجيل...'}</div>
+          ${state.showSilencePrompt && state.isRecording ? `<div class="silence-prompt">خذ وقتك — قول أي شيء يجي ببالك عن الموضوع 😊</div>` : ''}
         </div>
       `}
+
+      ${showShortHint ? `
+        <div class="short-hint">
+          <span class="sh-icon">💡</span>
+          جاوبت قصير — حاول تضيف جملة أو جملتين للحصول على تقييم أدق
+        </div>
+      ` : ''}
 
       <div class="row-btns">
         <button class="btn secondary" id="skipBtn">تخطي</button>
@@ -570,7 +774,10 @@ function resetQuestionState(){
   state.finalText = '';
   state.timerSeconds = 0;
   state.errorMsg = '';
+  state.showSilencePrompt = false;
+  state.lastSpeechTime = 0;
   if(state.timerHandle){ clearInterval(state.timerHandle); state.timerHandle=null; }
+  if(state.silenceHandle){ clearInterval(state.silenceHandle); state.silenceHandle=null; }
 }
 
 function startRecording(){
@@ -591,6 +798,9 @@ function startRecording(){
       }
       if(finalChunk) state.finalText = (state.finalText + ' ' + finalChunk).trim();
       state.interim = interimChunk;
+      // reset silence clock whenever speech arrives
+      state.lastSpeechTime = Date.now();
+      state.showSilencePrompt = false;
       render();
     };
     rec.onerror = (e)=>{
@@ -608,13 +818,25 @@ function startRecording(){
       if(state.isRecording){
         state.isRecording = false;
         if(state.timerHandle){ clearInterval(state.timerHandle); state.timerHandle=null; }
+        if(state.silenceHandle){ clearInterval(state.silenceHandle); state.silenceHandle=null; }
         render();
       }
     };
     state.recognition = rec;
     state.isRecording = true;
     state.timerSeconds = 0;
+    state.lastSpeechTime = Date.now();
+    state.showSilencePrompt = false;
     state.timerHandle = setInterval(()=>{ state.timerSeconds++; render(); }, 1000);
+    // Silence detection: encourage after 8 seconds of no new speech (only if no text yet)
+    state.silenceHandle = setInterval(()=>{
+      if(state.isRecording && !state.finalText && !state.interim){
+        if(Date.now() - state.lastSpeechTime > 8000){
+          state.showSilencePrompt = true;
+          render();
+        }
+      }
+    }, 1000);
     rec.start();
     render();
   }catch(err){
@@ -626,6 +848,8 @@ function startRecording(){
 function stopRecordingInternal(){
   state.isRecording = false;
   if(state.timerHandle){ clearInterval(state.timerHandle); state.timerHandle=null; }
+  if(state.silenceHandle){ clearInterval(state.silenceHandle); state.silenceHandle=null; }
+  state.showSilencePrompt = false;
   if(state.recognition){
     try{ state.recognition.stop(); }catch(e){}
   }
@@ -636,9 +860,110 @@ function stopRecording(){
   render();
 }
 
+function startWarmupRecording(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){ state.warmupDone = true; render(); return; }
+  try{
+    const rec = new SR();
+    rec.lang = 'en-US';
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.onresult = (e)=>{
+      let finalChunk='', interimChunk='';
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        const t=e.results[i][0].transcript;
+        if(e.results[i].isFinal) finalChunk += t+' ';
+        else interimChunk += t;
+      }
+      if(finalChunk) state.warmupText = (state.warmupText+' '+finalChunk).trim();
+      state.warmupInterim = interimChunk;
+      render();
+    };
+    rec.onerror = (e)=>{
+      if(e.error!=='no-speech') state.warmupDone=true; // allow proceeding on error
+      stopWarmupRecording();
+    };
+    rec.onend = ()=>{
+      if(state.warmupRecording){ stopWarmupRecording(); }
+    };
+    state.warmupRecognition = rec;
+    state.warmupRecording = true;
+    state.warmupCounter = 0;
+    state.warmupText = '';
+    state.warmupInterim = '';
+    // Auto-stop after 5 seconds
+    state.warmupCounterHandle = setInterval(()=>{
+      state.warmupCounter++;
+      if(state.warmupCounter >= 5){
+        clearInterval(state.warmupCounterHandle);
+        state.warmupCounterHandle = null;
+        stopWarmupRecording();
+        state.warmupDone = true;
+        render();
+      } else {
+        render();
+      }
+    }, 1000);
+    rec.start();
+    render();
+  }catch(err){
+    state.warmupDone = true;
+    render();
+  }
+}
+
+function stopWarmupRecording(){
+  state.warmupRecording = false;
+  if(state.warmupCounterHandle){ clearInterval(state.warmupCounterHandle); state.warmupCounterHandle=null; }
+  if(state.warmupRecognition){ try{ state.warmupRecognition.stop(); }catch(e){} }
+  if(state.warmupText || state.warmupInterim) state.warmupDone = true;
+  render();
+}
+
 function attachHandlers(){
   const startBtn = document.getElementById('startBtn');
   if(startBtn) startBtn.onclick = ()=>{
+    // Go to warmup screen first (unless mic not supported)
+    state.screen = 'warmup';
+    state.warmupDone = false;
+    state.warmupText = '';
+    state.warmupInterim = '';
+    state.warmupRecording = false;
+    render();
+  };
+
+  const resumeBtn = document.getElementById('resumeBtn');
+  if(resumeBtn) resumeBtn.onclick = ()=>{
+    const saved = loadSession();
+    if(!saved){ clearSession(); render(); return; }
+    state.history = saved.history || [];
+    state.turnLevels = saved.turnLevels || [];
+    state.turnIndex = saved.turnIndex || 0;
+    state.maxTurns = saved.maxTurns || MAX_TURNS_DEFAULT;
+    state.currentLevelIndex = saved.currentLevelIndex ?? 2;
+    state.directionHistory = saved.directionHistory || [];
+    state.currentQuestion = saved.currentQuestion || INTRO_QUESTION;
+    state.imagePointer = saved.imagePointer || 0;
+    state.extraRoundOffered = saved.extraRoundOffered || false;
+    clearSession();
+    state.screen = 'question';
+    resetQuestionState();
+    render();
+    speak(state.currentQuestion.en);
+  };
+
+  const discardBtn = document.getElementById('discardBtn');
+  if(discardBtn) discardBtn.onclick = ()=>{ clearSession(); render(); };
+
+  const warmupMicBtn = document.getElementById('warmupMicBtn');
+  if(warmupMicBtn) warmupMicBtn.onclick = ()=>{
+    if(state.warmupRecording){ stopWarmupRecording(); }
+    else { startWarmupRecording(); }
+  };
+
+  const warmupNextBtn = document.getElementById('warmupNextBtn');
+  if(warmupNextBtn) warmupNextBtn.onclick = ()=>{
+    if(state.warmupRecording) stopWarmupRecording();
     state.screen = 'question';
     state.turnIndex = 0;
     state.currentQuestion = INTRO_QUESTION;
@@ -670,13 +995,17 @@ function attachHandlers(){
 
   const restartBtn = document.getElementById('restartBtn');
   if(restartBtn) restartBtn.onclick = ()=>{
+    clearSession();
     state = {
       screen:'intro', turnIndex:0, maxTurns:MAX_TURNS_DEFAULT, currentLevelIndex:2,
       directionHistory:[], turnLevels:[], history:[], currentQuestion:INTRO_QUESTION,
       imagePointer:0, quickReply:null,
       recognitionSupported: state.recognitionSupported,
-      isRecording:false, interim:'', finalText:'', timerSeconds:0, timerHandle:null, recognition:null,
-      result:null, extraRoundOffered:false, pendingAction:null, errorMsg:''
+      isRecording:false, interim:'', finalText:'', timerSeconds:0, timerHandle:null,
+      silenceHandle:null, lastSpeechTime:0, showSilencePrompt:false,
+      recognition:null, result:null, extraRoundOffered:false, pendingAction:null, errorMsg:'',
+      warmupDone:false, warmupText:'', warmupInterim:'', warmupRecording:false,
+      warmupCounter:0, warmupCounterHandle:null, warmupRecognition:null
     };
     render();
   };
@@ -781,6 +1110,7 @@ async function fetchNextTurn(){
     render();
     speak(state.currentQuestion.en);
   }catch(err){
+    saveSession(); // preserve progress on network failure
     state.errorMsg = (err && err.message) ? err.message : 'خطأ غير معروف';
     state.screen = 'error';
     state.pendingAction = 'turn';
@@ -799,10 +1129,12 @@ async function runFinalAnalysis(){
     if(!resp.ok){
       throw new Error(parsed.error || 'Server error while evaluating your answers.');
     }
+    clearSession(); // analysis done — no need to keep the saved session
     state.result = parsed;
     state.screen = 'results';
     render();
   }catch(err){
+    saveSession(); // preserve progress on network failure
     state.errorMsg = (err && err.message) ? err.message : 'خطأ غير معروف';
     state.screen = 'error';
     state.pendingAction = 'analyze';
