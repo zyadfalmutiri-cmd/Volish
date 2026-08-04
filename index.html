@@ -61,24 +61,24 @@
 
   :root{
     /* ===== Volish — Quiet Luxury palette ===== */
-    --bg-1:#191526;        /* deep plum-ink */
-    --bg-2:#221C33;        /* plum */
-    --bg-glow:#332B4D;      /* soft violet glow */
-    --card:#FAF7F2;         /* warm porcelain */
-    --card-tint:#F3EFE8;    /* porcelain tint for insets */
-    --card-tint-2:#EDE8DF;  /* deeper porcelain */
-    --ink:#282234;          /* near-plum ink */
-    --ink-muted:#6E6678;    /* muted ink */
-    --gold:#C6A25E;         /* champagne gold */
-    --gold-soft:#DFC088;    /* soft champagne */
-    --violet:#8B7BC0;       /* calm lavender accent */
-    --violet-deep:#6E5EA6;  /* deeper lavender */
-    --sage:#89A992;         /* calm sage (positive) */
-    --rose:#B57C86;         /* muted dusty rose (attention) */
-    --offwhite:#EFEBF3;     /* light text on dark bg */
-    --muted-on-dark:#A79FB8;/* muted text on dark bg */
+    --bg-1:#191526;
+    --bg-2:#221C33;
+    --bg-glow:#332B4D;
+    --card:#FAF7F2;
+    --card-tint:#F3EFE8;
+    --card-tint-2:#EDE8DF;
+    --ink:#282234;
+    --ink-muted:#6E6678;
+    --gold:#C6A25E;
+    --gold-soft:#DFC088;
+    --violet:#8B7BC0;
+    --violet-deep:#6E5EA6;
+    --sage:#89A992;
+    --rose:#B57C86;
+    --offwhite:#EFEBF3;
+    --muted-on-dark:#A79FB8;
     --line:rgba(239,235,243,0.12);
-    --line-warm:#E4DDD1;    /* hairline on porcelain */
+    --line-warm:#E4DDD1;
 
     --f-display:'iStoriaHeavy','iStoriaBold','Tajawal',sans-serif;
     --f-heading:'iStoriaBold','iStoriaSemiBold','Tajawal',sans-serif;
@@ -143,7 +143,6 @@
     opacity:.85;
   }
 
-  /* ---------- Intro screen ---------- */
   .feature-list{list-style:none;padding:0;margin:22px 0 28px;display:flex;flex-direction:column;gap:16px;}
   .feature-list li{display:flex;align-items:flex-start;gap:13px;font-family:var(--f-body);font-size:14.5px;line-height:1.8;color:var(--ink-muted);}
   .feature-list .dot{
@@ -172,12 +171,19 @@
   .btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
   .mic-note{font-family:var(--f-thin);font-size:12.5px;color:var(--ink-muted);text-align:center;margin-top:16px;line-height:1.8;}
 
-  /* ---------- Progress ---------- */
   .progress-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-family:var(--f-thin);font-size:12px;color:var(--muted-on-dark);}
-  .progress-bar{height:6px;border-radius:99px;background:rgba(239,235,243,0.12);overflow:hidden;margin-bottom:24px;}
+  .progress-bar{height:6px;border-radius:99px;background:rgba(239,235,243,0.12);overflow:hidden;margin-bottom:16px;}
   .progress-fill{height:100%;background:linear-gradient(90deg,var(--violet),var(--gold));transition:width .5s ease;}
 
-  /* ---------- Question card ---------- */
+  .quick-reply{
+    display:flex;align-items:flex-start;gap:9px;
+    background:rgba(139,123,192,0.14);border:1px solid rgba(139,123,192,0.28);
+    border-radius:14px;padding:11px 14px;margin-bottom:14px;
+  }
+  .quick-reply .qr-dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--violet);margin-top:6px;}
+  .quick-reply .qr-text{font-family:var(--f-body);font-size:13px;line-height:1.8;color:var(--offwhite);}
+  .quick-reply .qr-text b{font-family:var(--f-semibold);color:var(--gold-soft);}
+
   .qtag{
     display:inline-flex;align-items:center;gap:6px;
     font-family:var(--f-semibold);font-size:11px;letter-spacing:.05em;
@@ -240,7 +246,6 @@
     font-family:var(--f-body);font-size:12.5px;padding:13px 15px;border-radius:12px;margin-bottom:16px;line-height:1.8;
   }
 
-  /* ---------- Loading / results ---------- */
   .loading-wrap{display:flex;flex-direction:column;align-items:center;padding:30px 10px;}
   .spinner{width:54px;height:54px;border-radius:50%;border:4px solid var(--card-tint-2);border-top-color:var(--violet);animation:spin 1s linear infinite;margin-bottom:18px;}
   @keyframes spin{to{transform:rotate(360deg);}}
@@ -269,7 +274,16 @@
   .needle::after{content:'';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);width:14px;height:14px;background:var(--ink);border-radius:50%;}
   .gauge-labels{display:flex;justify-content:space-between;width:260px;margin-top:6px;font-family:var(--f-thin);font-size:10.5px;color:var(--ink-muted);padding:0 4px;}
   .level-big{font-family:var(--f-display);font-size:44px;color:var(--ink);margin:12px 0 2px;}
-  .level-name{font-family:var(--f-body);font-size:14.5px;color:var(--ink-muted);margin-bottom:24px;}
+  .level-name{font-family:var(--f-body);font-size:14.5px;color:var(--ink-muted);margin-bottom:4px;}
+  .ielts-chip{
+    display:inline-flex;align-items:center;gap:6px;font-family:var(--f-semibold);font-size:12.5px;
+    color:var(--violet-deep);background:rgba(139,123,192,0.12);padding:5px 13px;border-radius:99px;margin-bottom:10px;
+  }
+  .confidence-note{
+    font-family:var(--f-body);font-size:12.5px;color:var(--rose);text-align:center;
+    background:rgba(181,124,134,0.08);border:1px solid rgba(181,124,134,0.25);
+    border-radius:10px;padding:9px 13px;margin-bottom:20px;line-height:1.8;
+  }
 
   .section-title{
     font-family:var(--f-semibold);font-size:13.5px;color:var(--ink);margin:24px 0 10px;
@@ -279,6 +293,13 @@
   ul.plain{margin:0;padding-right:18px;}
   ul.plain li{font-family:var(--f-body);font-size:14px;line-height:1.9;color:var(--ink-muted);margin-bottom:4px;}
   .summary-box{font-family:var(--f-body);font-size:14.5px;line-height:1.9;color:var(--ink);background:var(--card-tint);border:1px solid var(--line-warm);border-radius:14px;padding:15px 17px;}
+
+  .cat-row{margin-bottom:14px;}
+  .cat-row .cat-top{display:flex;justify-content:space-between;font-family:var(--f-semibold);font-size:13px;color:var(--ink);margin-bottom:6px;}
+  .cat-row .cat-score{color:var(--violet-deep);}
+  .cat-track{height:8px;border-radius:99px;background:var(--card-tint-2);overflow:hidden;margin-bottom:6px;}
+  .cat-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--sage),var(--gold));}
+  .cat-note{font-family:var(--f-body);font-size:12.5px;color:var(--ink-muted);line-height:1.7;}
 
   .correction-row{
     display:flex;flex-direction:column;gap:4px;padding:13px 15px;
@@ -295,16 +316,31 @@
 <div class="app" id="app"></div>
 
 <script>
-const QUESTIONS = [
-  {type:'talk', tag:'تعارف', prompt:"Let's start simple. Tell me your name, where you're from, and one thing you enjoy doing in your free time.", prompt_ar:"خلّنا نبدأ بشيء بسيط. قول لي اسمك، من وين انت، وشي وحد تحب تسويه بوقت فراغك."},
-  {type:'image', tag:'وصف صورة', prompt:"Look at this picture. Describe what you see — the place, the people, and what might be happening.", prompt_ar:"شوف هذي الصورة. وصف اللي تشوفه — المكان، الأشخاص، وايش ممكن يكون صاير.", img:'https://picsum.photos/seed/market42/800/520'},
-  {type:'talk', tag:'روتين يومي', prompt:"What do you usually do on weekends? Do you enjoy it, and why or why not?", prompt_ar:"وش تسوي عادة في نهاية الأسبوع؟ هل تستمتع فيه، وليه أو ليه لا؟"},
-  {type:'image', tag:'مقارنة', prompt:"Look at this second picture. How is it similar to or different from your own daily life?", prompt_ar:"شوف هذي الصورة الثانية. كيف تشبه أو تختلف عن حياتك اليومية؟", img:'https://picsum.photos/seed/family77/800/520'},
-  {type:'talk', tag:'رأي شخصي', prompt:"If you could change one thing about the city you live in, what would it be, and why?", prompt_ar:"لو تقدر تغيّر شي واحد بالمدينة اللي تعيش فيها، وش بيكون، وليه؟"},
-  {type:'talk', tag:'نقاش', prompt:"Some people think technology makes life easier. Others think it makes life more complicated and stressful. What's your opinion?", prompt_ar:"بعض الناس يشوفون إن التقنية تسهّل الحياة، وبعضهم يشوفون إنها تعقّدها وتزيد التوتر. وش رأيك انت؟"},
-  {type:'talk', tag:'خبرة شخصية', prompt:"Tell me about a difficult decision you once made. What did you decide, and what did you learn from it?", prompt_ar:"حدثني عن قرار صعب أخذته يوم من الأيام. وش قررت، وش تعلمت منه؟"},
-  {type:'talk', tag:'تفكير متقدم', prompt:"Imagine you were responsible for improving education in your country. What would you change first, and why?", prompt_ar:"تخيل انك مسؤول عن تطوير التعليم في بلدك. وش أول شي بتغيّره، وليه؟"}
+const LEVELS = ['A1','A2','B1','B2','C1','C2'];
+const LEVEL_AR = {A1:'مبتدئ',A2:'مبتدئ متقدم',B1:'متوسط',B2:'متوسط متقدم',C1:'متقدم',C2:'محترف'};
+
+const INTRO_QUESTION = {
+  en:"Let's start simple. Tell me your name, where you're from, and one thing you enjoy doing in your free time.",
+  ar:"خلّنا نبدأ بشيء بسيط. قول لي اسمك، من وين انت، وشي وحد تحب تسويه بوقت فراغك.",
+  type:'talk', topicCategory:'intro_daily_life'
+};
+
+const IMAGE_BANK = [
+  {
+    img:'https://picsum.photos/seed/market42/800/520',
+    en:"Look at this picture. Describe what you see — the place, the people, and what might be happening.",
+    ar:"شوف هذي الصورة. وصف اللي تشوفه — المكان، الأشخاص، وايش ممكن يكون صاير."
+  },
+  {
+    img:'https://picsum.photos/seed/family77/800/520',
+    en:"Look at this second picture. How is it similar to or different from your own daily life?",
+    ar:"شوف هذي الصورة. كيف تشبه أو تختلف عن حياتك اليومية؟"
+  }
 ];
+
+const MAX_TURNS_DEFAULT = 9;
+const EXTRA_ROUND_TURNS = 3;
+const IMAGE_TURN_POSITIONS = [1, 5];
 
 const ICON_MIC = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>';
 const ICON_STOP = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>';
@@ -312,8 +348,15 @@ const ICON_SPEAKER = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none
 
 let state = {
   screen:'intro',
-  qIndex:0,
-  answers:[],
+  turnIndex:0,
+  maxTurns: MAX_TURNS_DEFAULT,
+  currentLevelIndex: 2,
+  directionHistory: [],
+  turnLevels: [],
+  history: [],
+  currentQuestion: INTRO_QUESTION,
+  imagePointer: 0,
+  quickReply:null,
   recognitionSupported: !!(window.SpeechRecognition || window.webkitSpeechRecognition),
   isRecording:false,
   interim:'',
@@ -322,6 +365,8 @@ let state = {
   timerHandle:null,
   recognition:null,
   result:null,
+  extraRoundOffered:false,
+  pendingAction:null,
   errorMsg:''
 };
 
@@ -334,7 +379,8 @@ function render(){
   let body = '';
   if(state.screen==='intro') body = renderIntro();
   else if(state.screen==='question') body = renderQuestion();
-  else if(state.screen==='loading') body = renderLoading();
+  else if(state.screen==='loading-turn') body = renderLoading('جارٍ تجهيز السؤال التالي حسب إجابتك...');
+  else if(state.screen==='loading-final') body = renderLoading('جارٍ تحليل إجاباتك وتحديد مستواك...');
   else if(state.screen==='results') body = renderResults();
   else if(state.screen==='error') body = renderErrorScreen();
   app.innerHTML = renderBrand() + body;
@@ -343,15 +389,15 @@ function render(){
 
 function renderIntro(){
   return `
-    <div class="eyebrow">تقييم صوتي · ٨ أسئلة</div>
+    <div class="eyebrow">تقييم صوتي تكيّفي</div>
     <h1>وش مستواك بالإنجليزي؟</h1>
-    <p class="sub">محادثة قصيرة تكتشف مستواك الحقيقي حسب معيار CEFR العالمي (A1 إلى C2) — تسمع الأسئلة وتشوفها مكتوبة بالإنجليزي والعربي، وتجاوب بصوتك.</p>
+    <p class="sub">محادثة قصيرة تكتشف مستواك الحقيقي حسب معيار CEFR العالمي (A1 إلى C2) — الأسئلة تتغيّر تلقائيًا حسب أدائك، وتسمعها وتشوفها مكتوبة بالإنجليزي والعربي، وتجاوب بصوتك.</p>
     <div class="card">
       <ul class="feature-list">
-        <li><span class="dot">١</span>ثمانية أسئلة متدرجة الصعوبة — بعضها محادثة، وبعضها وصف صور.</li>
+        <li><span class="dot">١</span>حوالي ٨-٩ أسئلة تتكيّف مع مستواك أثناء المحادثة — تصعب لو جوابك قوي، وتسهل لو تحتاج وقت أكثر.</li>
         <li><span class="dot">٢</span>كل سؤال مكتوب ومترجم بالعربي، وتسمعه بصوت إنجليزي أصلي.</li>
         <li><span class="dot">٣</span>تجاوب بالتحدث مباشرة عبر الميكروفون فقط — بدون كتابة.</li>
-        <li><span class="dot">٤</span>بالنهاية تحصل على مستواك بالضبط، مع نقاط قوتك وأخطاء تحتاج تصحيح.</li>
+        <li><span class="dot">٤</span>بالنهاية تحصل على مستواك بالضبط مع تقدير IELTS تقريبي، وتفصيل ٤ فئات، ونقاط قوتك وأخطاء تحتاج تصحيح.</li>
       </ul>
       <button class="btn" id="startBtn">ابدأ الاختبار</button>
       <p class="mic-note">${state.recognitionSupported ? 'بيطلب المتصفح صلاحية الميكروفون عند أول تسجيل — وافق حتى تقدر تجاوب صوتيًا.' : 'تنبيه: هذا المتصفح لا يدعم التعرف الصوتي، يُفضّل فتح الموقع من متصفح Chrome على جهاز كمبيوتر أو أندرويد.'}</p>
@@ -360,22 +406,30 @@ function renderIntro(){
 }
 
 function renderQuestion(){
-  const q = QUESTIONS[state.qIndex];
-  const total = QUESTIONS.length;
-  const pct = Math.round((state.qIndex/total)*100);
+  const q = state.currentQuestion;
+  const total = state.maxTurns;
+  const pct = Math.round((state.turnIndex/total)*100);
   const transcriptText = (state.finalText + (state.interim?(' '+state.interim):'')).trim();
   const canGoNext = transcriptText.length>0 && !state.isRecording;
 
+  const quickReplyHtml = state.quickReply ? `
+    <div class="quick-reply">
+      <span class="qr-dot"></span>
+      <span class="qr-text"><b>${state.quickReply.en}</b><br>${state.quickReply.ar}</span>
+    </div>
+  ` : '';
+
   return `
-    <div class="progress-wrap"><span>السؤال ${state.qIndex+1} من ${total}</span><span>${pct}%</span></div>
+    <div class="progress-wrap"><span>السؤال ${state.turnIndex+1} من ${total}</span><span>${pct}%</span></div>
     <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    ${quickReplyHtml}
     <div class="card">
-      <span class="qtag">${q.tag}</span>
+      <span class="qtag">${topicLabelAr(q.topicCategory)}</span>
       ${q.img?`<img class="question-img" src="${q.img}" alt="question visual">`:''}
-      <p class="question-en">${q.prompt}</p>
+      <p class="question-en">${q.en}</p>
       <div class="question-ar-wrap">
         <span class="ar-badge">AR</span>
-        <p class="question-ar">${q.prompt_ar}</p>
+        <p class="question-ar">${q.ar}</p>
       </div>
       <button class="listen-btn" id="listenBtn">${ICON_SPEAKER} استمع للسؤال</button>
 
@@ -397,18 +451,30 @@ function renderQuestion(){
 
       <div class="row-btns">
         <button class="btn secondary" id="skipBtn">تخطي</button>
-        <button class="btn" id="nextBtn" ${canGoNext? '' : 'disabled'}>${state.qIndex===total-1?'إنهاء وتحليل النتيجة':'التالي'}</button>
+        <button class="btn" id="nextBtn" ${canGoNext? '' : 'disabled'}>${state.turnIndex===total-1?'إنهاء وتحليل النتيجة':'التالي'}</button>
       </div>
     </div>
   `;
 }
 
-function renderLoading(){
+function topicLabelAr(cat){
+  const map = {
+    intro_daily_life:'تعارف وحياة يومية',
+    describe_image:'وصف صورة',
+    opinion_reasoning:'رأي واستدلال',
+    narrative_experience:'سرد تجربة',
+    hypothetical_planning:'افتراضي وتخطيط',
+    argumentative_debate:'نقاش وتحدٍّ'
+  };
+  return map[cat] || 'محادثة';
+}
+
+function renderLoading(msg){
   return `
     <div class="card">
       <div class="loading-wrap">
         <div class="spinner"></div>
-        <p>جارٍ تحليل إجاباتك وتحديد مستواك...</p>
+        <p>${msg}</p>
       </div>
     </div>
   `;
@@ -417,14 +483,13 @@ function renderLoading(){
 function renderErrorScreen(){
   return `
     <div class="card">
-      <div class="warn">صار خطأ أثناء تحليل النتيجة: ${state.errorMsg}</div>
+      <div class="warn">صار خطأ: ${state.errorMsg}</div>
       <button class="btn" id="retryBtn">حاول مرة ثانية</button>
     </div>
   `;
 }
 
 const LEVEL_INDEX = {A1:0,A2:1,B1:2,B2:3,C1:4,C2:5};
-const LEVEL_AR = {A1:'مبتدئ',A2:'مبتدئ متقدم',B1:'متوسط',B2:'متوسط متقدم',C1:'متقدم',C2:'محترف'};
 
 function renderResults(){
   const r = state.result;
@@ -437,6 +502,14 @@ function renderResults(){
       <div class="orig">${c.original}</div>
       <div class="fixed">✓ ${c.corrected}</div>
     </div>`).join('');
+  const categories = (r.categoryScores||[]).map(c=>`
+    <div class="cat-row">
+      <div class="cat-top"><span>${c.name_ar}</span><span class="cat-score">${c.score}/100</span></div>
+      <div class="cat-track"><div class="cat-fill" style="width:${c.score}%"></div></div>
+      <div class="cat-note">${c.note_ar||''}</div>
+    </div>`).join('');
+
+  const displayedLevel = r.rangeLevel || r.level;
 
   return `
     <div class="eyebrow">نتيجة التقييم</div>
@@ -444,11 +517,17 @@ function renderResults(){
       <div class="gauge-wrap">
         <div class="gauge"><div class="needle" style="transform:rotate(${angle}deg)"></div></div>
         <div class="gauge-labels"><span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span></div>
-        <div class="level-big">${r.level}</div>
+        <div class="level-big">${displayedLevel}</div>
         <div class="level-name">${r.levelName_ar || LEVEL_AR[r.level] || ''}</div>
+        <div class="ielts-chip">تقدير IELTS تقريبي · ${r.ieltsEstimate || '—'}</div>
       </div>
 
+      ${r.lowConfidence ? `<div class="confidence-note">النتيجة تقريبية وتفاوتت إجاباتك بين مستويات متقاربة — ${state.extraRoundOffered ? 'ننصحك بجلسة ثانية لاحقًا لدقة أعلى.' : 'تقدر تسوي جولة إضافية الحين لرفع الدقة.'}</div>` : ''}
+
       <div class="summary-box">${r.summary_ar || ''}</div>
+
+      <div class="section-title"><span class="bar"></span>التفصيل حسب ٤ فئات</div>
+      ${categories}
 
       <div class="section-title"><span class="bar"></span>نقاط قوتك</div>
       <ul class="plain">${strengths}</ul>
@@ -462,10 +541,11 @@ function renderResults(){
       <div class="summary-box">${r.recommendation_ar || ''}</div>
 
       <div class="row-btns" style="margin-top:24px;">
+        ${(!state.extraRoundOffered) ? `<button class="btn secondary" id="extraRoundBtn">جولة إضافية لدقة أعلى</button>` : ''}
         <button class="btn" id="restartBtn">إعادة الاختبار</button>
       </div>
     </div>
-    <p class="footer-note">التقييم تقريبي ويعتمد على محادثة قصيرة — للحصول على تقييم رسمي معتمد يُفضّل اختبار مثل IELTS أو TOEFL.</p>
+    <p class="footer-note">التقييم يعتمد على تحليل نصّي لمحادثة قصيرة (بدون تحليل نطق صوتي حقيقي) — للحصول على تقييم رسمي معتمد يُفضّل اختبار مثل IELTS أو TOEFL.</p>
   `;
 }
 
@@ -560,14 +640,15 @@ function attachHandlers(){
   const startBtn = document.getElementById('startBtn');
   if(startBtn) startBtn.onclick = ()=>{
     state.screen = 'question';
-    state.qIndex = 0;
+    state.turnIndex = 0;
+    state.currentQuestion = INTRO_QUESTION;
     resetQuestionState();
     render();
-    speak(QUESTIONS[0].prompt);
+    speak(INTRO_QUESTION.en);
   };
 
   const listenBtn = document.getElementById('listenBtn');
-  if(listenBtn) listenBtn.onclick = ()=> speak(QUESTIONS[state.qIndex].prompt);
+  if(listenBtn) listenBtn.onclick = ()=> speak(state.currentQuestion.en);
 
   const micBtn = document.getElementById('micBtn');
   if(micBtn) micBtn.onclick = ()=>{
@@ -589,40 +670,130 @@ function attachHandlers(){
 
   const restartBtn = document.getElementById('restartBtn');
   if(restartBtn) restartBtn.onclick = ()=>{
-    state = {...state, screen:'intro', qIndex:0, answers:[], result:null, errorMsg:''};
+    state = {
+      screen:'intro', turnIndex:0, maxTurns:MAX_TURNS_DEFAULT, currentLevelIndex:2,
+      directionHistory:[], turnLevels:[], history:[], currentQuestion:INTRO_QUESTION,
+      imagePointer:0, quickReply:null,
+      recognitionSupported: state.recognitionSupported,
+      isRecording:false, interim:'', finalText:'', timerSeconds:0, timerHandle:null, recognition:null,
+      result:null, extraRoundOffered:false, pendingAction:null, errorMsg:''
+    };
     render();
   };
 
+  const extraRoundBtn = document.getElementById('extraRoundBtn');
+  if(extraRoundBtn) extraRoundBtn.onclick = ()=>{
+    state.extraRoundOffered = true;
+    state.maxTurns += EXTRA_ROUND_TURNS;
+    state.screen = 'loading-turn';
+    state.pendingAction = 'turn';
+    render();
+    fetchNextTurn();
+  };
+
   const retryBtn = document.getElementById('retryBtn');
-  if(retryBtn) retryBtn.onclick = ()=>{ state.screen='loading'; render(); runEvaluation(); };
+  if(retryBtn) retryBtn.onclick = ()=>{
+    if(state.pendingAction === 'analyze'){
+      state.screen = 'loading-final';
+      render();
+      runFinalAnalysis();
+    } else {
+      state.screen = 'loading-turn';
+      render();
+      fetchNextTurn();
+    }
+  };
 }
 
 function advance(answer){
-  const q = QUESTIONS[state.qIndex];
-  state.answers.push({prompt:q.prompt, type:q.type, answer});
+  const q = state.currentQuestion;
+  state.history.push({
+    question:q.en, question_ar:q.ar, type:q.type||'talk', topicCategory:q.topicCategory||'intro_daily_life', answer
+  });
   window.speechSynthesis && window.speechSynthesis.cancel();
   stopRecordingInternal();
 
-  if(state.qIndex < QUESTIONS.length-1){
-    state.qIndex++;
-    resetQuestionState();
+  if(state.turnIndex >= state.maxTurns - 1){
+    state.screen = 'loading-final';
+    state.pendingAction = 'analyze';
     render();
-    speak(QUESTIONS[state.qIndex].prompt);
+    runFinalAnalysis();
   } else {
-    state.screen = 'loading';
+    state.screen = 'loading-turn';
+    state.pendingAction = 'turn';
     render();
-    runEvaluation();
+    fetchNextTurn();
   }
 }
 
-async function runEvaluation(){
-  try{
-    const conversation = state.answers.map((a,i)=>`Q${i+1} [${a.type}]: ${a.prompt}\nStudent answer: ${a.answer}`).join('\n\n');
+function applyDirectionSignal(direction){
+  if(direction !== 'harder' && direction !== 'easier'){
+    state.directionHistory = [];
+    return;
+  }
+  state.directionHistory.push(direction);
+  if(state.directionHistory.length >= 2){
+    const lastTwo = state.directionHistory.slice(-2);
+    if(lastTwo[0] === lastTwo[1]){
+      state.currentLevelIndex = Math.max(0, Math.min(5,
+        state.currentLevelIndex + (direction === 'harder' ? 1 : -1)
+      ));
+      state.directionHistory = [];
+    }
+  }
+}
 
-    const resp = await fetch('/api/evaluate', {
+async function fetchNextTurn(){
+  try{
+    const resp = await fetch('/api/turn', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ conversation })
+      body: JSON.stringify({
+        history: state.history,
+        currentLevelIndex: state.currentLevelIndex,
+        turnNumber: state.turnIndex + 1,
+        maxTurns: state.maxTurns
+      })
+    });
+    const parsed = await resp.json();
+    if(!resp.ok){
+      throw new Error(parsed.error || 'Server error while generating the next question.');
+    }
+
+    if(parsed.turnCefrEstimate) state.turnLevels.push(parsed.turnCefrEstimate);
+    if(parsed.direction) applyDirectionSignal(parsed.direction);
+
+    state.turnIndex++;
+    state.quickReply = { en: parsed.quickReplyEn||'', ar: parsed.quickReplyAr||'' };
+
+    if(IMAGE_TURN_POSITIONS.includes(state.turnIndex) && state.imagePointer < IMAGE_BANK.length){
+      const img = IMAGE_BANK[state.imagePointer++];
+      state.currentQuestion = { en:img.en, ar:img.ar, img:img.img, type:'image', topicCategory:'describe_image' };
+    } else if(parsed.nextQuestion){
+      state.currentQuestion = {
+        en: parsed.nextQuestion.en, ar: parsed.nextQuestion.ar,
+        type: parsed.nextQuestion.type || 'talk', topicCategory: parsed.nextQuestion.topicCategory
+      };
+    }
+
+    resetQuestionState();
+    state.screen = 'question';
+    render();
+    speak(state.currentQuestion.en);
+  }catch(err){
+    state.errorMsg = (err && err.message) ? err.message : 'خطأ غير معروف';
+    state.screen = 'error';
+    state.pendingAction = 'turn';
+    render();
+  }
+}
+
+async function runFinalAnalysis(){
+  try{
+    const resp = await fetch('/api/analyze', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ history: state.history, turnLevels: state.turnLevels })
     });
     const parsed = await resp.json();
     if(!resp.ok){
@@ -634,6 +805,7 @@ async function runEvaluation(){
   }catch(err){
     state.errorMsg = (err && err.message) ? err.message : 'خطأ غير معروف';
     state.screen = 'error';
+    state.pendingAction = 'analyze';
     render();
   }
 }
