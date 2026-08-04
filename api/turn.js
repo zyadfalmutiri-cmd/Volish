@@ -1,0 +1,92 @@
+// api/turn.js
+// Vercel serverless function — evaluates the student's latest answer and
+// generates the next adaptive question. Called once per conversation turn.
+// Requires OPENROUTER_API_KEY env var (same as before).
+
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    res.status(500).json({
+      error: 'OPENROUTER_API_KEY is not set on the server. Add it in Vercel > Project Settings > Environment Variables, then redeploy.'
+    });
+    return;
+  }
+
+  const model = process.env.OPENROUTER_MODEL || 'anthropic/claude-sonnet-4.5';
+
+  try {
+    const { history, currentLevelIndex, turnNumber, maxTurns } = req.body || {};
+    if (!Array.isArray(history) || history.length === 0) {
+      res.status(400).json({ error: 'Missing "history" array in request body.' });
+      return;
+    }
+
+    const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+    const approxLevel = LEVELS[Math.max(0, Math.min(5, currentLevelIndex ?? 2))];
+    const isLastTurn = (turnNumber >= (maxTurns || 9));
+
+    const transcript = history.map((h, i) =>
+      `Turn ${i + 1} [${h.type}${h.topicCategory ? '/' + h.topicCategory : ''}]: ${h.question}\nStudent: ${h.answer}`
+    ).join('\n\n');
+
+    const systemPrompt = `You are an expert English speaking examiner running a live adaptive spoken interview, calibrating difficulty to the CEFR scale (A1-C2) turn by turn.
+
+Rules for adapting difficulty:
+- The student's current estimated level is ${approxLevel}. Judge ONLY the most recent answer (the last turn in the transcript).
+- Classify the most recent answer's own CEFR level (turnCefrEstimate) based on grammar accuracy, vocabulary range, coherence, and how well it actually answers what was asked. Do NOT judge pronunciation or accent — you only see a text transcript.
+- Also output "direction": whether the LAST ANSWER was "harder" (student handled the current question easily, ready for tougher), "same" (matched expectation), or "easier" (student struggled, needs a step down) relative to the question's difficulty. Do not overreact to a single answer — this signal will only be acted on by the caller after two consecutive matching signals.
+- If approxLevel is A1/A2: keep the next question short and concrete, never abstract/hypothetical, add a bit of gentle encouragement in quickReply, and never escalate right after a single weak answer.
+- If approxLevel is C1/C2: escalate faster, ask a genuine follow-up rooted in specific details from the student's actual last answer (not a generic bank question), and topics can include argumentative/debate prompts.
+- Only ask a deeper follow-up ON THE SAME TOPIC as the last question if the last answer left room to go deeper AND approxLevel is B1 or higher. Otherwise move to a fresh topic category.
+- Vary topic categories across the session. Categories: intro_daily_life, opinion_reasoning, narrative_experience, hypothetical_planning, argumentative_debate (C1+ only).
+- Write natural, everyday spoken English for questions — not textbook-formal English.
+${isLastTurn ? '- This is the FINAL turn of the session. Set "isFinal": true and "nextQuestion": null.' : '- Set "isFinal": false and provide "nextQuestion".'}
+
+Respond with ONLY valid JSON (no markdown fences, no preamble, no explanation outside the JSON). Exact schema:
+{
+  "turnCefrEstimate": "one of A1|A2|B1|B2|C1|C2",
+  "direction": "harder|same|easier",
+  "quickReplyEn": "a short (max 12 words) natural conversational reaction to the student's last answer, in English",
+  "quickReplyAr": "Gulf Arabic translation/equivalent of quickReplyEn, short",
+  "isFinal": ${isLastTurn},
+  "nextQuestion": ${isLastTurn ? 'null' : '{"en": "the next question in English", "ar": "Gulf Arabic translation of the question", "type": "talk", "topicCategory": "one of the categories above"}'}
+}`;
+
+    const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': process.env.SITE_URL || 'https://volish.vercel.app',
+        'X-Title': 'Volish'
+      },
+      body: JSON.stringify({
+        model: model,
+        max_tokens: 500,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: 'Interview transcript so far:\n\n' + transcript }
+        ]
+      })
+    });
+
+    const data = await orRes.json();
+
+    if (!orRes.ok) {
+      res.status(orRes.status).json({ error: (data && data.error && data.error.message) || 'OpenRouter API error' });
+      return;
+    }
+
+    const textOut = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+    const clean = textOut.replace(/```json/g, '').replace(/```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    res.status(200).json(parsed);
+  } catch (err) {
+    res.status(500).json({ error: (err && err.message) || 'Unknown server error' });
+  }
+};
