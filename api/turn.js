@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
   const model = process.env.OPENROUTER_MODEL || 'anthropic/claude-sonnet-4.5';
 
   try {
-    const { history, currentLevelIndex, turnNumber, maxTurns } = req.body || {};
+    const { history, currentLevelIndex, turnNumber, maxTurns, isCalibration } = req.body || {};
     if (!Array.isArray(history) || history.length === 0) {
       res.status(400).json({ error: 'Missing "history" array in request body.' });
       return;
@@ -34,6 +34,18 @@ module.exports = async (req, res) => {
       `Turn ${i + 1} [${h.type}${h.topicCategory ? '/' + h.topicCategory : ''}]: ${h.question}\nStudent: ${h.answer}`
     ).join('\n\n');
 
+    // Phase 2 UX decision: "محادثة تحديد المستوى بأول 1-2 سؤال" — the first
+    // couple of turns exist purely to establish a ballpark starting level,
+    // before the normal turn-by-turn adaptive escalation takes over. This
+    // avoids intimidating a true beginner or boring an advanced speaker
+    // while the slower two-in-a-row adaptation rule is still "warming up".
+    const calibrationInstructions = isCalibration ? `
+- IMPORTANT: this is a CALIBRATION turn (one of the first 1-2 assessed turns). Your job right now is to help place the student's ballpark CEFR level as accurately as possible from this single answer — NOT to escalate or de-escalate difficulty yet.
+- Ask the next question at a moderate, universally-approachable difficulty (a concrete, everyday question any level can attempt), regardless of the student's assumed level — do not tailor difficulty to approxLevel during calibration.
+- Still classify "turnCefrEstimate" as accurately as possible — this estimate is what determines the student's real starting level, so judge it carefully and don't default to the middle out of caution.
+- The "direction" field will be ignored by the caller during calibration — you may still fill it in, but it has no effect this turn.` : `
+- This is a normal adaptive turn (calibration is complete). Adapt difficulty using the rules below as usual.`;
+
     const systemPrompt = `You are an expert English speaking examiner running a live adaptive spoken interview, calibrating difficulty to the CEFR scale (A1-C2) turn by turn.
 
 Rules for adapting difficulty:
@@ -45,6 +57,7 @@ Rules for adapting difficulty:
 - Only ask a deeper follow-up ON THE SAME TOPIC as the last question if the last answer left room to go deeper AND approxLevel is B1 or higher. Otherwise move to a fresh topic category.
 - Vary topic categories across the session. Categories: intro_daily_life, opinion_reasoning, narrative_experience, hypothetical_planning, argumentative_debate (C1+ only).
 - Write natural, everyday spoken English for questions — not textbook-formal English.
+${calibrationInstructions}
 ${isLastTurn ? '- This is the FINAL turn of the session. Set "isFinal": true and "nextQuestion": null.' : '- Set "isFinal": false and provide "nextQuestion".'}
 
 Respond with ONLY valid JSON (no markdown fences, no preamble, no explanation outside the JSON). Exact schema:
