@@ -410,12 +410,31 @@
   .fallback-note{
     display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;
   }
+
+  /* ===== Auth screen ===== */
+  .auth-input{
+    width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--line-warm);
+    font-family:var(--f-body);font-size:14.5px;direction:ltr;text-align:left;
+    background:var(--card-tint);color:var(--ink);
+  }
+  .auth-input:focus{outline:none;border-color:var(--violet);}
+  .auth-fields{display:flex;flex-direction:column;gap:14px;}
+  .logout-btn{
+    margin-right:auto;appearance:none;border:1px solid var(--line);background:transparent;
+    color:var(--muted-on-dark);font-family:var(--f-thin);font-size:11px;
+    padding:6px 12px;border-radius:99px;cursor:pointer;direction:ltr;
+  }
 </style>
 </head>
 <body>
 <div class="app" id="app"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
+const SUPABASE_URL = 'https://strochdiezvzzqqeyqlk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cm9jaGRpZXp2enpxcWV5cWxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4NjgzNTYsImV4cCI6MjEwMTQ0NDM1Nn0.u5lXBfjrNpr8Bn_v0KrPGgDzit0kW-cByZIxxe-zsAY';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const LEVELS = ['A1','A2','B1','B2','C1','C2'];
 const LEVEL_AR = {A1:'مبتدئ',A2:'مبتدئ متقدم',B1:'متوسط',B2:'متوسط متقدم',C1:'متقدم',C2:'محترف'};
 const LEVEL_INDEX = {A1:0,A2:1,B1:2,B2:3,C1:4,C2:5};
@@ -482,7 +501,14 @@ function clearSession(){
 }
 
 let state = {
-  screen:'intro',
+  screen:'auth-loading',
+  user:null,
+  authMode:'login',
+  authEmail:'',
+  authPhone:'',
+  authPassword:'',
+  authError:'',
+  authLoading:false,
   turnIndex:0,
   maxTurns: MAX_TURNS_DEFAULT,
   currentLevelIndex: 2,
@@ -521,13 +547,16 @@ let state = {
 };
 
 function renderBrand(){
-  return `<div class="brand"><span class="brand-mark">Volish</span><span class="brand-tag">English Speaking Assessment</span></div>`;
+  const logoutHtml = state.user ? `<button id="logoutBtn" class="logout-btn">${state.user.email||'حسابي'} · تسجيل خروج</button>` : '';
+  return `<div class="brand"><span class="brand-mark">Volish</span><span class="brand-tag">English Speaking Assessment</span>${logoutHtml}</div>`;
 }
 
 function render(){
   const app = document.getElementById('app');
   let body = '';
-  if(state.screen==='intro') body = renderIntro();
+  if(state.screen==='auth-loading') body = renderLoading('جارٍ التحقق من حسابك...');
+  else if(state.screen==='auth') body = renderAuth();
+  else if(state.screen==='intro') body = renderIntro();
   else if(state.screen==='warmup') body = renderWarmup();
   else if(state.screen==='question') body = renderQuestion();
   else if(state.screen==='loading-turn') body = renderLoading('جارٍ تجهيز السؤال التالي حسب إجابتك...');
@@ -536,6 +565,25 @@ function render(){
   else if(state.screen==='error') body = renderErrorScreen();
   app.innerHTML = renderBrand() + body;
   attachHandlers();
+}
+
+function renderAuth(){
+  const isLogin = state.authMode === 'login';
+  return `
+    <div class="eyebrow">حسابك في Volish</div>
+    <h1>${isLogin ? 'سجل الدخول لبدء الاختبار' : 'أنشئ حساب جديد'}</h1>
+    <p class="sub">${isLogin ? 'سجل دخولك بالإيميل والباسورد للمتابعة وتقييم مستواك.' : 'أنشئ حسابك بالإيميل ورقم الجوال وكلمة المرور.'}</p>
+    <div class="card">
+      ${state.authError ? `<div class="warn">${state.authError}</div>` : ''}
+      <div class="auth-fields">
+        <input id="authEmail" type="email" class="auth-input" placeholder="البريد الإلكتروني" value="${state.authEmail||''}">
+        ${!isLogin ? `<input id="authPhone" type="tel" class="auth-input" placeholder="رقم الجوال" value="${state.authPhone||''}">` : ''}
+        <input id="authPassword" type="password" class="auth-input" placeholder="كلمة المرور" value="${state.authPassword||''}">
+      </div>
+      <button class="btn" id="authSubmitBtn" style="margin-top:20px;" ${state.authLoading?'disabled':''}>${state.authLoading ? 'جارٍ التحميل...' : (isLogin ? 'تسجيل الدخول' : 'إنشاء الحساب')}</button>
+      <button class="btn secondary" id="authToggleBtn" style="margin-top:12px;">${isLogin ? 'ليس لديك حساب؟ أنشئ حساب جديد' : 'لديك حساب؟ سجل الدخول'}</button>
+    </div>
+  `;
 }
 
 function renderIntro(){
@@ -982,7 +1030,119 @@ function stopWarmupRecording(){
   render();
 }
 
+async function initAuth(){
+  try{
+    const { data:{ session } } = await supabaseClient.auth.getSession();
+    if(session){
+      state.user = session.user;
+      state.screen = 'intro';
+    } else {
+      state.screen = 'auth';
+    }
+  }catch(e){
+    state.screen = 'auth';
+  }
+  supabaseClient.auth.onAuthStateChange((event, session)=>{
+    state.user = session ? session.user : null;
+    if(!session && state.screen !== 'auth'){
+      state.screen = 'auth';
+      render();
+    }
+  });
+  render();
+}
+
+async function handleSignup(){
+  if(!state.authEmail || !state.authPassword){
+    state.authError = 'الرجاء تعبئة الإيميل وكلمة المرور.';
+    render();
+    return;
+  }
+  state.authError = '';
+  state.authLoading = true;
+  render();
+  const { data, error } = await supabaseClient.auth.signUp({
+    email: state.authEmail,
+    password: state.authPassword,
+    options: { data: { phone: state.authPhone || null } }
+  });
+  state.authLoading = false;
+  if(error){
+    state.authError = error.message;
+    render();
+    return;
+  }
+  if(data.session){
+    state.user = data.user;
+    state.screen = 'intro';
+  } else {
+    state.authError = 'تم إنشاء الحساب بنجاح! تحقق من بريدك الإلكتروني لتأكيد الحساب ثم سجل الدخول.';
+    state.authMode = 'login';
+  }
+  render();
+}
+
+async function handleLogin(){
+  if(!state.authEmail || !state.authPassword){
+    state.authError = 'الرجاء تعبئة الإيميل وكلمة المرور.';
+    render();
+    return;
+  }
+  state.authError = '';
+  state.authLoading = true;
+  render();
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: state.authEmail,
+    password: state.authPassword
+  });
+  state.authLoading = false;
+  if(error){
+    state.authError = error.message;
+    render();
+    return;
+  }
+  state.user = data.user;
+  state.screen = 'intro';
+  render();
+}
+
+async function handleLogout(){
+  await supabaseClient.auth.signOut();
+  state.user = null;
+  state.screen = 'auth';
+  state.authMode = 'login';
+  state.authEmail = '';
+  state.authPhone = '';
+  state.authPassword = '';
+  state.authError = '';
+  render();
+}
+
 function attachHandlers(){
+  const authEmailInput = document.getElementById('authEmail');
+  if(authEmailInput) authEmailInput.oninput = (e)=>{ state.authEmail = e.target.value; };
+
+  const authPhoneInput = document.getElementById('authPhone');
+  if(authPhoneInput) authPhoneInput.oninput = (e)=>{ state.authPhone = e.target.value; };
+
+  const authPasswordInput = document.getElementById('authPassword');
+  if(authPasswordInput) authPasswordInput.oninput = (e)=>{ state.authPassword = e.target.value; };
+
+  const authSubmitBtn = document.getElementById('authSubmitBtn');
+  if(authSubmitBtn) authSubmitBtn.onclick = ()=>{
+    if(state.authMode === 'login') handleLogin(); else handleSignup();
+  };
+
+  const authToggleBtn = document.getElementById('authToggleBtn');
+  if(authToggleBtn) authToggleBtn.onclick = ()=>{
+    state.authMode = state.authMode === 'login' ? 'signup' : 'login';
+    state.authError = '';
+    render();
+  };
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  if(logoutBtn) logoutBtn.onclick = handleLogout;
+
   const startBtn = document.getElementById('startBtn');
   if(startBtn) startBtn.onclick = ()=>{
     // Go to warmup screen first (unless mic not supported)
@@ -1094,7 +1254,8 @@ function attachHandlers(){
       recognition:null, result:null, extraRoundOffered:false, pendingAction:null, errorMsg:'',
       calibrationEstimates:[], calibrationDone:false,
       warmupDone:false, warmupText:'', warmupInterim:'', warmupRecording:false,
-      warmupCounter:0, warmupCounterHandle:null, warmupRecognition:null
+      warmupCounter:0, warmupCounterHandle:null, warmupRecognition:null,
+      user: state.user, authMode:'login', authEmail:'', authPhone:'', authPassword:'', authError:'', authLoading:false
     };
     render();
   };
@@ -1253,7 +1414,7 @@ async function runFinalAnalysis(){
   }
 }
 
-render();
+initAuth();
 </script>
 </body>
 </html>
