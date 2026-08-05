@@ -611,6 +611,9 @@ let state = {
   /* level calibration — first 1-2 adaptive questions */
   calibrationEstimates: [],
   calibrationDone: false,
+  /* Phase 6: topic categories from this user's last completed session, used
+     to steer the opening question of a new session away from repeating them */
+  lastSessionTopics: [],
   /* warmup */
   warmupDone:false,
   warmupText:'',
@@ -1189,11 +1192,59 @@ async function initAuth(){
   }catch(e){
     state.user = null;
   }
+  if(state.user) loadLastSessionTopics();
   supabaseClient.auth.onAuthStateChange((event, session)=>{
     state.user = session ? session.user : null;
+    if(state.user) loadLastSessionTopics();
     render();
   });
   render();
+}
+
+// Phase 6: fetch the topic categories from this user's most recent saved
+// report, so the next session can steer its opening question away from
+// repeating the same topic. Soft/best-effort — never blocks the UI.
+async function loadLastSessionTopics(){
+  if(!state.user) { state.lastSessionTopics = []; return; }
+  try{
+    const { data, error } = await supabaseClient
+      .from('reports')
+      .select('topic_categories')
+      .eq('user_id', state.user.id)
+      .order('created_at', { ascending:false })
+      .limit(1);
+    if(!error && data && data[0] && Array.isArray(data[0].topic_categories)){
+      state.lastSessionTopics = data[0].topic_categories;
+    } else {
+      state.lastSessionTopics = [];
+    }
+  }catch(e){
+    state.lastSessionTopics = [];
+  }
+}
+
+// Phase 6 / Phase 3 data model: persist the finished report for logged-in
+// users (reports table) — both for their own history and so the NEXT
+// session can avoid repeating this session's opening topic categories.
+// Best-effort: a failed save should never interrupt the results screen.
+async function saveReportToSupabase(result){
+  if(!state.user) return;
+  try{
+    const topics = Array.from(new Set(state.history.map(h=>h.topicCategory).filter(Boolean)));
+    await supabaseClient.from('reports').insert({
+      user_id: state.user.id,
+      cefr_level: result.level || null,
+      range_level: result.rangeLevel || null,
+      ielts_estimate: result.ieltsEstimate || null,
+      category_scores: result.categoryScores || null,
+      strengths: result.strengths_ar || null,
+      weaknesses: result.weaknesses_ar || null,
+      corrections: result.corrections || null,
+      summary: result.summary_ar || null,
+      recommendation: result.recommendation_ar || null,
+      topic_categories: topics
+    });
+  }catch(e){ /* non-critical — never block or interrupt the results screen */ }
 }
 
 async function handleOverlaySignup(){
@@ -1495,6 +1546,10 @@ async function fetchNextTurn(){
     const turnNumber = state.turnIndex + 1; // the turn we're about to fetch a question for
     const isCalibration = !state.calibrationDone && turnNumber <= CALIBRATION_TURNS;
 
+    // Phase 6: only steer away from the LAST session's topics on the opening
+    // turns of THIS session — later turns already vary naturally within-session.
+    const avoidTopics = (turnNumber <= CALIBRATION_TURNS) ? state.lastSessionTopics : [];
+
     const resp = await fetch('/api/turn', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -1503,7 +1558,8 @@ async function fetchNextTurn(){
         currentLevelIndex: state.currentLevelIndex,
         turnNumber: turnNumber,
         maxTurns: state.maxTurns,
-        isCalibration: isCalibration
+        isCalibration: isCalibration,
+        avoidTopics: avoidTopics
       })
     });
     const parsed = await resp.json();
@@ -1560,6 +1616,7 @@ async function runFinalAnalysis(){
     state.result = parsed;
     state.screen = 'results';
     render();
+    saveReportToSupabase(parsed); // fire-and-forget — never blocks the results screen
   }catch(err){
     saveSession(); // preserve progress on network failure
     state.errorMsg = (err && err.message) ? err.message : 'خطأ غير معروف';
