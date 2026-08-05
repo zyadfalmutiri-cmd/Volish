@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Volish | تقييم مستواك في الإنجليزية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   /* ============ Brand typeface — Volish ============ */
   @font-face {
@@ -60,38 +60,42 @@
   }
 
   :root{
-    /* ===== Volish — Quiet Luxury palette ===== */
-    --bg-1:#191526;
-    --bg-2:#221C33;
-    --bg-glow:#332B4D;
-    --card:#FAF7F2;
-    --card-tint:#F3EFE8;
-    --card-tint-2:#EDE8DF;
-    --ink:#282234;
-    --ink-muted:#6E6678;
+    /* ===== Volish — Phase 4 identity: deep kohl-navy + warm gold/coral ===== */
+    --bg-1:#0D1F2C;
+    --bg-2:#132A3A;
+    --bg-glow:#1B3A4D;
+    --card:#FBF6FD;
+    --card-tint:#F3EEF5;
+    --card-tint-2:#EBE4EE;
+    --ink:#1F2A33;
+    --ink-muted:#5B6B73;
     --gold:#C6A25E;
     --gold-soft:#DFC088;
-    --violet:#8B7BC0;
-    --violet-deep:#6E5EA6;
+    --coral:#C8604E;
+    --coral-soft:#DE8A73;
     --sage:#89A992;
-    --rose:#B57C86;
-    --offwhite:#EFEBF3;
-    --muted-on-dark:#A79FB8;
-    --line:rgba(239,235,243,0.12);
-    --line-warm:#E4DDD1;
+    --violet-deep:#6E5EA6;
+    --offwhite:#EEE2EE;
+    --muted-on-dark:#9FB3BE;
+    --line:rgba(238,226,238,0.12);
+    --line-warm:#E4DDE6;
+    --focus-ring:#DFC088;
 
     --f-display:'iStoriaHeavy','iStoriaBold','Tajawal',sans-serif;
     --f-heading:'iStoriaBold','iStoriaSemiBold','Tajawal',sans-serif;
     --f-semibold:'iStoriaSemiBold','Tajawal',sans-serif;
     --f-body:'iStoriaRegular','Tajawal',sans-serif;
     --f-thin:'iStoriaThin','Tajawal',sans-serif;
+    /* Deliberate exception: the English conversation question uses a distinct
+       serif voice — visually separates "the conversation" from "the UI chrome". */
+    --f-question:'Lora','iStoriaRegular',serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:var(--bg-1);}
   body{
     background:
-      radial-gradient(1100px 520px at 82% -8%, var(--bg-glow) 0%, rgba(51,43,77,0) 55%),
-      radial-gradient(900px 500px at 10% 8%, #2A2340 0%, rgba(42,35,64,0) 50%),
+      radial-gradient(1100px 520px at 82% -8%, var(--bg-glow) 0%, rgba(27,58,77,0) 55%),
+      radial-gradient(900px 500px at 10% 8%, #17303F 0%, rgba(23,48,63,0) 50%),
       linear-gradient(180deg, var(--bg-2) 0%, var(--bg-1) 60%);
     min-height:100vh;
     font-family:var(--f-body);
@@ -100,12 +104,19 @@
     justify-content:center;
     padding:40px 18px 72px;
   }
-  .app{width:100%;max-width:640px;}
+  .app{width:100%;max-width:640px;min-width:0;}
   .brand{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
   .brand-mark{font-family:var(--f-display);font-size:25px;color:var(--gold-soft);letter-spacing:.01em;direction:ltr;}
   .brand-tag{
     font-family:var(--f-thin);font-size:10.5px;letter-spacing:.16em;color:var(--muted-on-dark);
     text-transform:uppercase;direction:ltr;padding:5px 10px;border:1px solid var(--line);border-radius:99px;
+  }
+
+  /* ===== Accessible focus states — every interactive element ===== */
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
+    outline:2.5px solid var(--focus-ring);
+    outline-offset:2px;
+    border-radius:8px;
   }
 
   .eyebrow{
@@ -116,7 +127,7 @@
     margin-bottom:8px;
     display:flex;align-items:center;gap:9px;
   }
-  .eyebrow::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--violet);box-shadow:0 0 0 4px rgba(139,123,192,0.2);}
+  .eyebrow::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 4px rgba(200,96,78,0.2);}
   h1{
     font-family:var(--f-heading);
     font-weight:400;
@@ -132,15 +143,16 @@
     color:var(--ink);
     border-radius:26px;
     padding:32px 26px;
-    box-shadow:0 30px 70px -28px rgba(12,8,26,0.7), 0 2px 0 rgba(255,255,255,0.6) inset;
+    box-shadow:0 30px 70px -28px rgba(6,14,20,0.7), 0 2px 0 rgba(255,255,255,0.6) inset;
     position:relative;
     overflow:hidden;
     border:1px solid rgba(198,162,94,0.16);
   }
   .card::before{
     content:'';position:absolute;top:0;right:0;left:0;height:3px;
-    background:linear-gradient(90deg,var(--sage),var(--gold),var(--violet));
-    opacity:.85;
+    /* Distinctive Volish top-border signature: Coral → Gold → Sage */
+    background:linear-gradient(90deg,var(--coral),var(--gold),var(--sage));
+    opacity:.9;
   }
 
   .feature-list{list-style:none;padding:0;margin:22px 0 28px;display:flex;flex-direction:column;gap:16px;}
@@ -155,13 +167,13 @@
     appearance:none;border:none;cursor:pointer;
     font-family:var(--f-semibold);font-size:15.5px;
     padding:16px 22px;border-radius:16px;min-height:52px;
-    background:linear-gradient(135deg,var(--gold-soft),var(--gold));
-    color:#2A2010;width:100%;
-    box-shadow:0 14px 30px -12px rgba(198,162,94,0.6);
+    background:linear-gradient(135deg,var(--gold-soft),var(--gold) 55%,var(--coral));
+    color:#2A1B10;width:100%;
+    box-shadow:0 14px 30px -12px rgba(198,162,94,0.55);
     transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
     display:inline-flex;align-items:center;justify-content:center;gap:8px;
   }
-  .btn:hover{transform:translateY(-1px);box-shadow:0 18px 34px -12px rgba(198,162,94,0.7);filter:brightness(1.02);}
+  .btn:hover{transform:translateY(-1px);box-shadow:0 18px 34px -12px rgba(198,162,94,0.65);filter:brightness(1.02);}
   .btn:active{transform:translateY(0);}
   .btn.secondary{
     background:transparent;color:var(--ink);border:1.5px solid var(--line-warm);
@@ -172,25 +184,26 @@
   .mic-note{font-family:var(--f-thin);font-size:12.5px;color:var(--ink-muted);text-align:center;margin-top:16px;line-height:1.8;}
 
   .progress-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-family:var(--f-thin);font-size:12px;color:var(--muted-on-dark);}
-  .progress-bar{height:6px;border-radius:99px;background:rgba(239,235,243,0.12);overflow:hidden;margin-bottom:16px;}
-  .progress-fill{height:100%;background:linear-gradient(90deg,var(--violet),var(--gold));transition:width .5s ease;}
+  .progress-bar{height:6px;border-radius:99px;background:rgba(238,226,238,0.12);overflow:hidden;margin-bottom:16px;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--violet-deep),var(--gold),var(--coral));transition:width .5s ease;}
 
   .quick-reply{
     display:flex;align-items:flex-start;gap:9px;
-    background:rgba(139,123,192,0.14);border:1px solid rgba(139,123,192,0.28);
+    background:rgba(110,94,166,0.14);border:1px solid rgba(110,94,166,0.3);
     border-radius:14px;padding:11px 14px;margin-bottom:14px;
   }
-  .quick-reply .qr-dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--violet);margin-top:6px;}
+  .quick-reply .qr-dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--violet-deep);margin-top:6px;}
   .quick-reply .qr-text{font-family:var(--f-body);font-size:13px;line-height:1.8;color:var(--offwhite);}
   .quick-reply .qr-text b{font-family:var(--f-semibold);color:var(--gold-soft);}
 
   .qtag{
     display:inline-flex;align-items:center;gap:6px;
     font-family:var(--f-semibold);font-size:11px;letter-spacing:.05em;
-    color:var(--violet-deep);background:rgba(139,123,192,0.12);padding:5px 12px;border-radius:99px;margin-bottom:18px;
+    color:var(--violet-deep);background:rgba(110,94,166,0.12);padding:5px 12px;border-radius:99px;margin-bottom:18px;
   }
+  /* Deliberate serif voice for the conversation question itself (Phase 4 identity) */
   .question-en{
-    font-family:var(--f-body);font-size:20px;line-height:1.6;color:var(--ink);
+    font-family:var(--f-question);font-style:normal;font-size:20.5px;line-height:1.6;color:var(--ink);
     direction:ltr;text-align:left;margin:0 0 10px;
   }
   .question-ar-wrap{display:flex;align-items:flex-start;gap:8px;margin:0 0 22px;padding-top:14px;border-top:1px dashed var(--line-warm);}
@@ -214,12 +227,12 @@
   .mic-btn{
     position:relative;width:92px;height:92px;border-radius:50%;border:none;cursor:pointer;
     background:linear-gradient(135deg,var(--gold-soft),var(--gold));
-    display:flex;align-items:center;justify-content:center;color:#2A2010;
+    display:flex;align-items:center;justify-content:center;color:#2A1B10;
     box-shadow:0 16px 30px -10px rgba(198,162,94,0.55);
   }
-  .mic-btn.recording{background:linear-gradient(135deg,var(--violet),var(--violet-deep));color:#FBF9FF;box-shadow:0 16px 30px -10px rgba(110,94,166,0.6);}
+  .mic-btn.recording{background:linear-gradient(135deg,var(--coral-soft),var(--coral));color:#FBF3F1;box-shadow:0 16px 30px -10px rgba(200,96,78,0.55);}
   .mic-btn .ring{
-    position:absolute;inset:-10px;border-radius:50%;border:2px solid var(--violet);
+    position:absolute;inset:-10px;border-radius:50%;border:2px solid var(--coral);
     opacity:0;
   }
   .mic-btn.recording .ring{animation:pulse 1.6s ease-out infinite;}
@@ -230,37 +243,60 @@
     100%{opacity:0;transform:scale(1.55);}
   }
   .mic-label{margin-top:16px;font-family:var(--f-body);font-size:13.5px;color:var(--ink-muted);}
-  .timer{font-family:var(--f-thin);font-size:13px;color:var(--violet-deep);margin-top:4px;min-height:18px;}
+  .timer{font-family:var(--f-thin);font-size:13px;color:var(--coral);margin-top:4px;min-height:18px;}
+
+  /* Live waveform — replaces a static box with an actual amplitude reading
+     from the mic while recording (Web Audio API), per Phase 4 spec. */
+  .waveform{
+    width:100%;height:44px;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:3px;
+  }
+  .waveform .bar{
+    flex:1;max-width:5px;min-height:4px;border-radius:3px;
+    background:linear-gradient(180deg,var(--gold),var(--coral));
+    transition:height .1s ease;
+  }
 
   .live-transcript{
-    width:100%;margin-top:20px;min-height:64px;
+    width:100%;margin-top:14px;min-height:64px;
     background:var(--card-tint);border:1.5px dashed var(--line-warm);border-radius:14px;
     padding:15px;font-family:var(--f-body);font-size:13.5px;
     color:var(--ink);direction:ltr;text-align:left;line-height:1.8;white-space:pre-wrap;
   }
-  .live-transcript.empty{color:#A79FB0;}
+  .live-transcript.empty{color:#8A8290;}
   .row-btns{display:flex;gap:12px;margin-top:20px;}
   .row-btns .btn{width:auto;flex:1;}
   .warn{
-    background:rgba(181,124,134,0.1);border:1px solid rgba(181,124,134,0.35);color:#8C4E5A;
+    background:rgba(200,96,78,0.1);border:1px solid rgba(200,96,78,0.35);color:#8C3D2E;
     font-family:var(--f-body);font-size:12.5px;padding:13px 15px;border-radius:12px;margin-bottom:16px;line-height:1.8;
   }
 
-  .loading-wrap{display:flex;flex-direction:column;align-items:center;padding:30px 10px;}
-  .spinner{width:54px;height:54px;border-radius:50%;border:4px solid var(--card-tint-2);border-top-color:var(--violet);animation:spin 1s linear infinite;margin-bottom:18px;}
-  @keyframes spin{to{transform:rotate(360deg);}}
+  /* "Thinking" state — distinctive brand pulse instead of a generic spinner */
+  .loading-wrap{display:flex;flex-direction:column;align-items:center;padding:34px 10px;}
+  .think-dots{display:flex;gap:9px;margin-bottom:20px;}
+  .think-dots span{
+    width:12px;height:12px;border-radius:50%;
+    background:linear-gradient(135deg,var(--gold),var(--coral));
+    animation:think-bounce 1.1s ease-in-out infinite;
+  }
+  .think-dots span:nth-child(2){animation-delay:.15s;background:linear-gradient(135deg,var(--coral),var(--violet-deep));}
+  .think-dots span:nth-child(3){animation-delay:.3s;background:linear-gradient(135deg,var(--violet-deep),var(--sage));}
+  @keyframes think-bounce{
+    0%,80%,100%{transform:translateY(0);opacity:.5;}
+    40%{transform:translateY(-10px);opacity:1;}
+  }
   .loading-wrap p{font-family:var(--f-body);font-size:14px;color:var(--ink-muted);}
 
   .gauge-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:8px;}
   .gauge{
     width:260px;height:132px;border-radius:130px 130px 4px 4px;position:relative;overflow:hidden;
+    /* Cold (A1) → warm (C2), consistently — matches the CEFR dial direction */
     background:conic-gradient(from 270deg at 50% 100%,
-      #7FA0C4 0deg, #7FA0C4 30deg,
-      #89A992 30deg, #89A992 60deg,
-      #C9B888 60deg, #C9B888 90deg,
-      #C6A25E 90deg, #C6A25E 120deg,
-      #A98FC0 120deg, #A98FC0 150deg,
-      #6E5EA6 150deg, #6E5EA6 180deg);
+      #6E93B8 0deg, #6E93B8 30deg,
+      #7FAE9C 30deg, #7FAE9C 60deg,
+      #9BB98A 60deg, #9BB98A 90deg,
+      #D0B36B 90deg, #D0B36B 120deg,
+      #D6935F 120deg, #D6935F 150deg,
+      #C8604E 150deg, #C8604E 180deg);
   }
   .gauge::after{
     content:'';position:absolute;left:50%;bottom:0;width:190px;height:96px;
@@ -269,6 +305,7 @@
   .needle{
     position:absolute;left:50%;bottom:0;width:3px;height:96px;background:var(--ink);
     transform-origin:bottom center;border-radius:3px;
+    transform:rotate(-90deg);
     transition:transform 1.1s cubic-bezier(.2,.9,.25,1);
   }
   .needle::after{content:'';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);width:14px;height:14px;background:var(--ink);border-radius:50%;}
@@ -277,11 +314,11 @@
   .level-name{font-family:var(--f-body);font-size:14.5px;color:var(--ink-muted);margin-bottom:4px;}
   .ielts-chip{
     display:inline-flex;align-items:center;gap:6px;font-family:var(--f-semibold);font-size:12.5px;
-    color:var(--violet-deep);background:rgba(139,123,192,0.12);padding:5px 13px;border-radius:99px;margin-bottom:10px;
+    color:var(--violet-deep);background:rgba(110,94,166,0.12);padding:5px 13px;border-radius:99px;margin-bottom:10px;
   }
   .confidence-note{
-    font-family:var(--f-body);font-size:12.5px;color:var(--rose);text-align:center;
-    background:rgba(181,124,134,0.08);border:1px solid rgba(181,124,134,0.25);
+    font-family:var(--f-body);font-size:12.5px;color:var(--coral);text-align:center;
+    background:rgba(200,96,78,0.08);border:1px solid rgba(200,96,78,0.25);
     border-radius:10px;padding:9px 13px;margin-bottom:20px;line-height:1.8;
   }
 
@@ -305,8 +342,8 @@
     display:flex;flex-direction:column;gap:4px;padding:13px 15px;
     background:var(--card-tint);border:1px solid var(--line-warm);border-radius:12px;margin-bottom:8px;
   }
-  .correction-row .orig{font-family:var(--f-body);font-size:12.5px;color:var(--rose);direction:ltr;text-align:left;text-decoration:line-through;opacity:.85;}
-  .correction-row .fixed{font-family:var(--f-body);font-size:12.5px;color:#4A7D5C;direction:ltr;text-align:left;}
+  .correction-row .orig{font-family:var(--f-body);font-size:12.5px;color:var(--coral);direction:ltr;text-align:left;text-decoration:line-through;opacity:.85;}
+  .correction-row .fixed{font-family:var(--f-body);font-size:12.5px;color:#3E7050;direction:ltr;text-align:left;}
 
   .footer-note{font-family:var(--f-thin);text-align:center;color:var(--muted-on-dark);font-size:12px;margin-top:24px;line-height:1.9;}
   .hidden{display:none !important;}
@@ -322,21 +359,20 @@
     border-radius:99px;padding:4px 12px;
   }
   .phase-badge .phase-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);}
-  .progress-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-family:var(--f-thin);font-size:12px;color:var(--muted-on-dark);}
 
   /* Short-answer hint */
   .short-hint{
     display:flex;align-items:flex-start;gap:8px;margin-top:14px;
     background:rgba(137,169,146,0.1);border:1px solid rgba(137,169,146,0.28);
     border-radius:12px;padding:10px 13px;font-family:var(--f-body);font-size:12.5px;
-    color:#4A7D5C;line-height:1.8;
+    color:#3E7050;line-height:1.8;
   }
-  .short-hint .sh-icon{flex:none;font-size:14px;margin-top:1px;}
+  .short-hint .sh-icon{flex:none;margin-top:1px;display:flex;color:#3E7050;}
 
   /* Silence prompt */
   .silence-prompt{
     margin-top:14px;padding:11px 14px;border-radius:12px;
-    background:rgba(139,123,192,0.08);border:1px solid rgba(139,123,192,0.25);
+    background:rgba(110,94,166,0.08);border:1px solid rgba(110,94,166,0.25);
     font-family:var(--f-body);font-size:12.5px;color:var(--muted-on-dark);line-height:1.8;text-align:center;
   }
 
@@ -352,7 +388,7 @@
     appearance:none;border:none;cursor:pointer;
     font-family:var(--f-semibold);font-size:13px;
     padding:9px 16px;border-radius:12px;min-height:38px;
-    background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:#2A2010;
+    background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:#2A1B10;
     box-shadow:0 8px 18px -8px rgba(198,162,94,0.5);white-space:nowrap;
   }
   .restore-banner .btn-discard{
@@ -382,7 +418,7 @@
   }
   .warmup-ok svg{color:#5C9A6A;flex:none;}
   .warmup-counter{
-    font-family:var(--f-thin);font-size:12px;color:var(--violet-deep);
+    font-family:var(--f-thin);font-size:12px;color:var(--coral);
     text-align:center;margin-top:4px;min-height:18px;
   }
   .warmup-live{
@@ -391,22 +427,23 @@
     padding:13px 14px;font-family:var(--f-body);font-size:13px;
     color:var(--ink);direction:ltr;text-align:left;line-height:1.8;
   }
-  .warmup-live.empty{color:#A79FB0;}
+  .warmup-live.empty{color:#8A8290;}
 
   /* ===== Phase 2 (round 2) additions: calibration + text fallback ===== */
   .calibration-note{
     display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;
-    background:rgba(139,123,192,0.12);border:1px solid rgba(139,123,192,0.3);
+    background:rgba(110,94,166,0.12);border:1px solid rgba(110,94,166,0.3);
     border-radius:12px;padding:11px 14px;font-family:var(--f-body);font-size:12.5px;
     color:var(--offwhite);line-height:1.8;
   }
+  .calibration-note svg{flex:none;margin-top:1px;color:var(--gold-soft);}
   .text-fallback{
     width:100%;min-height:110px;margin-top:6px;
     background:var(--card-tint);border:1.5px solid var(--line-warm);border-radius:14px;
-    padding:14px 15px;font-family:var(--f-body);font-size:14px;
+    padding:14px 15px;font-family:var(--f-question);font-size:14.5px;
     color:var(--ink);direction:ltr;text-align:left;line-height:1.8;resize:vertical;
   }
-  .text-fallback:focus{outline:none;border-color:var(--violet);}
+  .text-fallback:focus{outline:none;border-color:var(--violet-deep);}
   .fallback-note{
     display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;
   }
@@ -417,12 +454,44 @@
     font-family:var(--f-body);font-size:14.5px;direction:ltr;text-align:left;
     background:var(--card-tint);color:var(--ink);
   }
-  .auth-input:focus{outline:none;border-color:var(--violet);}
+  .auth-input:focus{outline:none;border-color:var(--violet-deep);}
   .auth-fields{display:flex;flex-direction:column;gap:14px;}
   .logout-btn{
     margin-right:auto;appearance:none;border:1px solid var(--line);background:transparent;
     color:var(--muted-on-dark);font-family:var(--f-thin);font-size:11px;
     padding:6px 12px;border-radius:99px;cursor:pointer;direction:ltr;
+  }
+
+  /* ===== Signup overlay ===== */
+  .overlay-backdrop{
+    position:fixed;inset:0;background:rgba(13,31,44,0.72);backdrop-filter:blur(3px);
+    display:flex;align-items:flex-end;justify-content:center;z-index:50;padding:0 18px;
+  }
+  @media (min-width:520px){
+    .overlay-backdrop{align-items:center;}
+  }
+  .overlay-card{width:100%;max-width:440px;margin-bottom:18px;animation:overlay-rise .25s ease;}
+  @keyframes overlay-rise{
+    from{opacity:0;transform:translateY(16px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  /* ===== Respect reduced-motion preference — no non-essential looping motion ===== */
+  @media (prefers-reduced-motion: reduce){
+    .mic-btn.recording .ring{animation:none;opacity:0;}
+    .think-dots span{animation:none;opacity:.85;}
+    .needle{transition:none;}
+    .overlay-card{animation:none;}
+    .btn, .listen-btn{transition:none;}
+    .waveform .bar{transition:none;}
+  }
+
+  /* ===== Minimum-width safety (320px) ===== */
+  @media (max-width:360px){
+    .card{padding:24px 18px;}
+    h1{font-size:25px;}
+    .gauge{width:220px;height:112px;}
+    .gauge-labels{width:220px;}
   }
 </style>
 </head>
@@ -471,6 +540,8 @@ const ICON_MIC = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" st
 const ICON_STOP = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>';
 const ICON_SPEAKER = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>';
 const ICON_KEYBOARD = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="6" y1="9" x2="6" y2="9.01"></line><line x1="10" y1="9" x2="10" y2="9.01"></line><line x1="14" y1="9" x2="14" y2="9.01"></line><line x1="18" y1="9" x2="18" y2="9.01"></line><line x1="6" y1="13" x2="18" y2="13"></line></svg>';
+const ICON_TARGET = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>';
+const ICON_BULB = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"></path></svg>';
 
 const SAVED_SESSION_KEY = 'volish_saved_session';
 
@@ -547,7 +618,12 @@ let state = {
   warmupRecording:false,
   warmupCounter:0,
   warmupCounterHandle:null,
-  warmupRecognition:null
+  warmupRecognition:null,
+  /* live waveform (Web Audio API) */
+  audioCtx:null,
+  analyser:null,
+  waveformRAF:null,
+  waveformBars:new Array(28).fill(4)
 };
 
 function renderBrand(){
@@ -567,6 +643,7 @@ function render(){
   else if(state.screen==='error') body = renderErrorScreen();
   app.innerHTML = renderBrand() + body;
   attachHandlers();
+  drawWaveformBars();
 }
 
 function renderIntro(){
@@ -641,6 +718,7 @@ function renderWarmup(){
           </button>
           <div class="mic-label">اضغط للإيقاف</div>
           <div class="warmup-counter">${state.warmupCounter > 0 ? formatTime(state.warmupCounter) : ''}</div>
+          <div class="waveform" id="waveformWarmup"></div>
         </div>
       ` : `
         <div class="rec-zone">
@@ -690,7 +768,7 @@ function renderQuestion(){
   ` : '';
 
   const calibrationNoteHtml = (!state.calibrationDone && state.turnIndex>=1) ? `
-    <div class="calibration-note">🎯 أول سؤالين نحدد فيها مستواك التقريبي، وبعدها الأسئلة تتكيّف بدقة أكثر.</div>
+    <div class="calibration-note">${ICON_TARGET} أول سؤالين نحدد فيها مستواك التقريبي، وبعدها الأسئلة تتكيّف بدقة أكثر.</div>
   ` : '';
 
   return `
@@ -728,6 +806,7 @@ function renderQuestion(){
           </button>
           <div class="mic-label">${state.isRecording? 'اضغط للإيقاف' : (transcriptText? 'اضغط لإعادة التسجيل' : 'اضغط وابدأ الكلام بالإنجليزي')}</div>
           <div class="timer">${state.isRecording? formatTime(state.timerSeconds) : ''}</div>
+          ${state.isRecording ? `<div class="waveform" id="waveformMain"></div>` : ''}
           <div class="live-transcript ${transcriptText? '' : 'empty'}">${transcriptText || 'سيظهر كلامك مكتوبًا هنا أثناء التسجيل...'}</div>
           ${state.showSilencePrompt && state.isRecording ? `<div class="silence-prompt">خذ وقتك — قول أي شيء يجي ببالك عن الموضوع 😊</div>` : ''}
         </div>
@@ -735,7 +814,7 @@ function renderQuestion(){
 
       ${showShortHint ? `
         <div class="short-hint">
-          <span class="sh-icon">💡</span>
+          <span class="sh-icon">${ICON_BULB}</span>
           جاوبت قصير — حاول تضيف جملة أو جملتين للحصول على تقييم أدق
         </div>
       ` : ''}
@@ -764,7 +843,7 @@ function renderLoading(msg){
   return `
     <div class="card">
       <div class="loading-wrap">
-        <div class="spinner"></div>
+        <div class="think-dots"><span></span><span></span><span></span></div>
         <p>${msg}</p>
       </div>
     </div>
@@ -827,7 +906,7 @@ function renderResults(){
     <div class="eyebrow">نتيجة التقييم</div>
     <div class="card">
       <div class="gauge-wrap">
-        <div class="gauge"><div class="needle" style="transform:rotate(${angle}deg)"></div></div>
+        <div class="gauge"><div class="needle" id="resultNeedle" data-angle="${angle}"></div></div>
         <div class="gauge-labels"><span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span></div>
         <div class="level-big">${displayedLevel}</div>
         <div class="level-name">${r.levelName_ar || LEVEL_AR[r.level] || ''}</div>
@@ -875,6 +954,51 @@ function speak(text){
   u.lang = 'en-US';
   u.rate = 0.95;
   window.speechSynthesis.speak(u);
+}
+
+/* ===== Live waveform (Web Audio API) — Phase 4 ===== */
+function startWaveform(stream){
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC || !stream) return;
+    state.audioCtx = new AC();
+    const source = state.audioCtx.createMediaStreamSource(stream);
+    state.analyser = state.audioCtx.createAnalyser();
+    state.analyser.fftSize = 64;
+    source.connect(state.analyser);
+    const dataArray = new Uint8Array(state.analyser.frequencyBinCount);
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const tick = ()=>{
+      if(!state.analyser) return;
+      state.analyser.getByteFrequencyData(dataArray);
+      const bars = state.waveformBars.length;
+      const step = Math.floor(dataArray.length/bars) || 1;
+      for(let i=0;i<bars;i++){
+        const v = dataArray[i*step] || 0;
+        state.waveformBars[i] = reduceMotion ? 8 : Math.max(4, Math.round((v/255)*40));
+      }
+      drawWaveformBars();
+      state.waveformRAF = requestAnimationFrame(tick);
+    };
+    tick();
+  }catch(e){ /* mic-level waveform is a nicety, never blocks the flow */ }
+}
+function stopWaveform(){
+  if(state.waveformRAF){ cancelAnimationFrame(state.waveformRAF); state.waveformRAF=null; }
+  if(state.audioCtx){ try{ state.audioCtx.close(); }catch(e){} state.audioCtx=null; }
+  state.analyser = null;
+  state.waveformBars = new Array(28).fill(4);
+}
+function drawWaveformBars(){
+  ['waveformMain','waveformWarmup'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(el.childElementCount !== state.waveformBars.length){
+      el.innerHTML = state.waveformBars.map(()=>'<span class="bar"></span>').join('');
+    }
+    const bars = el.children;
+    for(let i=0;i<bars.length;i++){ bars[i].style.height = state.waveformBars[i]+'px'; }
+  });
 }
 
 function resetQuestionState(){
@@ -930,6 +1054,7 @@ function startRecording(){
         state.isRecording = false;
         if(state.timerHandle){ clearInterval(state.timerHandle); state.timerHandle=null; }
         if(state.silenceHandle){ clearInterval(state.silenceHandle); state.silenceHandle=null; }
+        stopWaveform();
         render();
       }
     };
@@ -950,6 +1075,13 @@ function startRecording(){
     }, 1000);
     rec.start();
     render();
+    // Web Audio API waveform runs alongside SpeechRecognition, on its own mic stream
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+      navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+        state._micStream = stream;
+        startWaveform(stream);
+      }).catch(()=>{});
+    }
   }catch(err){
     state.errorMsg = 'ما قدرنا نبدأ التسجيل. حاول مرة ثانية أو اكتب إجابتك.';
     render();
@@ -964,6 +1096,8 @@ function stopRecordingInternal(){
   if(state.recognition){
     try{ state.recognition.stop(); }catch(e){}
   }
+  stopWaveform();
+  if(state._micStream){ try{ state._micStream.getTracks().forEach(t=>t.stop()); }catch(e){} state._micStream=null; }
 }
 
 function stopRecording(){
@@ -1023,6 +1157,12 @@ function startWarmupRecording(){
     }, 1000);
     rec.start();
     render();
+    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+      navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
+        state._micStream = stream;
+        startWaveform(stream);
+      }).catch(()=>{});
+    }
   }catch(err){
     state.warmupDone = true;
     render();
@@ -1033,6 +1173,8 @@ function stopWarmupRecording(){
   state.warmupRecording = false;
   if(state.warmupCounterHandle){ clearInterval(state.warmupCounterHandle); state.warmupCounterHandle=null; }
   if(state.warmupRecognition){ try{ state.warmupRecognition.stop(); }catch(e){} }
+  stopWaveform();
+  if(state._micStream){ try{ state._micStream.getTracks().forEach(t=>t.stop()); }catch(e){} state._micStream=null; }
   if(state.warmupText || state.warmupInterim) state.warmupDone = true;
   render();
 }
@@ -1257,6 +1399,7 @@ function attachHandlers(){
       calibrationEstimates:[], calibrationDone:false,
       warmupDone:false, warmupText:'', warmupInterim:'', warmupRecording:false,
       warmupCounter:0, warmupCounterHandle:null, warmupRecognition:null,
+      audioCtx:null, analyser:null, waveformRAF:null, waveformBars:new Array(28).fill(4),
       user: state.user,
       signupDismissed:false, overlayMode:'signup', overlayEmail:'', overlayPhone:'', overlayPassword:'', overlayError:'', overlayLoading:false
     };
@@ -1285,6 +1428,15 @@ function attachHandlers(){
       fetchNextTurn();
     }
   };
+
+  // Level gauge — animate the needle in exactly once on entry (Phase 4)
+  const resultNeedle = document.getElementById('resultNeedle');
+  if(resultNeedle){
+    const angle = resultNeedle.getAttribute('data-angle');
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{ resultNeedle.style.transform = `rotate(${angle}deg)`; });
+    });
+  }
 }
 
 function advance(answer){
