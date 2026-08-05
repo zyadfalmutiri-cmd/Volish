@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
   const model = process.env.OPENROUTER_MODEL || 'anthropic/claude-sonnet-4.5';
 
   try {
-    const { history, currentLevelIndex, turnNumber, maxTurns, isCalibration } = req.body || {};
+    const { history, currentLevelIndex, turnNumber, maxTurns, isCalibration, avoidTopics } = req.body || {};
     if (!Array.isArray(history) || history.length === 0) {
       res.status(400).json({ error: 'Missing "history" array in request body.' });
       return;
@@ -46,6 +46,13 @@ module.exports = async (req, res) => {
 - The "direction" field will be ignored by the caller during calibration — you may still fill it in, but it has no effect this turn.` : `
 - This is a normal adaptive turn (calibration is complete). Adapt difficulty using the rules below as usual.`;
 
+    // Phase 6: returning users shouldn't get the same opening topic category
+    // as their last session (per the ProgressSnapshot/reports history). This
+    // is a soft steer, not a hard ban — never force an awkward question.
+    const avoidTopicsList = Array.isArray(avoidTopics) ? avoidTopics.filter(Boolean) : [];
+    const avoidTopicsInstructions = avoidTopicsList.length ? `
+- This student has a previous session on record. Their last session opened with these topic categories: ${avoidTopicsList.join(', ')}. Prefer a DIFFERENT topic category for this question if one fits just as naturally — avoid repeating the same opening topic across sessions. This is a soft preference: never force an awkward or unnatural question just to dodge a topic.` : '';
+
     const systemPrompt = `You are an expert English speaking examiner running a live adaptive spoken interview, calibrating difficulty to the CEFR scale (A1-C2) turn by turn.
 
 Rules for adapting difficulty:
@@ -58,6 +65,7 @@ Rules for adapting difficulty:
 - Vary topic categories across the session. Categories: intro_daily_life, opinion_reasoning, narrative_experience, hypothetical_planning, argumentative_debate (C1+ only).
 - Write natural, everyday spoken English for questions — not textbook-formal English.
 ${calibrationInstructions}
+${avoidTopicsInstructions}
 ${isLastTurn ? '- This is the FINAL turn of the session. Set "isFinal": true and "nextQuestion": null.' : '- Set "isFinal": false and provide "nextQuestion".'}
 
 Respond with ONLY valid JSON (no markdown fences, no preamble, no explanation outside the JSON). Exact schema:
