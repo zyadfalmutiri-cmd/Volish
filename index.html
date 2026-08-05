@@ -501,14 +501,18 @@ function clearSession(){
 }
 
 let state = {
-  screen:'auth-loading',
+  screen:'intro',
   user:null,
-  authMode:'login',
-  authEmail:'',
-  authPhone:'',
-  authPassword:'',
-  authError:'',
-  authLoading:false,
+  /* signup overlay shown on top of the results screen (Phase 2/3 UX: sign up
+     AFTER the first experience, as a light overlay over the report — never a
+     gate before the test, never a separate blocking page) */
+  signupDismissed:false,
+  overlayMode:'signup',
+  overlayEmail:'',
+  overlayPhone:'',
+  overlayPassword:'',
+  overlayError:'',
+  overlayLoading:false,
   turnIndex:0,
   maxTurns: MAX_TURNS_DEFAULT,
   currentLevelIndex: 2,
@@ -554,9 +558,7 @@ function renderBrand(){
 function render(){
   const app = document.getElementById('app');
   let body = '';
-  if(state.screen==='auth-loading') body = renderLoading('جارٍ التحقق من حسابك...');
-  else if(state.screen==='auth') body = renderAuth();
-  else if(state.screen==='intro') body = renderIntro();
+  if(state.screen==='intro') body = renderIntro();
   else if(state.screen==='warmup') body = renderWarmup();
   else if(state.screen==='question') body = renderQuestion();
   else if(state.screen==='loading-turn') body = renderLoading('جارٍ تجهيز السؤال التالي حسب إجابتك...');
@@ -565,25 +567,6 @@ function render(){
   else if(state.screen==='error') body = renderErrorScreen();
   app.innerHTML = renderBrand() + body;
   attachHandlers();
-}
-
-function renderAuth(){
-  const isLogin = state.authMode === 'login';
-  return `
-    <div class="eyebrow">حسابك في Volish</div>
-    <h1>${isLogin ? 'سجل الدخول لبدء الاختبار' : 'أنشئ حساب جديد'}</h1>
-    <p class="sub">${isLogin ? 'سجل دخولك بالإيميل والباسورد للمتابعة وتقييم مستواك.' : 'أنشئ حسابك بالإيميل ورقم الجوال وكلمة المرور.'}</p>
-    <div class="card">
-      ${state.authError ? `<div class="warn">${state.authError}</div>` : ''}
-      <div class="auth-fields">
-        <input id="authEmail" type="email" class="auth-input" placeholder="البريد الإلكتروني" value="${state.authEmail||''}">
-        ${!isLogin ? `<input id="authPhone" type="tel" class="auth-input" placeholder="رقم الجوال" value="${state.authPhone||''}">` : ''}
-        <input id="authPassword" type="password" class="auth-input" placeholder="كلمة المرور" value="${state.authPassword||''}">
-      </div>
-      <button class="btn" id="authSubmitBtn" style="margin-top:20px;" ${state.authLoading?'disabled':''}>${state.authLoading ? 'جارٍ التحميل...' : (isLogin ? 'تسجيل الدخول' : 'إنشاء الحساب')}</button>
-      <button class="btn secondary" id="authToggleBtn" style="margin-top:12px;">${isLogin ? 'ليس لديك حساب؟ أنشئ حساب جديد' : 'لديك حساب؟ سجل الدخول'}</button>
-    </div>
-  `;
 }
 
 function renderIntro(){
@@ -797,6 +780,28 @@ function renderErrorScreen(){
   `;
 }
 
+function renderSignupOverlay(){
+  const isSignup = state.overlayMode === 'signup';
+  return `
+    <div class="overlay-backdrop" id="overlayBackdrop">
+      <div class="card overlay-card">
+        <div class="eyebrow">${isSignup ? 'احفظ نتيجتك' : 'سجل الدخول'}</div>
+        <h1 style="font-size:22px;">${isSignup ? 'سجل عشان تحفظ تقدمك' : 'سجل الدخول لحسابك'}</h1>
+        <p class="sub" style="margin-bottom:18px;">${isSignup ? 'أنشئ حساب بسيط عشان نحفظ نتيجتك ونتابع تطورك بمحاولات جاية — أو تقدر تتخطى وتشوف نتيجتك الحين.' : 'سجل دخولك لحسابك الحالي.'}</p>
+        ${state.overlayError ? `<div class="warn">${state.overlayError}</div>` : ''}
+        <div class="auth-fields">
+          <input id="overlayEmail" type="email" class="auth-input" placeholder="البريد الإلكتروني" value="${state.overlayEmail||''}">
+          ${isSignup ? `<input id="overlayPhone" type="tel" class="auth-input" placeholder="رقم الجوال (اختياري)" value="${state.overlayPhone||''}">` : ''}
+          <input id="overlayPassword" type="password" class="auth-input" placeholder="كلمة المرور" value="${state.overlayPassword||''}">
+        </div>
+        <button class="btn" id="overlaySubmitBtn" style="margin-top:18px;" ${state.overlayLoading?'disabled':''}>${state.overlayLoading ? 'جارٍ التحميل...' : (isSignup ? 'إنشاء الحساب' : 'تسجيل الدخول')}</button>
+        <button class="btn secondary" id="overlayToggleBtn" style="margin-top:10px;">${isSignup ? 'لديك حساب؟ سجل الدخول' : 'ليس لديك حساب؟ أنشئه'}</button>
+        <button class="btn secondary" id="overlaySkipBtn" style="margin-top:10px;border:none;color:var(--muted-on-dark);">تخطي وعرض نتيجتي</button>
+      </div>
+    </div>
+  `;
+}
+
 function renderResults(){
   const r = state.result;
   const idx = LEVEL_INDEX[r.level] ?? 2;
@@ -816,6 +821,7 @@ function renderResults(){
     </div>`).join('');
 
   const displayedLevel = r.rangeLevel || r.level;
+  const showOverlay = !state.user && !state.signupDismissed;
 
   return `
     <div class="eyebrow">نتيجة التقييم</div>
@@ -852,6 +858,7 @@ function renderResults(){
       </div>
     </div>
     <p class="footer-note">التقييم يعتمد على تحليل نصّي لمحادثة قصيرة (بدون تحليل نطق صوتي حقيقي) — للحصول على تقييم رسمي معتمد يُفضّل اختبار مثل IELTS أو TOEFL.</p>
+    ${showOverlay ? renderSignupOverlay() : ''}
   `;
 }
 
@@ -1031,112 +1038,107 @@ function stopWarmupRecording(){
 }
 
 async function initAuth(){
+  // Silent background session check — never blocks or gates the UI.
+  // Guests go straight into the flow; if a session already exists we just
+  // reflect it (logout button, and no signup overlay after the test).
   try{
     const { data:{ session } } = await supabaseClient.auth.getSession();
-    if(session){
-      state.user = session.user;
-      state.screen = 'intro';
-    } else {
-      state.screen = 'auth';
-    }
+    state.user = session ? session.user : null;
   }catch(e){
-    state.screen = 'auth';
+    state.user = null;
   }
   supabaseClient.auth.onAuthStateChange((event, session)=>{
     state.user = session ? session.user : null;
-    if(!session && state.screen !== 'auth'){
-      state.screen = 'auth';
-      render();
-    }
+    render();
   });
   render();
 }
 
-async function handleSignup(){
-  if(!state.authEmail || !state.authPassword){
-    state.authError = 'الرجاء تعبئة الإيميل وكلمة المرور.';
+async function handleOverlaySignup(){
+  if(!state.overlayEmail || !state.overlayPassword){
+    state.overlayError = 'الرجاء تعبئة الإيميل وكلمة المرور.';
     render();
     return;
   }
-  state.authError = '';
-  state.authLoading = true;
+  state.overlayError = '';
+  state.overlayLoading = true;
   render();
   const { data, error } = await supabaseClient.auth.signUp({
-    email: state.authEmail,
-    password: state.authPassword,
-    options: { data: { phone: state.authPhone || null } }
+    email: state.overlayEmail,
+    password: state.overlayPassword,
+    options: { data: { phone: state.overlayPhone || null } }
   });
-  state.authLoading = false;
+  state.overlayLoading = false;
   if(error){
-    state.authError = error.message;
+    state.overlayError = error.message;
     render();
     return;
   }
   if(data.session){
     state.user = data.user;
-    state.screen = 'intro';
+    state.signupDismissed = true; // signed up successfully — overlay is done
   } else {
-    state.authError = 'تم إنشاء الحساب بنجاح! تحقق من بريدك الإلكتروني لتأكيد الحساب ثم سجل الدخول.';
-    state.authMode = 'login';
+    state.overlayError = 'تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتأكيد الحساب ثم سجل الدخول.';
+    state.overlayMode = 'login';
   }
   render();
 }
 
-async function handleLogin(){
-  if(!state.authEmail || !state.authPassword){
-    state.authError = 'الرجاء تعبئة الإيميل وكلمة المرور.';
+async function handleOverlayLogin(){
+  if(!state.overlayEmail || !state.overlayPassword){
+    state.overlayError = 'الرجاء تعبئة الإيميل وكلمة المرور.';
     render();
     return;
   }
-  state.authError = '';
-  state.authLoading = true;
+  state.overlayError = '';
+  state.overlayLoading = true;
   render();
   const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: state.authEmail,
-    password: state.authPassword
+    email: state.overlayEmail,
+    password: state.overlayPassword
   });
-  state.authLoading = false;
+  state.overlayLoading = false;
   if(error){
-    state.authError = error.message;
+    state.overlayError = error.message;
     render();
     return;
   }
   state.user = data.user;
-  state.screen = 'intro';
+  state.signupDismissed = true;
   render();
 }
 
 async function handleLogout(){
   await supabaseClient.auth.signOut();
   state.user = null;
-  state.screen = 'auth';
-  state.authMode = 'login';
-  state.authEmail = '';
-  state.authPhone = '';
-  state.authPassword = '';
-  state.authError = '';
   render();
 }
 
 function attachHandlers(){
-  const authEmailInput = document.getElementById('authEmail');
-  if(authEmailInput) authEmailInput.oninput = (e)=>{ state.authEmail = e.target.value; };
+  const overlayEmailInput = document.getElementById('overlayEmail');
+  if(overlayEmailInput) overlayEmailInput.oninput = (e)=>{ state.overlayEmail = e.target.value; };
 
-  const authPhoneInput = document.getElementById('authPhone');
-  if(authPhoneInput) authPhoneInput.oninput = (e)=>{ state.authPhone = e.target.value; };
+  const overlayPhoneInput = document.getElementById('overlayPhone');
+  if(overlayPhoneInput) overlayPhoneInput.oninput = (e)=>{ state.overlayPhone = e.target.value; };
 
-  const authPasswordInput = document.getElementById('authPassword');
-  if(authPasswordInput) authPasswordInput.oninput = (e)=>{ state.authPassword = e.target.value; };
+  const overlayPasswordInput = document.getElementById('overlayPassword');
+  if(overlayPasswordInput) overlayPasswordInput.oninput = (e)=>{ state.overlayPassword = e.target.value; };
 
-  const authSubmitBtn = document.getElementById('authSubmitBtn');
-  if(authSubmitBtn) authSubmitBtn.onclick = ()=>{
-    if(state.authMode === 'login') handleLogin(); else handleSignup();
+  const overlaySubmitBtn = document.getElementById('overlaySubmitBtn');
+  if(overlaySubmitBtn) overlaySubmitBtn.onclick = ()=>{
+    if(state.overlayMode === 'signup') handleOverlaySignup(); else handleOverlayLogin();
   };
 
-  const authToggleBtn = document.getElementById('authToggleBtn');
-  if(authToggleBtn) authToggleBtn.onclick = ()=>{
-    state.authMode = state.authMode === 'login' ? 'signup' : 'login';
-    state.authError = '';
+  const overlayToggleBtn = document.getElementById('overlayToggleBtn');
+  if(overlayToggleBtn) overlayToggleBtn.onclick = ()=>{
+    state.overlayMode = state.overlayMode === 'signup' ? 'login' : 'signup';
+    state.overlayError = '';
+    render();
+  };
+
+  const overlaySkipBtn = document.getElementById('overlaySkipBtn');
+  if(overlaySkipBtn) overlaySkipBtn.onclick = ()=>{
+    state.signupDismissed = true;
     render();
   };
 
@@ -1255,7 +1257,8 @@ function attachHandlers(){
       calibrationEstimates:[], calibrationDone:false,
       warmupDone:false, warmupText:'', warmupInterim:'', warmupRecording:false,
       warmupCounter:0, warmupCounterHandle:null, warmupRecognition:null,
-      user: state.user, authMode:'login', authEmail:'', authPhone:'', authPassword:'', authError:'', authLoading:false
+      user: state.user,
+      signupDismissed:false, overlayMode:'signup', overlayEmail:'', overlayPhone:'', overlayPassword:'', overlayError:'', overlayLoading:false
     };
     render();
   };
@@ -1414,6 +1417,7 @@ async function runFinalAnalysis(){
   }
 }
 
+render();
 initAuth();
 </script>
 </body>
