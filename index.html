@@ -105,7 +105,12 @@
     padding:40px 18px 72px;
   }
   .app{width:100%;max-width:640px;min-width:0;}
-  .brand{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:28px;flex-wrap:wrap;}
+  .nav-link{
+    appearance:none;border:1px solid var(--line);background:transparent;
+    color:var(--gold-soft);font-family:var(--f-thin);font-size:11px;
+    padding:6px 12px;border-radius:99px;cursor:pointer;
+  }
   .brand-mark{font-family:var(--f-display);font-size:25px;color:var(--gold-soft);letter-spacing:.01em;direction:ltr;}
   .brand-tag{
     font-family:var(--f-thin);font-size:10.5px;letter-spacing:.16em;color:var(--muted-on-dark);
