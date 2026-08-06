@@ -631,12 +631,27 @@ let state = {
   audioCtx:null,
   analyser:null,
   waveformRAF:null,
-  waveformBars:new Array(28).fill(4)
+  waveformBars:new Array(28).fill(4),
+  /* DB-backed session tracking (logged-in users only) */
+  currentSessionId:null,
+  /* history / dashboard / settings / plan screens */
+  historyReports:null,
+  progressSnapshots:null,
+  currentPlan:null,
+  planLoading:false,
+  planError:''
 };
 
 function renderBrand(){
   const logoutHtml = state.user ? `<button id="logoutBtn" class="logout-btn">${state.user.email||'حسابي'} · تسجيل خروج</button>` : '';
-  return `<div class="brand"><span class="brand-mark">Volish</span><span class="brand-tag">English Speaking Assessment</span>${logoutHtml}</div>`;
+  // Only show nav on screens where switching away won't lose test progress
+  const safeScreens = ['intro','history','dashboard','settings','plan'];
+  const navHtml = (state.user && safeScreens.includes(state.screen)) ? `
+    <button class="nav-link" id="navDashboard">لوحتي</button>
+    <button class="nav-link" id="navHistory">السجل</button>
+    <button class="nav-link" id="navSettings">الإعدادات</button>
+  ` : '';
+  return `<div class="brand"><span class="brand-mark">Volish</span><span class="brand-tag">English Speaking Assessment</span>${navHtml}${logoutHtml}</div>`;
 }
 
 function render(){
@@ -649,6 +664,10 @@ function render(){
   else if(state.screen==='loading-final') body = renderLoading('جارٍ تحليل إجاباتك وتحديد مستواك...');
   else if(state.screen==='results') body = renderResults();
   else if(state.screen==='error') body = renderErrorScreen();
+  else if(state.screen==='history') body = renderHistory();
+  else if(state.screen==='dashboard') body = renderDashboard();
+  else if(state.screen==='settings') body = renderSettings();
+  else if(state.screen==='plan') body = renderPlan();
   app.innerHTML = renderBrand() + body;
   attachHandlers();
   drawWaveformBars();
@@ -867,6 +886,155 @@ function renderErrorScreen(){
   `;
 }
 
+/* ===== History screen ===== */
+async function ensureHistoryLoaded(){
+  if(state.historyReports !== null || !state.user) return;
+  try{
+    const { data, error } = await supabaseClient
+      .from('reports')
+      .select('id, cefr_level, range_level, ielts_estimate, summary, created_at')
+      .eq('user_id', state.user.id)
+      .order('created_at', { ascending:false })
+      .limit(30);
+    state.historyReports = (!error && data) ? data : [];
+  }catch(e){ state.historyReports = []; }
+  render();
+}
+
+function renderHistory(){
+  if(state.historyReports === null){ ensureHistoryLoaded(); }
+  const rows = state.historyReports || [];
+  const listHtml = rows.length ? rows.map(r=>{
+    const d = new Date(r.created_at);
+    const dateStr = d.toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' });
+    return `
+      <div class="warmup-step" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:11px;">
+          <span class="ws-num">${r.cefr_level||'—'}</span>
+          <span>${dateStr} · IELTS ${r.ielts_estimate||'—'}</span>
+        </div>
+      </div>`;
+  }).join('') : `<p class="sub" style="margin:0;">ما عندك جلسات مكتملة بعد.</p>`;
+
+  return `
+    <div class="eyebrow">سجل جلساتك</div>
+    <h1>محاولاتك السابقة</h1>
+    <div class="card">
+      ${state.historyReports === null ? renderLoading('جارٍ تحميل السجل...') : listHtml}
+    </div>
+  `;
+}
+
+/* ===== Dashboard screen ===== */
+async function ensureProgressLoaded(){
+  if(state.progressSnapshots !== null || !state.user) return;
+  try{
+    const { data, error } = await supabaseClient
+      .from('progress_snapshots')
+      .select('cefr_level, date')
+      .eq('user_id', state.user.id)
+      .order('date', { ascending:true })
+      .limit(50);
+    state.progressSnapshots = (!error && data) ? data : [];
+  }catch(e){ state.progressSnapshots = []; }
+  render();
+}
+
+function renderDashboard(){
+  if(state.progressSnapshots === null){ ensureProgressLoaded(); }
+  const snaps = state.progressSnapshots || [];
+  const rowsHtml = snaps.length ? snaps.map(s=>{
+    const d = new Date(s.date);
+    const dateStr = d.toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' });
+    const idx = LEVEL_INDEX[s.cefr_level] ?? 0;
+    const pct = Math.round(((idx+1)/6)*100);
+    return `
+      <div class="cat-row">
+        <div class="cat-top"><span>${dateStr}</span><span class="cat-score">${s.cefr_level}</span></div>
+        <div class="cat-track"><div class="cat-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  }).join('') : `<p class="sub" style="margin:0;">ما عندك بيانات تقدم بعد — كمّل أول جلسة عشان تبدأ يتكوّن المنحنى.</p>`;
+
+  return `
+    <div class="eyebrow">لوحة المتابعة</div>
+    <h1>تقدمك عبر الوقت</h1>
+    <div class="card">
+      ${state.progressSnapshots === null ? renderLoading('جارٍ تحميل بيانات التقدم...') : rowsHtml}
+    </div>
+  `;
+}
+
+/* ===== Settings screen ===== */
+function renderSettings(){
+  return `
+    <div class="eyebrow">إعدادات الحساب</div>
+    <h1>حسابك</h1>
+    <div class="card">
+      <p class="sub" style="margin-bottom:6px;">البريد الإلكتروني</p>
+      <p style="font-family:var(--f-semibold);color:var(--ink);margin:0 0 20px;">${state.user ? state.user.email : '—'}</p>
+      <button class="btn secondary" id="settingsLogoutBtn">تسجيل خروج</button>
+    </div>
+  `;
+}
+
+/* ===== Learning plan screen ===== */
+async function ensurePlanLoaded(report){
+  if(state.currentPlan || state.planLoading) return;
+  state.planLoading = true;
+  state.planError = '';
+  render();
+  try{
+    const resp = await fetch('/api/plan', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ report })
+    });
+    const parsed = await resp.json();
+    if(!resp.ok) throw new Error(parsed.error || 'Server error while generating the plan.');
+    state.currentPlan = parsed;
+    // best-effort save — never blocks the screen
+    if(state.user){
+      try{
+        await supabaseClient.from('learning_plans').insert({
+          user_id: state.user.id,
+          weekly_goals: parsed.weeklyGoals || null,
+          suggested_exercises: parsed.suggestedExercises || null
+        });
+      }catch(e){}
+    }
+  }catch(err){
+    state.planError = (err && err.message) ? err.message : 'خطأ غير معروف';
+  }
+  state.planLoading = false;
+  render();
+}
+
+function renderPlan(){
+  if(!state.result) return renderErrorScreen();
+  if(!state.currentPlan && !state.planLoading && !state.planError) ensurePlanLoaded(state.result);
+  if(state.planLoading) return renderLoading('جارٍ إعداد خطتك الأسبوعية...');
+  if(state.planError) return `<div class="card"><div class="warn">صار خطأ: ${state.planError}</div><button class="btn" id="retryPlanBtn">حاول مرة ثانية</button></div>`;
+
+  const goals = (state.currentPlan.weeklyGoals||[]).map(g=>`<li>${g}</li>`).join('');
+  const exercises = (state.currentPlan.suggestedExercises||[]).map(ex=>`
+    <div class="correction-row">
+      <div style="font-family:var(--f-semibold);font-size:13px;color:var(--ink);">${ex.title_ar}</div>
+      <div style="font-family:var(--f-body);font-size:12.5px;color:var(--ink-muted);line-height:1.8;">${ex.description_ar}</div>
+    </div>`).join('');
+
+  return `
+    <div class="eyebrow">خطتك الأسبوعية</div>
+    <h1>خطة التحسين الشخصية</h1>
+    <div class="card">
+      <div class="section-title"><span class="bar"></span>أهداف هذا الأسبوع</div>
+      <ul class="plain">${goals}</ul>
+      <div class="section-title"><span class="bar"></span>تمارين مقترحة</div>
+      ${exercises}
+      <button class="btn" id="planBackBtn" style="margin-top:22px;">رجوع للتقرير</button>
+    </div>
+  `;
+}
+
 function renderSignupOverlay(){
   const isSignup = state.overlayMode === 'signup';
   return `
@@ -943,6 +1111,7 @@ function renderResults(){
         ${(!state.extraRoundOffered) ? `<button class="btn secondary" id="extraRoundBtn">جولة إضافية لدقة أعلى</button>` : ''}
         <button class="btn" id="restartBtn">إعادة الاختبار</button>
       </div>
+      <button class="btn secondary" id="planBtn" style="margin-top:12px;">خطة التحسين الشخصية</button>
     </div>
     <p class="footer-note">التقييم يعتمد على تحليل نصّي لمحادثة قصيرة (بدون تحليل نطق صوتي حقيقي) — للحصول على تقييم رسمي معتمد يُفضّل اختبار مثل IELTS أو TOEFL.</p>
     ${showOverlay ? renderSignupOverlay() : ''}
@@ -1228,6 +1397,48 @@ async function loadLastSessionTopics(){
   }
 }
 
+// Create a DB-backed session row when the test actually starts (logged-in
+// users only — guests keep working exactly as before via localStorage).
+async function createSessionRecord(){
+  state.currentSessionId = null;
+  if(!state.user) return;
+  try{
+    const { data, error } = await supabaseClient
+      .from('sessions')
+      .insert({ user_id: state.user.id, status:'in_progress' })
+      .select('id')
+      .single();
+    if(!error && data) state.currentSessionId = data.id;
+  }catch(e){ /* non-critical — session just won't be trackable in history */ }
+}
+
+// Persist each turn as it's answered (best-effort, never blocks the flow).
+async function saveTurnRecord(turnIndex, q, answer, turnCefrEstimate){
+  if(!state.user || !state.currentSessionId) return;
+  try{
+    await supabaseClient.from('turns').insert({
+      session_id: state.currentSessionId,
+      turn_index: turnIndex,
+      question_en: q.en, question_ar: q.ar,
+      topic_category: q.topicCategory || null,
+      answer, turn_cefr_estimate: turnCefrEstimate || null
+    });
+  }catch(e){}
+}
+
+// Mark the session completed + drop a progress snapshot for the dashboard.
+async function completeSessionRecord(finalLevel){
+  if(!state.user || !state.currentSessionId) return;
+  try{
+    await supabaseClient.from('sessions')
+      .update({ status:'completed', completed_at:new Date().toISOString() })
+      .eq('id', state.currentSessionId);
+    await supabaseClient.from('progress_snapshots').insert({
+      user_id: state.user.id, session_id: state.currentSessionId, cefr_level: finalLevel
+    });
+  }catch(e){}
+}
+
 // Phase 6 / Phase 3 data model: persist the finished report for logged-in
 // users (reports table) — both for their own history and so the NEXT
 // session can avoid repeating this session's opening topic categories.
@@ -1238,6 +1449,7 @@ async function saveReportToSupabase(result){
     const topics = Array.from(new Set(state.history.map(h=>h.topicCategory).filter(Boolean)));
     await supabaseClient.from('reports').insert({
       user_id: state.user.id,
+      session_id: state.currentSessionId || null,
       cefr_level: result.level || null,
       range_level: result.rangeLevel || null,
       ielts_estimate: result.ieltsEstimate || null,
@@ -1343,6 +1555,27 @@ function attachHandlers(){
   const logoutBtn = document.getElementById('logoutBtn');
   if(logoutBtn) logoutBtn.onclick = handleLogout;
 
+  const settingsLogoutBtn = document.getElementById('settingsLogoutBtn');
+  if(settingsLogoutBtn) settingsLogoutBtn.onclick = handleLogout;
+
+  const navDashboard = document.getElementById('navDashboard');
+  if(navDashboard) navDashboard.onclick = ()=>{ state.screen='dashboard'; render(); };
+
+  const navHistory = document.getElementById('navHistory');
+  if(navHistory) navHistory.onclick = ()=>{ state.screen='history'; render(); };
+
+  const navSettings = document.getElementById('navSettings');
+  if(navSettings) navSettings.onclick = ()=>{ state.screen='settings'; render(); };
+
+  const planBtn = document.getElementById('planBtn');
+  if(planBtn) planBtn.onclick = ()=>{ state.screen='plan'; render(); };
+
+  const planBackBtn = document.getElementById('planBackBtn');
+  if(planBackBtn) planBackBtn.onclick = ()=>{ state.screen='results'; render(); };
+
+  const retryPlanBtn = document.getElementById('retryPlanBtn');
+  if(retryPlanBtn) retryPlanBtn.onclick = ()=>{ state.planError=''; render(); };
+
   const startBtn = document.getElementById('startBtn');
   if(startBtn) startBtn.onclick = ()=>{
     // Go to warmup screen first (unless mic not supported)
@@ -1401,6 +1634,7 @@ function attachHandlers(){
     resetQuestionState();
     render();
     speak(INTRO_QUESTION.en);
+    createSessionRecord(); // fire-and-forget — logged-in users only
   };
 
   const listenBtn = document.getElementById('listenBtn');
@@ -1457,7 +1691,9 @@ function attachHandlers(){
       warmupCounter:0, warmupCounterHandle:null, warmupRecognition:null,
       audioCtx:null, analyser:null, waveformRAF:null, waveformBars:new Array(28).fill(4),
       user: state.user,
-      signupDismissed:false, overlayMode:'signup', overlayEmail:'', overlayPhone:'', overlayPassword:'', overlayError:'', overlayLoading:false
+      signupDismissed:false, overlayMode:'signup', overlayEmail:'', overlayPhone:'', overlayPassword:'', overlayError:'', overlayLoading:false,
+      currentSessionId:null, historyReports:null, progressSnapshots:null,
+      currentPlan:null, planLoading:false, planError:''
     };
     render();
   };
@@ -1500,6 +1736,7 @@ function advance(answer){
   state.history.push({
     question:q.en, question_ar:q.ar, type:q.type||'talk', topicCategory:q.topicCategory||'intro_daily_life', answer
   });
+  saveTurnRecord(state.turnIndex, q, answer, (state.turnLevels||[])[state.turnLevels.length-1]);
   window.speechSynthesis && window.speechSynthesis.cancel();
   stopRecordingInternal();
 
@@ -1622,6 +1859,7 @@ async function runFinalAnalysis(){
     state.screen = 'results';
     render();
     saveReportToSupabase(parsed); // fire-and-forget — never blocks the results screen
+    completeSessionRecord(parsed.level);
   }catch(err){
     saveSession(); // preserve progress on network failure
     state.errorMsg = (err && err.message) ? err.message : 'خطأ غير معروف';
