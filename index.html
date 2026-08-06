@@ -639,8 +639,166 @@ let state = {
   progressSnapshots:null,
   currentPlan:null,
   planLoading:false,
-  planError:''
+  planError:'',
+  /* ===== Routing additions ===== */
+  reportLoading:false,
+  reportError:'',
+  viewingHistoricalReport:false,
+  pendingDeepLink:null
 };
+
+/* =========================================================================
+   URL ROUTING
+   Maps in-app "screens" to real browser URLs via the History API, so that:
+   - the back/forward buttons work as expected
+   - /report/:id is a real, shareable, reloadable link to a saved report
+   - /dashboard /history /settings /plan are real, bookmarkable URLs
+   Requires a Vercel rewrite (vercel.json) sending all non-/api paths to
+   index.html so a hard refresh on a deep URL still boots the SPA.
+   ========================================================================= */
+let suppressRouting = false;
+
+function screenToPath(){
+  switch(state.screen){
+    case 'intro': return '/';
+    case 'warmup': return '/warmup';
+    case 'question':
+    case 'loading-turn':
+    case 'loading-final':
+      return '/session';
+    case 'results':
+      return (state.result && state.result.reportId) ? ('/report/' + state.result.reportId) : '/report';
+    case 'report-loading':
+      return state.pendingDeepLink ? ('/report/' + state.pendingDeepLink) : '/report';
+    case 'plan': return '/plan';
+    case 'dashboard': return '/dashboard';
+    case 'history': return '/history';
+    case 'settings': return '/settings';
+    default: return null; // 'error' and unknown screens: don't touch the URL
+  }
+}
+
+function syncUrl(replace){
+  if(suppressRouting) return;
+  const path = screenToPath();
+  if(path === null) return;
+  if(location.pathname === path) return;
+  const fn = replace ? 'replaceState' : 'pushState';
+  history[fn]({ screen: state.screen }, '', path);
+}
+
+// Navigate to a screen from a user action (adds a new history entry unless
+// the target path is identical to the current one, e.g. moving between the
+// question/loading-turn/loading-final states which all live at /session).
+function goTo(screen, opts){
+  state.screen = screen;
+  if(opts && opts.replace) syncUrl(true); else syncUrl(false);
+  render();
+}
+
+// Handle browser Back/Forward. Best-effort: screens that depend on in-memory
+// state which no longer exists (e.g. an in-progress test after a hard
+// back-navigation) safely fall back to the home screen instead of breaking.
+window.addEventListener('popstate', ()=>{
+  suppressRouting = true;
+  routeFromPath(location.pathname, true);
+  suppressRouting = false;
+});
+
+function routeFromPath(path, isPopState){
+  if(path === '/' || path === ''){
+    state.screen = 'intro';
+    render();
+    return;
+  }
+  if(path === '/history'){
+    state.screen = state.user ? 'history' : 'intro';
+    render();
+    return;
+  }
+  if(path === '/dashboard'){
+    state.screen = state.user ? 'dashboard' : 'intro';
+    render();
+    return;
+  }
+  if(path === '/settings'){
+    state.screen = state.user ? 'settings' : 'intro';
+    render();
+    return;
+  }
+  if(path === '/plan'){
+    // Only meaningful with an active result in memory (fresh completion or
+    // a report already loaded this session) — otherwise send home.
+    state.screen = state.result ? 'plan' : 'intro';
+    render();
+    return;
+  }
+  if(path.indexOf('/report/') === 0){
+    const id = path.slice('/report/'.length);
+    if(id) loadReportById(id, isPopState);
+    else { state.screen = 'intro'; render(); }
+    return;
+  }
+  if(path === '/report'){
+    state.screen = state.result ? 'results' : 'intro';
+    render();
+    return;
+  }
+  // '/warmup' and '/session' cold-loads have no reconstructable in-memory
+  // test state (questions, mic permissions, timers) — send home rather than
+  // showing a broken mid-flow screen.
+  state.screen = 'intro';
+  render();
+}
+
+// Open a saved report by id — used both for deep links (cold load / back
+// button) and for clicking a row in the History screen.
+async function loadReportById(id, isPopState){
+  state.screen = 'report-loading';
+  state.pendingDeepLink = id;
+  if(!isPopState) syncUrl(false);
+  render();
+  if(!state.user){
+    // Reports are RLS-protected to their owner — without a session there is
+    // nothing valid to fetch. Send the guest home rather than spinning forever.
+    state.screen = 'intro';
+    syncUrl(true);
+    render();
+    return;
+  }
+  try{
+    const { data, error } = await supabaseClient
+      .from('reports')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if(error || !data) throw new Error('ما قدرنا نلقى هذا التقرير.');
+    state.result = {
+      reportId: data.id,
+      level: data.cefr_level,
+      rangeLevel: data.range_level,
+      ieltsEstimate: data.ielts_estimate,
+      categoryScores: data.category_scores || [],
+      strengths_ar: data.strengths || [],
+      weaknesses_ar: data.weaknesses || [],
+      corrections: data.corrections || [],
+      summary_ar: data.summary || '',
+      recommendation_ar: data.recommendation || '',
+      lowConfidence: false,
+      levelName_ar: LEVEL_AR[data.cefr_level] || ''
+    };
+    state.viewingHistoricalReport = true;
+    state.signupDismissed = true; // never show the signup overlay on a historical view
+    state.screen = 'results';
+    if(!isPopState) syncUrl(true);
+    render();
+  }catch(err){
+    state.reportError = (err && err.message) ? err.message : 'خطأ غير معروف';
+    state.screen = 'error';
+    state.errorMsg = state.reportError;
+    render();
+  }
+}
 
 function renderBrand(){
   const logoutHtml = state.user ? `<button id="logoutBtn" class="logout-btn">${state.user.email||'حسابي'} · تسجيل خروج</button>` : '';
@@ -662,6 +820,7 @@ function render(){
   else if(state.screen==='question') body = renderQuestion();
   else if(state.screen==='loading-turn') body = renderLoading('جارٍ تجهيز السؤال التالي حسب إجابتك...');
   else if(state.screen==='loading-final') body = renderLoading('جارٍ تحليل إجاباتك وتحديد مستواك...');
+  else if(state.screen==='report-loading') body = renderLoading('جارٍ تحميل التقرير...');
   else if(state.screen==='results') body = renderResults();
   else if(state.screen==='error') body = renderErrorScreen();
   else if(state.screen==='history') body = renderHistory();
@@ -882,6 +1041,7 @@ function renderErrorScreen(){
     <div class="card">
       <div class="warn">صار خطأ: ${state.errorMsg}</div>
       <button class="btn" id="retryBtn">حاول مرة ثانية</button>
+      <button class="btn secondary" id="errorHomeBtn" style="margin-top:12px;">الرجوع للرئيسية</button>
     </div>
   `;
 }
@@ -908,12 +1068,13 @@ function renderHistory(){
     const d = new Date(r.created_at);
     const dateStr = d.toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' });
     return `
-      <div class="warmup-step" style="justify-content:space-between;">
+      <button class="warmup-step history-row" data-report-id="${r.id}" style="justify-content:space-between;width:100%;border:none;cursor:pointer;text-align:right;">
         <div style="display:flex;align-items:center;gap:11px;">
           <span class="ws-num">${r.cefr_level||'—'}</span>
           <span>${dateStr} · IELTS ${r.ielts_estimate||'—'}</span>
         </div>
-      </div>`;
+        <span style="color:var(--ink-muted);">←</span>
+      </button>`;
   }).join('') : `<p class="sub" style="margin:0;">ما عندك جلسات مكتملة بعد.</p>`;
 
   return `
@@ -1077,9 +1238,11 @@ function renderResults(){
 
   const displayedLevel = r.rangeLevel || r.level;
   const showOverlay = !state.user && !state.signupDismissed;
+  const historical = !!state.viewingHistoricalReport;
 
   return `
-    <div class="eyebrow">نتيجة التقييم</div>
+    <div class="eyebrow">${historical ? 'تقرير محفوظ' : 'نتيجة التقييم'}</div>
+    ${historical ? `<button class="listen-btn" id="backToHistoryBtn" style="margin-bottom:16px;">→ الرجوع للسجل</button>` : ''}
     <div class="card">
       <div class="gauge-wrap">
         <div class="gauge"><div class="needle" id="resultNeedle" data-angle="${angle}"></div></div>
@@ -1108,8 +1271,8 @@ function renderResults(){
       <div class="summary-box">${r.recommendation_ar || ''}</div>
 
       <div class="row-btns" style="margin-top:24px;">
-        ${(!state.extraRoundOffered) ? `<button class="btn secondary" id="extraRoundBtn">جولة إضافية لدقة أعلى</button>` : ''}
-        <button class="btn" id="restartBtn">إعادة الاختبار</button>
+        ${(!historical && !state.extraRoundOffered) ? `<button class="btn secondary" id="extraRoundBtn">جولة إضافية لدقة أعلى</button>` : ''}
+        <button class="btn" id="restartBtn">${historical ? 'اختبار جديد' : 'إعادة الاختبار'}</button>
       </div>
       <button class="btn secondary" id="planBtn" style="margin-top:12px;">خطة التحسين الشخصية</button>
     </div>
@@ -1372,7 +1535,12 @@ async function initAuth(){
     if(state.user) loadLastSessionTopics();
     render();
   });
-  render();
+  // Resolve the initial URL now that we know whether the visitor is logged
+  // in — this is what makes /dashboard, /history, /settings, and
+  // /report/:id work as real, reloadable, shareable links.
+  suppressRouting = true;
+  routeFromPath(location.pathname, true);
+  suppressRouting = false;
 }
 
 // Phase 6: fetch the topic categories from this user's most recent saved
@@ -1443,11 +1611,13 @@ async function completeSessionRecord(finalLevel){
 // users (reports table) — both for their own history and so the NEXT
 // session can avoid repeating this session's opening topic categories.
 // Best-effort: a failed save should never interrupt the results screen.
+// On success, records the new report's id in state.result.reportId so the
+// results screen's URL can immediately become a real, shareable /report/:id.
 async function saveReportToSupabase(result){
   if(!state.user) return;
   try{
     const topics = Array.from(new Set(state.history.map(h=>h.topicCategory).filter(Boolean)));
-    await supabaseClient.from('reports').insert({
+    const { data, error } = await supabaseClient.from('reports').insert({
       user_id: state.user.id,
       session_id: state.currentSessionId || null,
       cefr_level: result.level || null,
@@ -1460,7 +1630,11 @@ async function saveReportToSupabase(result){
       summary: result.summary_ar || null,
       recommendation: result.recommendation_ar || null,
       topic_categories: topics
-    });
+    }).select('id').single();
+    if(!error && data && state.screen === 'results'){
+      state.result.reportId = data.id;
+      syncUrl(true); // upgrade the URL from /report to /report/:id in place
+    }
   }catch(e){ /* non-critical — never block or interrupt the results screen */ }
 }
 
@@ -1559,19 +1733,32 @@ function attachHandlers(){
   if(settingsLogoutBtn) settingsLogoutBtn.onclick = handleLogout;
 
   const navDashboard = document.getElementById('navDashboard');
-  if(navDashboard) navDashboard.onclick = ()=>{ state.screen='dashboard'; render(); };
+  if(navDashboard) navDashboard.onclick = ()=> goTo('dashboard');
 
   const navHistory = document.getElementById('navHistory');
-  if(navHistory) navHistory.onclick = ()=>{ state.screen='history'; render(); };
+  if(navHistory) navHistory.onclick = ()=> goTo('history');
 
   const navSettings = document.getElementById('navSettings');
-  if(navSettings) navSettings.onclick = ()=>{ state.screen='settings'; render(); };
+  if(navSettings) navSettings.onclick = ()=> goTo('settings');
 
   const planBtn = document.getElementById('planBtn');
-  if(planBtn) planBtn.onclick = ()=>{ state.screen='plan'; render(); };
+  if(planBtn) planBtn.onclick = ()=> goTo('plan');
 
   const planBackBtn = document.getElementById('planBackBtn');
-  if(planBackBtn) planBackBtn.onclick = ()=>{ state.screen='results'; render(); };
+  if(planBackBtn) planBackBtn.onclick = ()=> goTo('results');
+
+  const backToHistoryBtn = document.getElementById('backToHistoryBtn');
+  if(backToHistoryBtn) backToHistoryBtn.onclick = ()=> goTo('history');
+
+  const errorHomeBtn = document.getElementById('errorHomeBtn');
+  if(errorHomeBtn) errorHomeBtn.onclick = ()=>{ state.errorMsg=''; goTo('intro'); };
+
+  document.querySelectorAll('.history-row').forEach(el=>{
+    el.onclick = ()=>{
+      const id = el.getAttribute('data-report-id');
+      if(id) loadReportById(id, false);
+    };
+  });
 
   const retryPlanBtn = document.getElementById('retryPlanBtn');
   if(retryPlanBtn) retryPlanBtn.onclick = ()=>{ state.planError=''; render(); };
@@ -1579,12 +1766,11 @@ function attachHandlers(){
   const startBtn = document.getElementById('startBtn');
   if(startBtn) startBtn.onclick = ()=>{
     // Go to warmup screen first (unless mic not supported)
-    state.screen = 'warmup';
     state.warmupDone = false;
     state.warmupText = '';
     state.warmupInterim = '';
     state.warmupRecording = false;
-    render();
+    goTo('warmup');
   };
 
   const resumeBtn = document.getElementById('resumeBtn');
@@ -1603,9 +1789,8 @@ function attachHandlers(){
     state.calibrationEstimates = saved.calibrationEstimates || [];
     state.calibrationDone = saved.calibrationDone || false;
     clearSession();
-    state.screen = 'question';
     resetQuestionState();
-    render();
+    goTo('question');
     speak(state.currentQuestion.en);
   };
 
@@ -1628,11 +1813,10 @@ function attachHandlers(){
   const warmupNextBtn = document.getElementById('warmupNextBtn');
   if(warmupNextBtn) warmupNextBtn.onclick = ()=>{
     if(state.warmupRecording) stopWarmupRecording();
-    state.screen = 'question';
     state.turnIndex = 0;
     state.currentQuestion = INTRO_QUESTION;
     resetQuestionState();
-    render();
+    goTo('question');
     speak(INTRO_QUESTION.en);
     createSessionRecord(); // fire-and-forget — logged-in users only
   };
@@ -1693,8 +1877,10 @@ function attachHandlers(){
       user: state.user,
       signupDismissed:false, overlayMode:'signup', overlayEmail:'', overlayPhone:'', overlayPassword:'', overlayError:'', overlayLoading:false,
       currentSessionId:null, historyReports:null, progressSnapshots:null,
-      currentPlan:null, planLoading:false, planError:''
+      currentPlan:null, planLoading:false, planError:'',
+      reportLoading:false, reportError:'', viewingHistoricalReport:false, pendingDeepLink:null
     };
+    syncUrl(false);
     render();
   };
 
@@ -1702,21 +1888,18 @@ function attachHandlers(){
   if(extraRoundBtn) extraRoundBtn.onclick = ()=>{
     state.extraRoundOffered = true;
     state.maxTurns += EXTRA_ROUND_TURNS;
-    state.screen = 'loading-turn';
     state.pendingAction = 'turn';
-    render();
+    goTo('loading-turn');
     fetchNextTurn();
   };
 
   const retryBtn = document.getElementById('retryBtn');
   if(retryBtn) retryBtn.onclick = ()=>{
     if(state.pendingAction === 'analyze'){
-      state.screen = 'loading-final';
-      render();
+      goTo('loading-final');
       runFinalAnalysis();
     } else {
-      state.screen = 'loading-turn';
-      render();
+      goTo('loading-turn');
       fetchNextTurn();
     }
   };
@@ -1741,14 +1924,12 @@ function advance(answer){
   stopRecordingInternal();
 
   if(state.turnIndex >= state.maxTurns - 1){
-    state.screen = 'loading-final';
     state.pendingAction = 'analyze';
-    render();
+    goTo('loading-final');
     runFinalAnalysis();
   } else {
-    state.screen = 'loading-turn';
     state.pendingAction = 'turn';
-    render();
+    goTo('loading-turn');
     fetchNextTurn();
   }
 }
@@ -1831,15 +2012,13 @@ async function fetchNextTurn(){
     }
 
     resetQuestionState();
-    state.screen = 'question';
-    render();
+    goTo('question');
     speak(state.currentQuestion.en);
   }catch(err){
     saveSession(); // preserve progress on network failure
     state.errorMsg = (err && err.message) ? err.message : 'خطأ غير معروف';
-    state.screen = 'error';
     state.pendingAction = 'turn';
-    render();
+    goTo('error');
   }
 }
 
@@ -1856,16 +2035,15 @@ async function runFinalAnalysis(){
     }
     clearSession(); // analysis done — no need to keep the saved session
     state.result = parsed;
-    state.screen = 'results';
-    render();
+    state.viewingHistoricalReport = false;
+    goTo('results');
     saveReportToSupabase(parsed); // fire-and-forget — never blocks the results screen
     completeSessionRecord(parsed.level);
   }catch(err){
     saveSession(); // preserve progress on network failure
     state.errorMsg = (err && err.message) ? err.message : 'خطأ غير معروف';
-    state.screen = 'error';
     state.pendingAction = 'analyze';
-    render();
+    goTo('error');
   }
 }
 
