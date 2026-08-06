@@ -2,7 +2,8 @@
   "name": "volish",
   "version": "1.0.0",
   "private": true,
-    "node": "20.x"
+  "engines": {
+    "node": "24.x"
   },
   "scripts": {
     "start": "node server.js",
