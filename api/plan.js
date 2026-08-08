@@ -1,7 +1,7 @@
 // api/plan.js
 // Vercel serverless function — generates a personalized ONE-WEEK study plan
 // from an already-completed report (weaknesses/strengths/level).
-// Requires OPENROUTER_API_KEY env var (same as turn.js / analyze.js).
+// Requires GEMINI_API_KEY env var (Google AI Studio, free tier).
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -9,15 +9,15 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const apiKey = process.env.OPENROUTER_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     res.status(500).json({
-      error: 'OPENROUTER_API_KEY is not set on the server. Add it in Vercel > Project Settings > Environment Variables, then redeploy.'
+      error: 'GEMINI_API_KEY is not set on the server. Add it in Vercel > Project Settings > Environment Variables, then redeploy.'
     });
     return;
   }
 
-  const model = process.env.OPENROUTER_MODEL || 'anthropic/claude-sonnet-4.5';
+  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
   try {
     const { report } = req.body || {};
@@ -44,32 +44,34 @@ Respond with ONLY valid JSON (no markdown fences, no preamble, no explanation ou
 }
 Limit "suggestedExercises" to at most 5 items. Be concrete and specific to this student's actual weaknesses — never generic "practice more" advice.`;
 
-    const orRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': process.env.SITE_URL || 'https://volish.vercel.app',
-        'X-Title': 'Volish'
-      },
-      body: JSON.stringify({
-        model: model,
-        max_tokens: 700,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: 'Generate this week\'s plan now.' }
-        ]
-      })
-    });
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          contents: [
+            { role: 'user', parts: [{ text: 'Generate this week\'s plan now.' }] }
+          ],
+          generationConfig: {
+            maxOutputTokens: 700,
+            responseMimeType: 'application/json'
+          }
+        })
+      }
+    );
 
-    const data = await orRes.json();
+    const data = await geminiRes.json();
 
-    if (!orRes.ok) {
-      res.status(orRes.status).json({ error: (data && data.error && data.error.message) || 'OpenRouter API error' });
+    if (!geminiRes.ok) {
+      res.status(geminiRes.status).json({ error: (data && data.error && data.error.message) || 'Gemini API error' });
       return;
     }
 
-    const textOut = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+    const textOut = (data.candidates && data.candidates[0] && data.candidates[0].content &&
+      data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
+      data.candidates[0].content.parts[0].text) || '';
     const clean = textOut.replace(/```json/g, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(clean);
 
