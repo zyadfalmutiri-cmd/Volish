@@ -57,7 +57,8 @@ Limit "suggestedExercises" to at most 5 items. Be concrete and specific to this 
           ],
           generationConfig: {
             maxOutputTokens: 700,
-            responseMimeType: 'application/json'
+            responseMimeType: 'application/json',
+            thinkingConfig: { thinkingLevel: 'low' }
           }
         })
       }
