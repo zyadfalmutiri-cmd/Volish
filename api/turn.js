@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
 
   try {
     const { history, currentLevelIndex, turnNumber, maxTurns, isCalibration, avoidTopics } = req.body || {};
