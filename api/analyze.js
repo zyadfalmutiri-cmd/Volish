@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
 
   const IELTS_BY_CEFR = {
     A1: '2.0–3.0', A2: '3.5–4.0', B1: '4.5–5.5',
