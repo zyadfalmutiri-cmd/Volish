@@ -95,7 +95,8 @@ Limit "corrections" to at most 3 items. Keep every string concise.`;
           ],
           generationConfig: {
             maxOutputTokens: 1000,
-            responseMimeType: 'application/json'
+            responseMimeType: 'application/json',
+            thinkingConfig: { thinkingLevel: 'low' }
           }
         })
       }
