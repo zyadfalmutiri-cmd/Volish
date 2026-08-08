@@ -90,7 +90,8 @@ Respond with ONLY valid JSON (no markdown fences, no preamble, no explanation ou
           ],
           generationConfig: {
             maxOutputTokens: 500,
-            responseMimeType: 'application/json'
+            responseMimeType: 'application/json',
+            thinkingConfig: { thinkingLevel: 'low' }
           }
         })
       }
