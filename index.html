@@ -343,6 +343,17 @@
   .cat-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--sage),var(--gold));}
   .cat-note{font-family:var(--f-body);font-size:12.5px;color:var(--ink-muted);line-height:1.7;}
 
+  /* ===== Dashboard progress line chart (SVG) ===== */
+  .chart-wrap{width:100%;overflow-x:auto;}
+  .chart-svg{display:block;width:100%;height:auto;min-width:280px;direction:ltr;}
+  .chart-svg .grid-line{stroke:var(--line-warm);stroke-width:1;}
+  .chart-svg .grid-label{font-family:var(--f-thin);font-size:9px;fill:var(--ink-muted);}
+  .chart-svg .chart-area{fill:url(#chartAreaGradient);opacity:.16;}
+  .chart-svg .chart-line{fill:none;stroke:url(#chartLineGradient);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+  .chart-svg .chart-dot{fill:var(--card);stroke:var(--gold);stroke-width:2;}
+  .chart-svg .x-label{font-family:var(--f-thin);font-size:8.5px;fill:var(--ink-muted);}
+  .chart-latest{margin-top:16px;}
+
   .correction-row{
     display:flex;flex-direction:column;gap:4px;padding:13px 15px;
     background:var(--card-tint);border:1px solid var(--line-warm);border-radius:12px;margin-bottom:8px;
@@ -1101,26 +1112,91 @@ async function ensureProgressLoaded(){
   render();
 }
 
+// Real SVG line chart for the progress dashboard (replaces the old stacked
+// bar list). Plots CEFR level (A1..C2, y-axis) against snapshot date
+// (x-axis, evenly spaced by order). Pure inline SVG — no chart library —
+// styled with the same brand gradient used elsewhere (violet → gold → coral).
+function buildProgressChartSvg(snaps){
+  const W = 600, H = 220;
+  const padL = 30, padR = 12, padT = 16, padB = 26;
+  const innerW = W - padL - padR;
+  const innerH = H - padT - padB;
+  const n = snaps.length;
+
+  const xFor = (i)=> n<=1 ? padL + innerW/2 : padL + (innerW * i/(n-1));
+  const yFor = (idx)=> padT + innerH * (5-idx)/5;
+
+  const points = snaps.map((s,i)=>{
+    const idx = LEVEL_INDEX[s.cefr_level] ?? 0;
+    return { x:xFor(i), y:yFor(idx), level:s.cefr_level, date:new Date(s.date) };
+  });
+
+  const linePath = points.map((p,i)=> (i===0?'M':'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+  const baseline = (padT+innerH).toFixed(1);
+  const areaPath = n>1
+    ? `${linePath} L${points[points.length-1].x.toFixed(1)},${baseline} L${points[0].x.toFixed(1)},${baseline} Z`
+    : '';
+
+  const gridHtml = LEVELS.map((lv,idx)=>{
+    const y = yFor(idx);
+    return `<line class="grid-line" x1="${padL}" y1="${y.toFixed(1)}" x2="${W-padR}" y2="${y.toFixed(1)}"></line>
+      <text class="grid-label" x="${padL-6}" y="${(y+3).toFixed(1)}" text-anchor="end">${lv}</text>`;
+  }).join('');
+
+  // x-axis date labels — first / middle / last only, to avoid crowding on mobile
+  const labelIdxs = n<=1 ? [0] : (n===2 ? [0,1] : [0, Math.floor((n-1)/2), n-1]);
+  const uniqueIdxs = Array.from(new Set(labelIdxs));
+  const xLabelsHtml = uniqueIdxs.map(i=>{
+    const p = points[i];
+    const d = p.date.toLocaleDateString('ar-SA', { month:'short', day:'numeric' });
+    return `<text class="x-label" x="${p.x.toFixed(1)}" y="${H-8}" text-anchor="middle">${d}</text>`;
+  }).join('');
+
+  const dotsHtml = points.map(p=>{
+    const dateStr = p.date.toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' });
+    return `<circle class="chart-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5"><title>${p.level} · ${dateStr}</title></circle>`;
+  }).join('');
+
+  return `
+    <div class="chart-wrap">
+      <svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="منحنى تقدم المستوى عبر الوقت">
+        <defs>
+          <linearGradient id="chartLineGradient" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" style="stop-color:var(--violet-deep)"></stop>
+            <stop offset="50%" style="stop-color:var(--gold)"></stop>
+            <stop offset="100%" style="stop-color:var(--coral)"></stop>
+          </linearGradient>
+          <linearGradient id="chartAreaGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" style="stop-color:var(--gold)"></stop>
+            <stop offset="100%" style="stop-color:var(--gold);stop-opacity:0"></stop>
+          </linearGradient>
+        </defs>
+        ${gridHtml}
+        ${areaPath ? `<path class="chart-area" d="${areaPath}"></path>` : ''}
+        ${n>1 ? `<path class="chart-line" d="${linePath}"></path>` : ''}
+        ${dotsHtml}
+        ${xLabelsHtml}
+      </svg>
+    </div>
+  `;
+}
+
 function renderDashboard(){
   if(state.progressSnapshots === null){ ensureProgressLoaded(); }
   const snaps = state.progressSnapshots || [];
-  const rowsHtml = snaps.length ? snaps.map(s=>{
-    const d = new Date(s.date);
-    const dateStr = d.toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' });
-    const idx = LEVEL_INDEX[s.cefr_level] ?? 0;
-    const pct = Math.round(((idx+1)/6)*100);
-    return `
-      <div class="cat-row">
-        <div class="cat-top"><span>${dateStr}</span><span class="cat-score">${s.cefr_level}</span></div>
-        <div class="cat-track"><div class="cat-fill" style="width:${pct}%"></div></div>
-      </div>`;
-  }).join('') : `<p class="sub" style="margin:0;">ما عندك بيانات تقدم بعد — كمّل أول جلسة عشان تبدأ يتكوّن المنحنى.</p>`;
+  const chartHtml = snaps.length
+    ? buildProgressChartSvg(snaps)
+    : `<p class="sub" style="margin:0;">ما عندك بيانات تقدم بعد — كمّل أول جلسة عشان يبدأ يتكوّن المنحنى.</p>`;
+  const latestHtml = snaps.length ? `
+    <div class="ielts-chip chart-latest">آخر مستوى مسجّل · ${snaps[snaps.length-1].cefr_level}</div>
+  ` : '';
 
   return `
     <div class="eyebrow">لوحة المتابعة</div>
     <h1>تقدمك عبر الوقت</h1>
     <div class="card">
-      ${state.progressSnapshots === null ? renderLoading('جارٍ تحميل بيانات التقدم...') : rowsHtml}
+      ${state.progressSnapshots === null ? renderLoading('جارٍ تحميل بيانات التقدم...') : chartHtml}
+      ${state.progressSnapshots !== null ? latestHtml : ''}
     </div>
   `;
 }
