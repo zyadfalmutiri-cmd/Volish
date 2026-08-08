@@ -560,6 +560,7 @@ const ICON_TARGET = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none"
 const ICON_BULB = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"></path></svg>';
 
 const SAVED_SESSION_KEY = 'volish_saved_session';
+const IS_IOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 function hasSavedSession(){
   try{ return !!localStorage.getItem(SAVED_SESSION_KEY); }catch(e){ return false; }
@@ -1492,7 +1493,7 @@ function startRecording(){
     rec.start();
     render();
     // Web Audio API waveform runs alongside SpeechRecognition, on its own mic stream
-    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+    if(!IS_IOS && navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
       navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
         state._micStream = stream;
         startWaveform(stream);
@@ -1573,7 +1574,7 @@ function startWarmupRecording(){
     }, 1000);
     rec.start();
     render();
-    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+    if(!IS_IOS && navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
       navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
         state._micStream = stream;
         startWaveform(stream);
