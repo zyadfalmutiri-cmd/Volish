@@ -247,6 +247,28 @@
     0%{opacity:.55;transform:scale(1);}
     100%{opacity:0;transform:scale(1.55);}
   }
+    /* ===== Hero voice-pulse animation (Volish landing) ===== */
+  .hero-vp-backdrop, .hero-vp-mic, .hero-vp-ring{
+    transform-box:fill-box;transform-origin:center;
+  }
+  .hero-vp-backdrop{animation:hero-vp-breathe-bg 2.4s ease-in-out infinite;}
+  .hero-vp-mic{animation:hero-vp-breathe-mic 2.4s ease-in-out infinite;}
+  .hero-vp-ring{animation:hero-vp-pulse 2.4s cubic-bezier(0,0,0.2,1) infinite;}
+  .hero-vp-ring--delayed{animation-delay:-1.2s;}
+  .hero-vp-wrap{display:flex;justify-content:center;margin-bottom:22px;}
+  @keyframes hero-vp-breathe-bg{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.015);}
+  }
+  @keyframes hero-vp-breathe-mic{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.04);}
+  }
+  @keyframes hero-vp-pulse{
+    0%{transform:scale(1);opacity:.55;}
+    100%{transform:scale(2.3);opacity:0;}
+  }
+
   .mic-label{margin-top:16px;font-family:var(--f-body);font-size:13.5px;color:var(--ink-muted);}
   .timer{font-family:var(--f-thin);font-size:13px;color:var(--coral);margin-top:4px;min-height:18px;}
 
@@ -499,7 +521,8 @@
     .needle{transition:none;}
     .overlay-card{animation:none;}
     .btn, .listen-btn{transition:none;}
-    .waveform .bar{transition:none;}
+  .waveform .bar{transition:none;}
+    .hero-vp-backdrop, .hero-vp-mic, .hero-vp-ring{animation:none;}
   }
 
   /* ===== Minimum-width safety (320px) ===== */
@@ -854,8 +877,20 @@ function renderIntro(){
       </div>
     </div>
   ` : '';
-  return `
+    return `
     ${restoreHtml}
+    <div class="hero-vp-wrap">
+      <svg viewBox="0 0 400 400" width="180" height="180" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="200" cy="200" r="170" fill="#241d36" class="hero-vp-backdrop"/>
+        <g class="hero-vp-mic">
+          <rect x="172" y="150" width="56" height="90" rx="28" ry="28" fill="#f4efe6"/>
+          <rect x="197" y="240" width="6" height="26" rx="3" ry="3" fill="#f4efe6"/>
+          <rect x="175" y="266" width="50" height="6" rx="3" ry="3" fill="#f4efe6"/>
+        </g>
+        <circle cx="200" cy="195" r="42" fill="none" stroke="#ff7a52" stroke-width="4" class="hero-vp-ring"/>
+        <circle cx="200" cy="195" r="42" fill="none" stroke="#ff7a52" stroke-width="4" class="hero-vp-ring hero-vp-ring--delayed"/>
+      </svg>
+    </div>
     <div class="eyebrow">تقييم صوتي تكيّفي</div>
     <h1>وش مستواك بالإنجليزي؟</h1>
     <p class="sub">محادثة قصيرة تكتشف مستواك الحقيقي حسب معيار CEFR العالمي (A1 إلى C2) — الأسئلة تتغيّر تلقائيًا حسب أدائك، وتسمعها وتشوفها مكتوبة بالإنجليزي والعربي، وتجاوب بصوتك.</p>
