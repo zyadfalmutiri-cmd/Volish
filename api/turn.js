@@ -3,9 +3,16 @@
 // generates the next adaptive question. Called once per conversation turn.
 // Requires GEMINI_API_KEY env var (Google AI Studio, free tier).
 
+const { checkRateLimit } = require('../lib/rateLimit');
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  if (!checkRateLimit(req)) {
+    res.status(429).json({ error: 'عدد الطلبات كثير جدًا خلال وقت قصير. حاول مرة ثانية بعد دقيقة.' });
     return;
   }
 
@@ -23,6 +30,15 @@ module.exports = async (req, res) => {
     const { history, currentLevelIndex, turnNumber, maxTurns, isCalibration, avoidTopics } = req.body || {};
     if (!Array.isArray(history) || history.length === 0) {
       res.status(400).json({ error: 'Missing "history" array in request body.' });
+      return;
+    }
+    if (history.length > 40) {
+      res.status(400).json({ error: 'حجم المحادثة أكبر من المسموح.' });
+      return;
+    }
+    const rawSize = JSON.stringify(req.body || {}).length;
+    if (rawSize > 30000) {
+      res.status(413).json({ error: 'حجم البيانات المرسلة كبير جدًا.' });
       return;
     }
 
@@ -108,9 +124,17 @@ Respond with ONLY valid JSON (no markdown fences, no preamble, no explanation ou
       data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
       data.candidates[0].content.parts[0].text) || '';
     const clean = textOut.replace(/```json/g, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(clean);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(clean);
+    } catch (parseErr) {
+      res.status(502).json({ error: 'صار خطأ بمعالجة رد نظام الذكاء الاصطناعي. حاول مرة ثانية.' });
+      return;
+    }
+
     res.status(200).json(parsed);
   } catch (err) {
-    res.status(500).json({ error: (err && err.message) || 'Unknown server error' });
+    res.status(500).json({ error: 'صار خطأ غير متوقع بالسيرفر. حاول مرة ثانية.' });
   }
 };
