@@ -8,6 +8,7 @@ app.use(express.static(path.join(__dirname)));
 // Mount the existing Vercel-style API handlers
 app.post('/api/turn', require('./api/turn'));
 app.post('/api/analyze', require('./api/analyze'));
+app.post('/api/plan', require('./api/plan'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
