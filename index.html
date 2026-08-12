@@ -3,2166 +3,537 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Volish | تقييم مستواك في الإنجليزية</title>
+<title>فولش — تحدث الإنجليزية بثقة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Reem+Kufi:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ============ Brand typeface — Volish ============ */
-  @font-face {
-    font-family: "iStoriaHeavy";
-    src: url("./iStoriaHeavy.eot");
-    src:
-        url("./iStoriaHeavy.eot") format("embedded-opentype"),
-        url("./iStoriaHeavy.woff2") format("woff2"),
-        url("./iStoriaHeavy.woff") format("woff"),
-        url("./iStoriaHeavy.ttf") format("truetype"),
-        url("./iStoriaHeavy.svg#iStoriaHeavy") format("svg");
-  }
-  @font-face {
-    font-family: "iStoriaRegular";
-    src: url("./iStoriaRegular.eot");
-    src:
-        url("./iStoriaRegular.eot") format("embedded-opentype"),
-        url("./iStoriaRegular.woff2") format("woff2"),
-        url("./iStoriaRegular.woff") format("woff"),
-        url("./iStoriaRegular.ttf") format("truetype"),
-        url("./iStoriaRegular.svg#iStoriaRegular") format("svg");
-  }
-  @font-face {
-    font-family: "iStoriaSemiBold";
-    src: url("./iStoriaSemiBold.eot");
-    src:
-        url("./iStoriaSemiBold.eot") format("embedded-opentype"),
-        url("./iStoriaSemiBold.woff2") format("woff2"),
-        url("./iStoriaSemiBold.woff") format("woff"),
-        url("./iStoriaSemiBold.ttf") format("truetype"),
-        url("./iStoriaSemiBold.svg#iStoriaSemiBold") format("svg");
-  }
-  @font-face {
-    font-family: "iStoriaThin";
-    src: url("./iStoriaThin.eot");
-    src:
-        url("./iStoriaThin.eot") format("embedded-opentype"),
-        url("./iStoriaThin.woff2") format("woff2"),
-        url("./iStoriaThin.woff") format("woff"),
-        url("./iStoriaThin.ttf") format("truetype"),
-        url("./iStoriaThin.svg#iStoriaThin") format("svg");
-  }
-  @font-face {
-    font-family: "iStoriaBold";
-    src: url("./iStoriaBold.eot");
-    src:
-        url("./iStoriaBold.eot") format("embedded-opentype"),
-        url("./iStoriaBold.woff2") format("woff2"),
-        url("./iStoriaBold.woff") format("woff"),
-        url("./iStoriaBold.ttf") format("truetype"),
-        url("./iStoriaBold.svg#iStoriaBold") format("svg");
-  }
-  
-
   :root{
-    /* ===== Volish — Phase 4 identity: deep kohl-navy + warm gold/coral ===== */
-    --bg-1:#0D1F2C;
-    --bg-2:#132A3A;
-    --bg-glow:#1B3A4D;
-    --card:#FBF6FD;
-    --card-tint:#F3EEF5;
-    --card-tint-2:#EBE4EE;
-    --ink:#1F2A33;
-    --ink-muted:#5B6B73;
-    --gold:#C6A25E;
-    --gold-soft:#DFC088;
-    --coral:#C8604E;
-    --coral-soft:#DE8A73;
-    --sage:#89A992;
-    --violet-deep:#6E5EA6;
-    --offwhite:#EEE2EE;
-    --muted-on-dark:#9FB3BE;
-    --line:rgba(238,226,238,0.12);
-    --line-warm:#E4DDE6;
-    --focus-ring:#DFC088;
-
-    --f-display:'iStoriaHeavy','iStoriaBold','Tajawal',sans-serif;
-    --f-heading:'iStoriaBold','iStoriaSemiBold','Tajawal',sans-serif;
-    --f-semibold:'iStoriaSemiBold','Tajawal',sans-serif;
-    --f-body:'iStoriaRegular','Tajawal',sans-serif;
-    --f-thin:'iStoriaThin','Tajawal',sans-serif;
-    /* Deliberate exception: the English conversation question uses a distinct
-       serif voice — visually separates "the conversation" from "the UI chrome". */
-    --f-question:'Lora','iStoriaRegular',serif;
+    --sand:#F3E9D7;
+    --sand-deep:#E7D6B4;
+    --sand-line:#D8C39C;
+    --ink:#2A2318;
+    --ink-soft:#665A45;
+    --oasis:#3C6255;
+    --oasis-deep:#26433A;
+    --oasis-soft:#DEE9E1;
+    --clay:#AE602C;
+    --gold:#C39A54;
+    --shadow: 0 20px 40px -20px rgba(42,35,24,.25);
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:var(--bg-1);}
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
   body{
-    background:
-      radial-gradient(1100px 520px at 82% -8%, var(--bg-glow) 0%, rgba(27,58,77,0) 55%),
-      radial-gradient(900px 500px at 10% 8%, #17303F 0%, rgba(23,48,63,0) 50%),
-      linear-gradient(180deg, var(--bg-2) 0%, var(--bg-1) 60%);
-    min-height:100vh;
-    font-family:var(--f-body);
-    color:var(--offwhite);
-    display:flex;
-    justify-content:center;
-    padding:40px 18px 72px;
-  }
-  .app{width:100%;max-width:640px;min-width:0;}
-  .brand{display:flex;align-items:center;gap:12px;margin-bottom:28px;flex-wrap:wrap;}
-  .nav-link{
-    appearance:none;border:1px solid var(--line);background:transparent;
-    color:var(--gold-soft);font-family:var(--f-thin);font-size:11px;
-    padding:6px 12px;border-radius:99px;cursor:pointer;
-  }
-  .brand-mark{font-family:var(--f-display);font-size:25px;color:var(--gold-soft);letter-spacing:.01em;direction:ltr;}
-  .brand-tag{
-    font-family:var(--f-thin);font-size:10.5px;letter-spacing:.16em;color:var(--muted-on-dark);
-    text-transform:uppercase;direction:ltr;padding:5px 10px;border:1px solid var(--line);border-radius:99px;
-  }
-
-  /* ===== Accessible focus states — every interactive element ===== */
-  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
-    outline:2.5px solid var(--focus-ring);
-    outline-offset:2px;
-    border-radius:8px;
-  }
-
-  .eyebrow{
-    font-family:var(--f-thin);
-    font-size:12.5px;
-    letter-spacing:.12em;
-    color:var(--gold-soft);
-    margin-bottom:8px;
-    display:flex;align-items:center;gap:9px;
-  }
-  .eyebrow::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 4px rgba(200,96,78,0.2);}
-  h1{
-    font-family:var(--f-heading);
-    font-weight:400;
-    font-size:29px;
-    margin:0 0 12px;
-    color:var(--offwhite);
-    line-height:1.4;
-    letter-spacing:.005em;
-  }
-  .sub{font-family:var(--f-body);color:var(--muted-on-dark);font-size:15px;line-height:2;margin:0 0 30px;}
-  .card{
-    background:var(--card);
+    background:var(--sand);
     color:var(--ink);
-    border-radius:26px;
-    padding:32px 26px;
-    box-shadow:0 30px 70px -28px rgba(6,14,20,0.7), 0 2px 0 rgba(255,255,255,0.6) inset;
+    font-family:'IBM Plex Sans Arabic', sans-serif;
+    line-height:1.7;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Aref Ruqaa', serif; font-weight:700; color:var(--ink);}
+  .eyebrow{
+    font-family:'Reem Kufi', sans-serif;
+    letter-spacing:.12em;
+    font-size:.78rem;
+    color:var(--oasis-deep);
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:.6rem;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px;height:1px;
+    background:var(--clay);
+    display:inline-block;
+  }
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%;display:block;}
+  section{padding:min(11vw,7rem) min(8vw,6rem);}
+  .container{max-width:1180px; margin:0 auto;}
+
+  /* ---------- NAV ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(243,233,215,.86);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--sand-line);
+  }
+  nav{
+    max-width:1180px; margin:0 auto;
+    padding:1.1rem min(8vw,6rem);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo{
+    font-family:'Aref Ruqaa', serif; font-size:1.6rem; font-weight:700;
+    color:var(--oasis-deep);
+    display:flex; align-items:center; gap:.5rem;
+  }
+  .logo-mark{
+    width:30px;height:30px;
+    position:relative;
+  }
+  nav ul{
+    display:flex; gap:2.4rem; list-style:none;
+    font-size:.95rem; color:var(--ink-soft);
+  }
+  nav ul a:hover{color:var(--oasis-deep);}
+  .cta-btn{
+    background:var(--oasis-deep);
+    color:var(--sand);
+    padding:.7rem 1.6rem;
+    border-radius:100px;
+    font-size:.9rem;
+    font-weight:600;
+    transition:transform .35s ease, background .35s ease;
+    display:inline-block;
+  }
+  .cta-btn:hover{transform:translateY(-2px); background:var(--oasis);}
+  .navlinks{display:flex; align-items:center; gap:2.4rem;}
+  .navtoggle{display:none;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding-top:min(8vw,5rem);
+    display:grid;
+    grid-template-columns: 1.1fr .9fr;
+    gap:3rem;
+    align-items:center;
+  }
+  .hero h1{
+    font-size:clamp(2.6rem, 5vw, 4.2rem);
+    line-height:1.25;
+  }
+  .hero h1 em{
+    font-style:normal;
+    color:var(--clay);
+  }
+  .hero p.lead{
+    margin-top:1.4rem;
+    font-size:1.15rem;
+    color:var(--ink-soft);
+    max-width:34ch;
+  }
+  .hero-actions{
+    margin-top:2.2rem;
+    display:flex; gap:1rem; align-items:center;
+  }
+  .ghost-btn{
+    border:1px solid var(--ink-soft);
+    padding:.68rem 1.5rem;
+    border-radius:100px;
+    font-size:.9rem;
+    color:var(--ink);
+    transition:border-color .3s, background .3s;
+  }
+  .ghost-btn:hover{border-color:var(--oasis-deep); background:var(--oasis-soft);}
+
+  .breath-wrap{
+    position:relative;
+    aspect-ratio:1/1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .breath-ring{
+    position:absolute;
+    border-radius:50%;
+    border:1px solid var(--sand-line);
+  }
+  .breath-ring.r1{width:100%; height:100%;}
+  .breath-ring.r2{width:78%; height:78%;}
+  .breath-core{
+    position:relative;
+    width:64%; height:64%;
+    border-radius:50%;
+    background: radial-gradient(circle at 32% 28%, #4C7566, var(--oasis-deep) 72%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow);
+    animation: breathe 5.4s ease-in-out infinite;
+  }
+  @keyframes breathe{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.045); }
+  }
+  .breath-core svg{width:56%; height:56%;}
+  .breath-core path{
+    fill:none;
+    stroke:var(--sand);
+    stroke-width:2.4;
+    stroke-linecap:round;
+  }
+  .cefr-chip{
+    position:absolute;
+    background:var(--sand);
+    border:1px solid var(--sand-line);
+    padding:.5rem 1rem;
+    border-radius:100px;
+    font-family:'Reem Kufi', sans-serif;
+    font-size:.8rem;
+    color:var(--ink);
+    box-shadow: 0 10px 25px -14px rgba(42,35,24,.35);
+  }
+  .cefr-chip.c1{top:2%; left:6%;}
+  .cefr-chip.c2{bottom:8%; right:2%;}
+
+  /* ---------- MARQUEE STRIP ---------- */
+  .strip{
+    border-top:1px solid var(--sand-line);
+    border-bottom:1px solid var(--sand-line);
+    padding:1.1rem 0;
+    overflow:hidden;
+    background:var(--sand-deep);
+  }
+  .strip-track{
+    display:flex; gap:3.2rem; white-space:nowrap;
+    animation: scroll-rtl 26s linear infinite;
+    width:max-content;
+    font-family:'Reem Kufi', sans-serif;
+    color:var(--ink-soft);
+    font-size:.85rem;
+  }
+  @keyframes scroll-rtl{
+    0%{ transform:translateX(0); }
+    100%{ transform:translateX(50%); }
+  }
+
+  /* ---------- SECTION: JOURNEY / DUNES ---------- */
+  .journey-head{
+    max-width:640px;
+    margin-bottom:3.5rem;
+  }
+  .journey-head h2{
+    font-size:clamp(2rem,3.4vw,2.8rem);
+    margin-top:.7rem;
+  }
+  .journey-head p{color:var(--ink-soft); margin-top:1rem; font-size:1.05rem;}
+
+  .dunes{
+    position:relative;
+    width:100%;
+  }
+  .dunes svg{width:100%; height:auto; display:block;}
+  .dune-path{
+    stroke:var(--oasis-deep);
+    stroke-width:2.5;
+    fill:none;
+    stroke-dasharray:1400;
+    stroke-dashoffset:1400;
+    transition: stroke-dashoffset 1.8s ease;
+  }
+  .dune-path.in-view{stroke-dashoffset:0;}
+  .dune-fill{fill:url(#duneGrad); opacity:0; transition:opacity 1.2s ease .5s;}
+  .dune-fill.in-view{opacity:1;}
+  .level-label{
+    font-family:'Reem Kufi', sans-serif;
+    font-size:14px;
+    fill:var(--ink);
+  }
+  .level-tag{
+    font-family:'IBM Plex Sans Arabic', sans-serif;
+    font-size:11px;
+    fill:var(--ink-soft);
+  }
+
+  /* ---------- FEATURES ---------- */
+  .features{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1.6rem;
+    margin-top:3rem;
+  }
+  .feature-card{
+    background:var(--sand-deep);
+    border:1px solid var(--sand-line);
+    border-radius:22px;
+    padding:2.2rem 1.9rem;
+    transition: transform .4s ease, box-shadow .4s ease;
+    opacity:0; transform:translateY(24px);
+  }
+  .feature-card.in-view{opacity:1; transform:translateY(0); transition:opacity .7s ease, transform .7s ease;}
+  .feature-card:hover{transform:translateY(-6px); box-shadow:var(--shadow);}
+  .feature-num{
+    font-family:'Reem Kufi', sans-serif;
+    color:var(--clay);
+    font-size:.85rem;
+    margin-bottom:1.2rem;
+  }
+  .feature-card h3{font-size:1.3rem; margin-bottom:.6rem;}
+  .feature-card p{color:var(--ink-soft); font-size:.95rem;}
+
+  /* ---------- VOICE PANEL ---------- */
+  .voice-panel{
+    background:var(--oasis-deep);
+    color:var(--sand);
+    border-radius:32px;
+    padding:min(6vw,4.5rem);
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:3rem;
+    align-items:center;
     position:relative;
     overflow:hidden;
-    border:1px solid rgba(198,162,94,0.16);
   }
-  .card::before{
-    content:'';position:absolute;top:0;right:0;left:0;height:3px;
-    /* Distinctive Volish top-border signature: Coral → Gold → Sage */
-    background:linear-gradient(90deg,var(--coral),var(--gold),var(--sage));
-    opacity:.9;
+  .voice-panel::before{
+    content:"";
+    position:absolute; inset:0;
+    background: radial-gradient(600px 300px at 85% 20%, rgba(195,154,84,.18), transparent 60%);
+    pointer-events:none;
+  }
+  .voice-panel .eyebrow{color:var(--gold);}
+  .voice-panel .eyebrow::before{background:var(--gold);}
+  .voice-panel h2{color:var(--sand); font-size:clamp(1.9rem,3vw,2.5rem); margin-top:.6rem;}
+  .voice-panel p{color:#D8CFB9; margin-top:1rem; max-width:44ch;}
+
+  .wave{
+    display:flex; align-items:flex-end; gap:5px; height:120px;
+  }
+  .wave span{
+    width:6px; border-radius:6px;
+    background:linear-gradient(180deg, var(--gold), #8fae9d);
+    animation: wave-move 2.4s ease-in-out infinite;
+  }
+  @keyframes wave-move{
+    0%,100%{ transform:scaleY(.35); }
+    50%{ transform:scaleY(1); }
   }
 
-  .feature-list{list-style:none;padding:0;margin:22px 0 28px;display:flex;flex-direction:column;gap:16px;}
-  .feature-list li{display:flex;align-items:flex-start;gap:13px;font-family:var(--f-body);font-size:14.5px;line-height:1.8;color:var(--ink-muted);}
-  .feature-list .dot{
-    flex:none;width:28px;height:28px;border-radius:9px;
-    display:flex;align-items:center;justify-content:center;
-    font-family:var(--f-semibold);font-size:12px;
-    background:var(--card-tint);color:var(--gold);border:1px solid var(--line-warm);margin-top:1px;
+  /* ---------- STATS ---------- */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:2rem;
+    margin-top:2.6rem;
+    padding-top:2.6rem;
+    border-top:1px solid rgba(243,233,215,.18);
   }
-  .btn{
-    appearance:none;border:none;cursor:pointer;
-    font-family:var(--f-semibold);font-size:15.5px;
-    padding:16px 22px;border-radius:16px;min-height:52px;
-    background:linear-gradient(135deg,var(--gold-soft),var(--gold) 55%,var(--coral));
-    color:#2A1B10;width:100%;
-    box-shadow:0 14px 30px -12px rgba(198,162,94,0.55);
-    transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
-    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  .stat b{
+    font-family:'Aref Ruqaa', serif;
+    font-size:2.4rem;
+    display:block;
+    color:var(--sand);
   }
-  .btn:hover{transform:translateY(-1px);box-shadow:0 18px 34px -12px rgba(198,162,94,0.65);filter:brightness(1.02);}
-  .btn:active{transform:translateY(0);}
-  .btn.secondary{
-    background:transparent;color:var(--ink);border:1.5px solid var(--line-warm);
-    box-shadow:none;font-family:var(--f-body);
-  }
-  .btn.secondary:hover{background:var(--card-tint);box-shadow:none;filter:none;}
-  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;}
-  .mic-note{font-family:var(--f-thin);font-size:12.5px;color:var(--ink-muted);text-align:center;margin-top:16px;line-height:1.8;}
+  .stat span{color:#C9BFA6; font-size:.85rem;}
 
-  .progress-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-family:var(--f-thin);font-size:12px;color:var(--muted-on-dark);}
-  .progress-bar{height:6px;border-radius:99px;background:rgba(238,226,238,0.12);overflow:hidden;margin-bottom:16px;}
-  .progress-fill{height:100%;background:linear-gradient(90deg,var(--violet-deep),var(--gold),var(--coral));transition:width .5s ease;}
+  /* ---------- FOOTER CTA ---------- */
+  .final-cta{
+    text-align:center;
+    padding-top:4rem;
+  }
+  .final-cta h2{font-size:clamp(2.1rem,4vw,3.2rem); max-width:20ch; margin:0 auto;}
+  .final-cta p{color:var(--ink-soft); margin:1.2rem auto 2rem; max-width:42ch;}
 
-  .quick-reply{
-    display:flex;align-items:flex-start;gap:9px;
-    background:rgba(110,94,166,0.14);border:1px solid rgba(110,94,166,0.3);
-    border-radius:14px;padding:11px 14px;margin-bottom:14px;
-  }
-  .quick-reply .qr-dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--violet-deep);margin-top:6px;}
-  .quick-reply .qr-text{font-family:var(--f-body);font-size:13px;line-height:1.8;color:var(--offwhite);}
-  .quick-reply .qr-text b{font-family:var(--f-semibold);color:var(--gold-soft);}
-
-  .qtag{
-    display:inline-flex;align-items:center;gap:6px;
-    font-family:var(--f-semibold);font-size:11px;letter-spacing:.05em;
-    color:var(--violet-deep);background:rgba(110,94,166,0.12);padding:5px 12px;border-radius:99px;margin-bottom:18px;
-  }
-  /* Deliberate serif voice for the conversation question itself (Phase 4 identity) */
-  .question-en{
-    font-family:var(--f-question);font-style:normal;font-size:20.5px;line-height:1.6;color:var(--ink);
-    direction:ltr;text-align:left;margin:0 0 10px;
-  }
-  .question-ar-wrap{display:flex;align-items:flex-start;gap:8px;margin:0 0 22px;padding-top:14px;border-top:1px dashed var(--line-warm);}
-  .ar-badge{
-    flex:none;font-family:var(--f-thin);font-size:10.5px;color:var(--gold);
-    background:var(--card-tint);border:1px solid var(--line-warm);border-radius:6px;padding:2px 7px;margin-top:3px;
-  }
-  .question-ar{font-family:var(--f-body);font-size:14.5px;line-height:1.9;color:var(--ink-muted);margin:0;}
-
-  .question-img{width:100%;border-radius:16px;margin-bottom:20px;display:block;object-fit:cover;max-height:250px;}
-  .listen-btn{
-    display:inline-flex;align-items:center;gap:8px;
-    background:var(--card-tint);border:1px solid var(--line-warm);border-radius:12px;padding:10px 15px;
-    font-family:var(--f-semibold);font-size:13.5px;color:var(--ink);
-    cursor:pointer;margin-bottom:24px;transition:background .15s ease;
-  }
-  .listen-btn:hover{background:var(--card-tint-2);}
-  .listen-btn svg{color:var(--violet-deep);}
-
-  .rec-zone{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;}
-  .mic-btn{
-    position:relative;width:92px;height:92px;border-radius:50%;border:none;cursor:pointer;
-    background:linear-gradient(135deg,var(--gold-soft),var(--gold));
-    display:flex;align-items:center;justify-content:center;color:#2A1B10;
-    box-shadow:0 16px 30px -10px rgba(198,162,94,0.55);
-  }
-  .mic-btn.recording{background:linear-gradient(135deg,var(--coral-soft),var(--coral));color:#FBF3F1;box-shadow:0 16px 30px -10px rgba(200,96,78,0.55);}
-  .mic-btn .ring{
-    position:absolute;inset:-10px;border-radius:50%;border:2px solid var(--coral);
-    opacity:0;
-  }
-  .mic-btn.recording .ring{animation:pulse 1.6s ease-out infinite;}
-  .mic-btn.recording .ring:nth-child(2){animation-delay:.5s;}
-  .mic-btn.recording .ring:nth-child(3){animation-delay:1s;}
-  @keyframes pulse{
-    0%{opacity:.55;transform:scale(1);}
-    100%{opacity:0;transform:scale(1.55);}
-  }
-    /* ===== Hero voice-pulse animation (Volish landing) ===== */
-  .hero-vp-backdrop, .hero-vp-mic, .hero-vp-ring{
-    transform-box:fill-box;transform-origin:center;
-  }
-  .hero-vp-backdrop{animation:hero-vp-breathe-bg 2.4s ease-in-out infinite;}
-  .hero-vp-mic{animation:hero-vp-breathe-mic 2.4s ease-in-out infinite;}
-  .hero-vp-ring{animation:hero-vp-pulse 2.4s cubic-bezier(0,0,0.2,1) infinite;}
-  .hero-vp-ring--delayed{animation-delay:-1.2s;}
-  .hero-vp-wrap{display:flex;justify-content:center;margin-bottom:22px;}
-  @keyframes hero-vp-breathe-bg{
-    0%,100%{transform:scale(1);}
-    50%{transform:scale(1.015);}
-  }
-  @keyframes hero-vp-breathe-mic{
-    0%,100%{transform:scale(1);}
-    50%{transform:scale(1.04);}
-  }
-  @keyframes hero-vp-pulse{
-    0%{transform:scale(1);opacity:.55;}
-    100%{transform:scale(2.3);opacity:0;}
+  footer{
+    border-top:1px solid var(--sand-line);
+    padding:2.5rem min(8vw,6rem);
+    display:flex; justify-content:space-between; align-items:center;
+    color:var(--ink-soft); font-size:.85rem;
   }
 
-  .mic-label{margin-top:16px;font-family:var(--f-body);font-size:13.5px;color:var(--ink-muted);}
-  .timer{font-family:var(--f-thin);font-size:13px;color:var(--coral);margin-top:4px;min-height:18px;}
+  .reveal{opacity:0; transform:translateY(28px); transition:opacity .8s ease, transform .8s ease;}
+  .reveal.in-view{opacity:1; transform:translateY(0);}
 
-  /* Live waveform — replaces a static box with an actual amplitude reading
-     from the mic while recording (Web Audio API), per Phase 4 spec. */
-  .waveform{
-    width:100%;height:44px;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:3px;
-  }
-  .waveform .bar{
-    flex:1;max-width:5px;min-height:4px;border-radius:3px;
-    background:linear-gradient(180deg,var(--gold),var(--coral));
-    transition:height .1s ease;
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;}
+    nav ul{display:none;}
+    .features{grid-template-columns:1fr;}
+    .voice-panel{grid-template-columns:1fr;}
+    .stats{grid-template-columns:1fr; gap:1.4rem;}
   }
 
-  .live-transcript{
-    width:100%;margin-top:14px;min-height:64px;
-    background:var(--card-tint);border:1.5px dashed var(--line-warm);border-radius:14px;
-    padding:15px;font-family:var(--f-body);font-size:13.5px;
-    color:var(--ink);direction:ltr;text-align:left;line-height:1.8;white-space:pre-wrap;
-  }
-  .live-transcript.empty{color:#8A8290;}
-  .row-btns{display:flex;gap:12px;margin-top:20px;}
-  .row-btns .btn{width:auto;flex:1;}
-  .warn{
-    background:rgba(200,96,78,0.1);border:1px solid rgba(200,96,78,0.35);color:#8C3D2E;
-    font-family:var(--f-body);font-size:12.5px;padding:13px 15px;border-radius:12px;margin-bottom:16px;line-height:1.8;
-  }
-
-  /* "Thinking" state — distinctive brand pulse instead of a generic spinner */
-  .loading-wrap{display:flex;flex-direction:column;align-items:center;padding:34px 10px;}
-  .think-dots{display:flex;gap:9px;margin-bottom:20px;}
-  .think-dots span{
-    width:12px;height:12px;border-radius:50%;
-    background:linear-gradient(135deg,var(--gold),var(--coral));
-    animation:think-bounce 1.1s ease-in-out infinite;
-  }
-  .think-dots span:nth-child(2){animation-delay:.15s;background:linear-gradient(135deg,var(--coral),var(--violet-deep));}
-  .think-dots span:nth-child(3){animation-delay:.3s;background:linear-gradient(135deg,var(--violet-deep),var(--sage));}
-  @keyframes think-bounce{
-    0%,80%,100%{transform:translateY(0);opacity:.5;}
-    40%{transform:translateY(-10px);opacity:1;}
-  }
-  .loading-wrap p{font-family:var(--f-body);font-size:14px;color:var(--ink-muted);}
-
-  .gauge-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:8px;}
-  .gauge{
-    width:260px;height:132px;border-radius:130px 130px 4px 4px;position:relative;overflow:hidden;
-    /* Cold (A1) → warm (C2), consistently — matches the CEFR dial direction */
-    background:conic-gradient(from 270deg at 50% 100%,
-      #6E93B8 0deg, #6E93B8 30deg,
-      #7FAE9C 30deg, #7FAE9C 60deg,
-      #9BB98A 60deg, #9BB98A 90deg,
-      #D0B36B 90deg, #D0B36B 120deg,
-      #D6935F 120deg, #D6935F 150deg,
-      #C8604E 150deg, #C8604E 180deg);
-  }
-  .gauge::after{
-    content:'';position:absolute;left:50%;bottom:0;width:190px;height:96px;
-    transform:translateX(-50%);background:var(--card);border-radius:100px 100px 0 0;
-  }
-  .needle{
-    position:absolute;left:50%;bottom:0;width:3px;height:96px;background:var(--ink);
-    transform-origin:bottom center;border-radius:3px;
-    transform:rotate(-90deg);
-    transition:transform 1.1s cubic-bezier(.2,.9,.25,1);
-  }
-  .needle::after{content:'';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);width:14px;height:14px;background:var(--ink);border-radius:50%;}
-  .gauge-labels{display:flex;justify-content:space-between;width:260px;margin-top:6px;font-family:var(--f-thin);font-size:10.5px;color:var(--ink-muted);padding:0 4px;}
-  .level-big{font-family:var(--f-display);font-size:44px;color:var(--ink);margin:12px 0 2px;}
-  .level-name{font-family:var(--f-body);font-size:14.5px;color:var(--ink-muted);margin-bottom:4px;}
-  .ielts-chip{
-    display:inline-flex;align-items:center;gap:6px;font-family:var(--f-semibold);font-size:12.5px;
-    color:var(--violet-deep);background:rgba(110,94,166,0.12);padding:5px 13px;border-radius:99px;margin-bottom:10px;
-  }
-  .confidence-note{
-    font-family:var(--f-body);font-size:12.5px;color:var(--coral);text-align:center;
-    background:rgba(200,96,78,0.08);border:1px solid rgba(200,96,78,0.25);
-    border-radius:10px;padding:9px 13px;margin-bottom:20px;line-height:1.8;
-  }
-
-  .section-title{
-    font-family:var(--f-semibold);font-size:13.5px;color:var(--ink);margin:24px 0 10px;
-    display:flex;align-items:center;gap:8px;
-  }
-  .section-title .bar{width:4px;height:14px;border-radius:2px;background:var(--gold);}
-  ul.plain{margin:0;padding-right:18px;}
-  ul.plain li{font-family:var(--f-body);font-size:14px;line-height:1.9;color:var(--ink-muted);margin-bottom:4px;}
-  .summary-box{font-family:var(--f-body);font-size:14.5px;line-height:1.9;color:var(--ink);background:var(--card-tint);border:1px solid var(--line-warm);border-radius:14px;padding:15px 17px;}
-
-  .cat-row{margin-bottom:14px;}
-  .cat-row .cat-top{display:flex;justify-content:space-between;font-family:var(--f-semibold);font-size:13px;color:var(--ink);margin-bottom:6px;}
-  .cat-row .cat-score{color:var(--violet-deep);}
-  .cat-track{height:8px;border-radius:99px;background:var(--card-tint-2);overflow:hidden;margin-bottom:6px;}
-  .cat-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--sage),var(--gold));}
-  .cat-note{font-family:var(--f-body);font-size:12.5px;color:var(--ink-muted);line-height:1.7;}
-
-  /* ===== Dashboard progress line chart (SVG) ===== */
-  .chart-wrap{width:100%;overflow-x:auto;}
-  .chart-svg{display:block;width:100%;height:auto;min-width:280px;direction:ltr;}
-  .chart-svg .grid-line{stroke:var(--line-warm);stroke-width:1;}
-  .chart-svg .grid-label{font-family:var(--f-thin);font-size:9px;fill:var(--ink-muted);}
-  .chart-svg .chart-area{fill:url(#chartAreaGradient);opacity:.16;}
-  .chart-svg .chart-line{fill:none;stroke:url(#chartLineGradient);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
-  .chart-svg .chart-dot{fill:var(--card);stroke:var(--gold);stroke-width:2;}
-  .chart-svg .x-label{font-family:var(--f-thin);font-size:8.5px;fill:var(--ink-muted);}
-  .chart-latest{margin-top:16px;}
-
-  .correction-row{
-    display:flex;flex-direction:column;gap:4px;padding:13px 15px;
-    background:var(--card-tint);border:1px solid var(--line-warm);border-radius:12px;margin-bottom:8px;
-  }
-  .correction-row .orig{font-family:var(--f-body);font-size:12.5px;color:var(--coral);direction:ltr;text-align:left;text-decoration:line-through;opacity:.85;}
-  .correction-row .fixed{font-family:var(--f-body);font-size:12.5px;color:#3E7050;direction:ltr;text-align:left;}
-
-  .footer-note{font-family:var(--f-thin);text-align:center;color:var(--muted-on-dark);font-size:12px;margin-top:24px;line-height:1.9;}
-  .hidden{display:none !important;}
-
-  /* ===== Phase 2 additions ===== */
-
-  /* Phase label instead of question count */
-  .phase-badge{
-    display:inline-flex;align-items:center;gap:7px;
-    font-family:var(--f-thin);font-size:11.5px;letter-spacing:.1em;
-    color:var(--gold-soft);text-transform:uppercase;
-    background:rgba(198,162,94,0.08);border:1px solid rgba(198,162,94,0.22);
-    border-radius:99px;padding:4px 12px;
-  }
-  .phase-badge .phase-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);}
-
-  /* Short-answer hint */
-  .short-hint{
-    display:flex;align-items:flex-start;gap:8px;margin-top:14px;
-    background:rgba(137,169,146,0.1);border:1px solid rgba(137,169,146,0.28);
-    border-radius:12px;padding:10px 13px;font-family:var(--f-body);font-size:12.5px;
-    color:#3E7050;line-height:1.8;
-  }
-  .short-hint .sh-icon{flex:none;margin-top:1px;display:flex;color:#3E7050;}
-
-  /* Silence prompt */
-  .silence-prompt{
-    margin-top:14px;padding:11px 14px;border-radius:12px;
-    background:rgba(110,94,166,0.08);border:1px solid rgba(110,94,166,0.25);
-    font-family:var(--f-body);font-size:12.5px;color:var(--muted-on-dark);line-height:1.8;text-align:center;
-  }
-
-  /* Session restore banner */
-  .restore-banner{
-    background:rgba(198,162,94,0.1);border:1px solid rgba(198,162,94,0.3);
-    border-radius:16px;padding:15px 18px;margin-bottom:20px;
-    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
-  }
-  .restore-banner p{margin:0;font-family:var(--f-body);font-size:13.5px;color:var(--gold-soft);line-height:1.7;flex:1;}
-  .restore-banner .restore-btns{display:flex;gap:8px;}
-  .restore-banner .btn-restore{
-    appearance:none;border:none;cursor:pointer;
-    font-family:var(--f-semibold);font-size:13px;
-    padding:9px 16px;border-radius:12px;min-height:38px;
-    background:linear-gradient(135deg,var(--gold-soft),var(--gold));color:#2A1B10;
-    box-shadow:0 8px 18px -8px rgba(198,162,94,0.5);white-space:nowrap;
-  }
-  .restore-banner .btn-discard{
-    appearance:none;border:1.5px solid rgba(198,162,94,0.3);background:transparent;cursor:pointer;
-    font-family:var(--f-body);font-size:12.5px;color:var(--muted-on-dark);
-    padding:9px 14px;border-radius:12px;white-space:nowrap;
-  }
-
-  /* Warmup screen */
-  .warmup-title{font-family:var(--f-heading);font-size:22px;color:var(--ink);margin:0 0 8px;}
-  .warmup-sub{font-family:var(--f-body);font-size:14px;color:var(--ink-muted);line-height:1.9;margin:0 0 24px;}
-  .warmup-step{
-    display:flex;align-items:center;gap:11px;padding:11px 14px;
-    background:var(--card-tint);border-radius:12px;margin-bottom:10px;
-    font-family:var(--f-body);font-size:13.5px;color:var(--ink);
-  }
-  .warmup-step .ws-num{
-    flex:none;width:26px;height:26px;border-radius:8px;
-    background:var(--card-tint-2);color:var(--gold);
-    font-family:var(--f-semibold);font-size:12px;
-    display:flex;align-items:center;justify-content:center;border:1px solid var(--line-warm);
-  }
-  .warmup-ok{
-    display:flex;align-items:center;gap:9px;padding:13px 15px;border-radius:14px;
-    background:rgba(137,169,146,0.12);border:1.5px solid rgba(137,169,146,0.35);
-    font-family:var(--f-semibold);font-size:13.5px;color:#3E7050;margin:16px 0 20px;
-  }
-  .warmup-ok svg{color:#5C9A6A;flex:none;}
-  .warmup-counter{
-    font-family:var(--f-thin);font-size:12px;color:var(--coral);
-    text-align:center;margin-top:4px;min-height:18px;
-  }
-  .warmup-live{
-    width:100%;margin-top:16px;min-height:52px;
-    background:var(--card-tint);border:1.5px dashed var(--line-warm);border-radius:12px;
-    padding:13px 14px;font-family:var(--f-body);font-size:13px;
-    color:var(--ink);direction:ltr;text-align:left;line-height:1.8;
-  }
-  .warmup-live.empty{color:#8A8290;}
-
-  /* ===== Phase 2 (round 2) additions: calibration + text fallback ===== */
-  .calibration-note{
-    display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;
-    background:rgba(110,94,166,0.12);border:1px solid rgba(110,94,166,0.3);
-    border-radius:12px;padding:11px 14px;font-family:var(--f-body);font-size:12.5px;
-    color:var(--offwhite);line-height:1.8;
-  }
-  .calibration-note svg{flex:none;margin-top:1px;color:var(--gold-soft);}
-  .text-fallback{
-    width:100%;min-height:110px;margin-top:6px;
-    background:var(--card-tint);border:1.5px solid var(--line-warm);border-radius:14px;
-    padding:14px 15px;font-family:var(--f-question);font-size:14.5px;
-    color:var(--ink);direction:ltr;text-align:left;line-height:1.8;resize:vertical;
-  }
-  .text-fallback:focus{outline:none;border-color:var(--violet-deep);}
-  .fallback-note{
-    display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;
-  }
-
-  /* ===== Auth screen ===== */
-  .auth-input{
-    width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid var(--line-warm);
-    font-family:var(--f-body);font-size:14.5px;direction:ltr;text-align:left;
-    background:var(--card-tint);color:var(--ink);
-  }
-  .auth-input:focus{outline:none;border-color:var(--violet-deep);}
-  .auth-fields{display:flex;flex-direction:column;gap:14px;}
-  .logout-btn{
-    margin-right:auto;appearance:none;border:1px solid var(--line);background:transparent;
-    color:var(--muted-on-dark);font-family:var(--f-thin);font-size:11px;
-    padding:6px 12px;border-radius:99px;cursor:pointer;direction:ltr;
-  }
-
-  /* ===== Signup overlay ===== */
-  .overlay-backdrop{
-    position:fixed;inset:0;background:rgba(13,31,44,0.72);backdrop-filter:blur(3px);
-    display:flex;align-items:flex-end;justify-content:center;z-index:50;padding:0 18px;
-  }
-  @media (min-width:520px){
-    .overlay-backdrop{align-items:center;}
-  }
-  .overlay-card{width:100%;max-width:440px;margin-bottom:18px;animation:overlay-rise .25s ease;}
-  @keyframes overlay-rise{
-    from{opacity:0;transform:translateY(16px);}
-    to{opacity:1;transform:translateY(0);}
-  }
-
-  /* ===== Respect reduced-motion preference — no non-essential looping motion ===== */
   @media (prefers-reduced-motion: reduce){
-    .mic-btn.recording .ring{animation:none;opacity:0;}
-    .think-dots span{animation:none;opacity:.85;}
-    .needle{transition:none;}
-    .overlay-card{animation:none;}
-    .btn, .listen-btn{transition:none;}
-  .waveform .bar{transition:none;}
-    .hero-vp-backdrop, .hero-vp-mic, .hero-vp-ring{animation:none;}
-  }
-
-  /* ===== Minimum-width safety (320px) ===== */
-  @media (max-width:360px){
-    .card{padding:24px 18px;}
-    h1{font-size:25px;}
-    .gauge{width:220px;height:112px;}
-    .gauge-labels{width:220px;}
+    *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
   }
 </style>
 </head>
 <body>
-<div class="app" id="app"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script>
-const SUPABASE_URL = 'https://strochdiezvzzqqeyqlk.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0cm9jaGRpZXp2enpxcWV5cWxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4NjgzNTYsImV4cCI6MjEwMTQ0NDM1Nn0.u5lXBfjrNpr8Bn_v0KrPGgDzit0kW-cByZIxxe-zsAY';
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-const LEVELS = ['A1','A2','B1','B2','C1','C2'];
-const LEVEL_AR = {A1:'مبتدئ',A2:'مبتدئ متقدم',B1:'متوسط',B2:'متوسط متقدم',C1:'متقدم',C2:'محترف'};
-const LEVEL_INDEX = {A1:0,A2:1,B1:2,B2:3,C1:4,C2:5};
-
-const INTRO_QUESTION = {
-  en:"Let's start simple. Tell me your name, where you're from, and one thing you enjoy doing in your free time.",
-  ar:"خلّنا نبدأ بشيء بسيط. قول لي اسمك، من وين انت، وشي وحد تحب تسويه بوقت فراغك.",
-  type:'talk', topicCategory:'intro_daily_life'
-};
-
-const IMAGE_BANK = [
-  {
-    img:'https://commons.wikimedia.org/wiki/Special:FilePath/People%20at%20the%20flea%20market%20Waterlooplein%20on%20a%20sunny%20Autumn%20day%3B%20free%20photo%20Amsterdam%20by%20Fons%20Heijnsbroek%2C%2010-2021.jpg?width=800',
-    en:"Look at this picture. Describe what you see — the place, the people, and what might be happening.",
-    ar:"شوف هذي الصورة. وصف اللي تشوفه — المكان، الأشخاص، وايش ممكن يكون صاير."
-  },
-  {
-    img:'https://commons.wikimedia.org/wiki/Special:FilePath/Family%20Portrait.jpg?width=800',
-    en:"Look at this second picture. How is it similar to or different from your own daily life?",
-    ar:"شوف هذي الصورة. كيف تشبه أو تختلف عن حياتك اليومية؟"
-  }
-];
-
-
-const MAX_TURNS_DEFAULT = 9;
-const EXTRA_ROUND_TURNS = 3;
-const IMAGE_TURN_POSITIONS = [1, 5];
-
-// Phase 2: first N adaptively-fetched questions are used to CALIBRATE the
-// starting level, rather than to escalate/de-escalate via the normal
-// two-consecutive-signal rule. Prevents beginner intimidation / advanced boredom.
-const CALIBRATION_TURNS = 2;
-
-const ICON_MIC = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>';
-const ICON_STOP = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>';
-const ICON_SPEAKER = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>';
-const ICON_KEYBOARD = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="6" y1="9" x2="6" y2="9.01"></line><line x1="10" y1="9" x2="10" y2="9.01"></line><line x1="14" y1="9" x2="14" y2="9.01"></line><line x1="18" y1="9" x2="18" y2="9.01"></line><line x1="6" y1="13" x2="18" y2="13"></line></svg>';
-const ICON_TARGET = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>';
-const ICON_BULB = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"></path></svg>';
-
-const SAVED_SESSION_KEY = 'volish_saved_session';
-const IS_IOS = /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-function hasSavedSession(){
-  try{ return !!localStorage.getItem(SAVED_SESSION_KEY); }catch(e){ return false; }
-}
-function saveSession(){
-  try{
-    const s = state;
-    localStorage.setItem(SAVED_SESSION_KEY, JSON.stringify({
-      history: s.history, turnLevels: s.turnLevels, turnIndex: s.turnIndex,
-      maxTurns: s.maxTurns, currentLevelIndex: s.currentLevelIndex,
-      directionHistory: s.directionHistory, currentQuestion: s.currentQuestion,
-      imagePointer: s.imagePointer, extraRoundOffered: s.extraRoundOffered,
-      calibrationEstimates: s.calibrationEstimates, calibrationDone: s.calibrationDone
-    }));
-  }catch(e){}
-}
-function loadSession(){
-  try{
-    const raw = localStorage.getItem(SAVED_SESSION_KEY);
-    if(!raw) return null;
-    return JSON.parse(raw);
-  }catch(e){ return null; }
-}
-function clearSession(){
-  try{ localStorage.removeItem(SAVED_SESSION_KEY); }catch(e){}
-}
-
-let state = {
-  screen:'intro',
-  user:null,
-  /* signup overlay shown on top of the results screen (Phase 2/3 UX: sign up
-     AFTER the first experience, as a light overlay over the report — never a
-     gate before the test, never a separate blocking page) */
-  signupDismissed:false,
-  overlayMode:'signup',
-  overlayEmail:'',
-  overlayPhone:'',
-  overlayPassword:'',
-  overlayError:'',
-  overlayLoading:false,
-  turnIndex:0,
-  maxTurns: MAX_TURNS_DEFAULT,
-  currentLevelIndex: 2,
-  directionHistory: [],
-  turnLevels: [],
-  history: [],
-  currentQuestion: INTRO_QUESTION,
-  imagePointer: 0,
-  quickReply:null,
-  recognitionSupported: !!(window.SpeechRecognition || window.webkitSpeechRecognition),
-  micDenied:false,
-  isRecording:false,
-  interim:'',
-  finalText:'',
-  timerSeconds:0,
-  timerHandle:null,
-  silenceHandle:null,
-  lastSpeechTime:0,
-  showSilencePrompt:false,
-  recognition:null,
-  result:null,
-  extraRoundOffered:false,
-  pendingAction:null,
-  errorMsg:'',
-  /* level calibration — first 1-2 adaptive questions */
-  calibrationEstimates: [],
-  calibrationDone: false,
-  /* Phase 6: topic categories from this user's last completed session, used
-     to steer the opening question of a new session away from repeating them */
-  lastSessionTopics: [],
-  /* warmup */
-  warmupDone:false,
-  warmupText:'',
-  warmupInterim:'',
-  warmupRecording:false,
-  warmupCounter:0,
-  warmupCounterHandle:null,
-  warmupRecognition:null,
-  /* live waveform (Web Audio API) */
-  audioCtx:null,
-  analyser:null,
-  waveformRAF:null,
-  waveformBars:new Array(28).fill(4),
-  /* DB-backed session tracking (logged-in users only) */
-  currentSessionId:null,
-  /* history / dashboard / settings / plan screens */
-  historyReports:null,
-  progressSnapshots:null,
-  currentPlan:null,
-  planLoading:false,
-  planError:'',
-  /* ===== Routing additions ===== */
-  reportLoading:false,
-  reportError:'',
-  viewingHistoricalReport:false,
-  pendingDeepLink:null
-};
-
-/* =========================================================================
-   URL ROUTING
-   Maps in-app "screens" to real browser URLs via the History API, so that:
-   - the back/forward buttons work as expected
-   - /report/:id is a real, shareable, reloadable link to a saved report
-   - /dashboard /history /settings /plan are real, bookmarkable URLs
-   Requires a Vercel rewrite (vercel.json) sending all non-/api paths to
-   index.html so a hard refresh on a deep URL still boots the SPA.
-   ========================================================================= */
-let suppressRouting = false;
-
-function screenToPath(){
-  switch(state.screen){
-    case 'intro': return '/';
-    case 'warmup': return '/warmup';
-    case 'question':
-    case 'loading-turn':
-    case 'loading-final':
-      return '/session';
-    case 'results':
-      return (state.result && state.result.reportId) ? ('/report/' + state.result.reportId) : '/report';
-    case 'report-loading':
-      return state.pendingDeepLink ? ('/report/' + state.pendingDeepLink) : '/report';
-    case 'plan': return '/plan';
-    case 'dashboard': return '/dashboard';
-    case 'history': return '/history';
-    case 'settings': return '/settings';
-    default: return null; // 'error' and unknown screens: don't touch the URL
-  }
-}
-
-function syncUrl(replace){
-  if(suppressRouting) return;
-  const path = screenToPath();
-  if(path === null) return;
-  if(location.pathname === path) return;
-  const fn = replace ? 'replaceState' : 'pushState';
-  history[fn]({ screen: state.screen }, '', path);
-}
-
-// Navigate to a screen from a user action (adds a new history entry unless
-// the target path is identical to the current one, e.g. moving between the
-// question/loading-turn/loading-final states which all live at /session).
-function goTo(screen, opts){
-  state.screen = screen;
-  if(opts && opts.replace) syncUrl(true); else syncUrl(false);
-  render();
-}
-
-// Handle browser Back/Forward. Best-effort: screens that depend on in-memory
-// state which no longer exists (e.g. an in-progress test after a hard
-// back-navigation) safely fall back to the home screen instead of breaking.
-window.addEventListener('popstate', ()=>{
-  suppressRouting = true;
-  routeFromPath(location.pathname, true);
-  suppressRouting = false;
-});
-
-function routeFromPath(path, isPopState){
-  if(path === '/' || path === ''){
-    state.screen = 'intro';
-    render();
-    return;
-  }
-  if(path === '/history'){
-    state.screen = state.user ? 'history' : 'intro';
-    render();
-    return;
-  }
-  if(path === '/dashboard'){
-    state.screen = state.user ? 'dashboard' : 'intro';
-    render();
-    return;
-  }
-  if(path === '/settings'){
-    state.screen = state.user ? 'settings' : 'intro';
-    render();
-    return;
-  }
-  if(path === '/plan'){
-    // Only meaningful with an active result in memory (fresh completion or
-    // a report already loaded this session) — otherwise send home.
-    state.screen = state.result ? 'plan' : 'intro';
-    render();
-    return;
-  }
-  if(path.indexOf('/report/') === 0){
-    const id = path.slice('/report/'.length);
-    if(id) loadReportById(id, isPopState);
-    else { state.screen = 'intro'; render(); }
-    return;
-  }
-  if(path === '/report'){
-    state.screen = state.result ? 'results' : 'intro';
-    render();
-    return;
-  }
-  // '/warmup' and '/session' cold-loads have no reconstructable in-memory
-  // test state (questions, mic permissions, timers) — send home rather than
-  // showing a broken mid-flow screen.
-  state.screen = 'intro';
-  render();
-}
-
-// Open a saved report by id — used both for deep links (cold load / back
-// button) and for clicking a row in the History screen.
-async function loadReportById(id, isPopState){
-  state.screen = 'report-loading';
-  state.pendingDeepLink = id;
-  if(!isPopState) syncUrl(false);
-  render();
-  if(!state.user){
-    // Reports are RLS-protected to their owner — without a session there is
-    // nothing valid to fetch. Send the guest home rather than spinning forever.
-    state.screen = 'intro';
-    syncUrl(true);
-    render();
-    return;
-  }
-  try{
-    const { data, error } = await supabaseClient
-      .from('reports')
-      .select('*')
-      .eq('id', id)
-      .single();
-    if(error || !data) throw new Error('ما قدرنا نلقى هذا التقرير.');
-    state.result = {
-      reportId: data.id,
-      level: data.cefr_level,
-      rangeLevel: data.range_level,
-      ieltsEstimate: data.ielts_estimate,
-      categoryScores: data.category_scores || [],
-      strengths_ar: data.strengths || [],
-      weaknesses_ar: data.weaknesses || [],
-      corrections: data.corrections || [],
-      summary_ar: data.summary || '',
-      recommendation_ar: data.recommendation || '',
-      lowConfidence: false,
-      levelName_ar: LEVEL_AR[data.cefr_level] || ''
-    };
-    state.viewingHistoricalReport = true;
-    state.signupDismissed = true; // never show the signup overlay on a historical view
-    state.screen = 'results';
-    if(!isPopState) syncUrl(true);
-    render();
-  }catch(err){
-    state.reportError = (err && err.message) ? err.message : 'خطأ غير معروف';
-    state.screen = 'error';
-    state.errorMsg = state.reportError;
-    render();
-  }
-}
-
-function renderBrand(){
-  const logoutHtml = state.user ? `<button id="logoutBtn" class="logout-btn">${state.user.email||'حسابي'} · تسجيل خروج</button>` : '';
-  // Only show nav on screens where switching away won't lose test progress
-  const safeScreens = ['intro','history','dashboard','settings','plan'];
-  const navHtml = (state.user && safeScreens.includes(state.screen)) ? `
-    <button class="nav-link" id="navDashboard">لوحتي</button>
-    <button class="nav-link" id="navHistory">السجل</button>
-    <button class="nav-link" id="navSettings">الإعدادات</button>
-  ` : '';
-  return `<div class="brand"><span class="brand-mark">Volish</span><span class="brand-tag">English Speaking Assessment</span>${navHtml}${logoutHtml}</div>`;
-}
-
-function render(){
-  const app = document.getElementById('app');
-  let body = '';
-  if(state.screen==='intro') body = renderIntro();
-  else if(state.screen==='warmup') body = renderWarmup();
-  else if(state.screen==='question') body = renderQuestion();
-  else if(state.screen==='loading-turn') body = renderLoading('جارٍ تجهيز السؤال التالي حسب إجابتك...');
-  else if(state.screen==='loading-final') body = renderLoading('جارٍ تحليل إجاباتك وتحديد مستواك...');
-  else if(state.screen==='report-loading') body = renderLoading('جارٍ تحميل التقرير...');
-  else if(state.screen==='results') body = renderResults();
-  else if(state.screen==='error') body = renderErrorScreen();
-  else if(state.screen==='history') body = renderHistory();
-  else if(state.screen==='dashboard') body = renderDashboard();
-  else if(state.screen==='settings') body = renderSettings();
-  else if(state.screen==='plan') body = renderPlan();
-  app.innerHTML = renderBrand() + body;
-  attachHandlers();
-  drawWaveformBars();
-}
-
-function renderIntro(){
-  const restoreHtml = hasSavedSession() ? `
-    <div class="restore-banner">
-      <p>عندك جلسة غير مكتملة — تبي تكمّل من وين وقفت؟</p>
-      <div class="restore-btns">
-        <button class="btn-restore" id="resumeBtn">كمّل الجلسة</button>
-        <button class="btn-discard" id="discardBtn">ابدأ من جديد</button>
-      </div>
-    </div>
-  ` : '';
-    return `
-    ${restoreHtml}
-    <div class="hero-vp-wrap">
-      <svg viewBox="0 0 400 400" width="180" height="180" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="200" cy="200" r="170" fill="#241d36" class="hero-vp-backdrop"/>
-        <g class="hero-vp-mic">
-          <rect x="172" y="150" width="56" height="90" rx="28" ry="28" fill="#f4efe6"/>
-          <rect x="197" y="240" width="6" height="26" rx="3" ry="3" fill="#f4efe6"/>
-          <rect x="175" y="266" width="50" height="6" rx="3" ry="3" fill="#f4efe6"/>
-        </g>
-        <circle cx="200" cy="195" r="42" fill="none" stroke="#ff7a52" stroke-width="4" class="hero-vp-ring"/>
-        <circle cx="200" cy="195" r="42" fill="none" stroke="#ff7a52" stroke-width="4" class="hero-vp-ring hero-vp-ring--delayed"/>
+<header>
+  <nav>
+    <div class="logo">
+      <svg class="logo-mark" viewBox="0 0 30 30" fill="none">
+        <circle cx="15" cy="15" r="13" stroke="#3C6255" stroke-width="1.4"/>
+        <path d="M9 15c1.5-4 3-4 4.5 0s3 4 4.5 0" stroke="#AE602C" stroke-width="1.6" stroke-linecap="round" fill="none"/>
       </svg>
+      فولش
     </div>
-    <div class="eyebrow">تقييم صوتي تكيّفي</div>
-    <h1>وش مستواك بالإنجليزي؟</h1>
-    <p class="sub">محادثة قصيرة تكتشف مستواك الحقيقي حسب معيار CEFR العالمي (A1 إلى C2) — الأسئلة تتغيّر تلقائيًا حسب أدائك، وتسمعها وتشوفها مكتوبة بالإنجليزي والعربي، وتجاوب بصوتك.</p>
-    <div class="card">
-      <ul class="feature-list">
-        <li><span class="dot">١</span>حوالي ٨-٩ أسئلة تتكيّف مع مستواك أثناء المحادثة — تصعب لو جوابك قوي، وتسهل لو تحتاج وقت أكثر.</li>
-        <li><span class="dot">٢</span>كل سؤال مكتوب ومترجم بالعربي، وتسمعه بصوت إنجليزي أصلي.</li>
-        <li><span class="dot">٣</span>تجاوب بالتحدث مباشرة عبر الميكروفون — ولو تعذّر الميكروفون تقدر تكتب إجابتك بدل التسجيل.</li>
-        <li><span class="dot">٤</span>بالنهاية تحصل على مستواك بالضبط مع تقدير IELTS تقريبي، وتفصيل ٤ فئات، ونقاط قوتك وأخطاء تحتاج تصحيح.</li>
+    <div class="navlinks">
+      <ul>
+        <li><a href="#journey">المستويات</a></li>
+        <li><a href="#features">المميزات</a></li>
+        <li><a href="#voice">التقييم الصوتي</a></li>
       </ul>
-      <button class="btn" id="startBtn">ابدأ الاختبار</button>
-      <p class="mic-note">${state.recognitionSupported ? 'بيطلب المتصفح صلاحية الميكروفون عند أول تسجيل — وافق حتى تقدر تجاوب صوتيًا. لو رفضت الصلاحية بالغلط، تقدر تكتب إجاباتك بدل ذلك.' : 'تنبيه: هذا المتصفح لا يدعم التعرف الصوتي — بترد على الأسئلة كتابة بدل التسجيل الصوتي.'}</p>
+      <a href="#" class="cta-btn">ابدأ التقييم</a>
     </div>
-  `;
-}
+  </nav>
+</header>
 
-function renderWarmup(){
-  const micText = (state.warmupText + (state.warmupInterim ? ' ' + state.warmupInterim : '')).trim();
-  const done = state.warmupDone;
-  const fallbackMode = !state.recognitionSupported || state.micDenied;
-
-  if(fallbackMode){
-    return `
-      <div class="eyebrow">تجهيز الاختبار</div>
-      <div class="card">
-        <p class="warmup-title">جاهز تبدأ</p>
-        <p class="warmup-sub">${!state.recognitionSupported
-          ? 'متصفحك الحالي لا يدعم التعرف الصوتي، فبترد على أسئلة الاختبار كتابة بدل التسجيل — هذا ما يأثر على تقييم مستواك.'
-          : 'ما قدرنا نوصل لميكروفونك (يمكن رفضت الصلاحية). لا مشكلة — بترد على أسئلة الاختبار كتابة بدل التسجيل الصوتي.'}</p>
-        <button class="btn" id="warmupNextBtn" style="margin-top:10px;">ابدأ الاختبار الآن</button>
-        ${state.recognitionSupported ? `<button class="listen-btn" id="retryMicWarmupBtn" style="margin-top:14px;width:100%;justify-content:center;">${ICON_MIC} جرب الميكروفون مرة ثانية</button>` : ''}
-      </div>
-    `;
-  }
-
-  return `
-    <div class="eyebrow">تجهيز الميكروفون</div>
-    <div class="card">
-      <p class="warmup-title">جهّز ميكروفونك قبل ما تبدأ</p>
-      <p class="warmup-sub">قبل الاختبار، تأكد إن صوتك يوصل صح — قول أي جملة بالإنجليزي لمدة ٥ ثوانٍ.</p>
-
-      <div class="warmup-step"><span class="ws-num">١</span>اضغط الزر واسمح للمتصفح بالوصول للميكروفون</div>
-      <div class="warmup-step"><span class="ws-num">٢</span>تكلّم بالإنجليزي لمدة ٥ ثوانٍ — أي جملة تجي ببالك</div>
-      <div class="warmup-step"><span class="ws-num">٣</span>اضغط إيقاف، وبعدين ابدأ الاختبار</div>
-
-      ${done ? `
-        <div class="warmup-ok">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          ميكروفونك يشتغل — كلامك وصل بوضوح
-        </div>
-      ` : ''}
-
-      ${state.warmupRecording ? `
-        <div class="rec-zone">
-          <button class="mic-btn recording" id="warmupMicBtn">
-            <span class="ring"></span><span class="ring"></span><span class="ring"></span>
-            <span style="position:relative;z-index:2;display:flex;">${ICON_STOP}</span>
-          </button>
-          <div class="mic-label">اضغط للإيقاف</div>
-          <div class="warmup-counter">${state.warmupCounter > 0 ? formatTime(state.warmupCounter) : ''}</div>
-          <div class="waveform" id="waveformWarmup"></div>
-        </div>
-      ` : `
-        <div class="rec-zone">
-          <button class="mic-btn" id="warmupMicBtn">
-            <span class="ring"></span><span class="ring"></span><span class="ring"></span>
-            <span style="position:relative;z-index:2;display:flex;">${ICON_MIC}</span>
-          </button>
-          <div class="mic-label">${done ? 'سجّل مرة ثانية' : 'اضغط وتكلّم بالإنجليزي'}</div>
-          <div class="warmup-counter"></div>
-        </div>
-      `}
-
-      ${micText ? `<div class="warmup-live">${micText}</div>` : (state.warmupRecording ? `<div class="warmup-live empty">سيظهر كلامك هنا...</div>` : '')}
-
-      <button class="btn" id="warmupNextBtn" style="margin-top:22px;" ${done ? '' : 'disabled'}>ابدأ الاختبار الآن</button>
-      <p class="mic-note" style="margin-top:12px;">لو ما ظهر كلامك، تأكد إنك سمحت للمتصفح بالميكروفون — أو تقدر تكمل وترد كتابة.</p>
+<section class="hero">
+  <div>
+    <div class="eyebrow">تقييم تكيفي · A1 إلى C2</div>
+    <h1>تحدّث الإنجليزية <em>بثقة</em>، على وتيرتك</h1>
+    <p class="lead">فولش يستمع إليك، لا إلى إجاباتك الجاهزة. محادثة صوتية تتكيّف مع مستواك لحظة بلحظة، وتخبرك أين تقف بالضبط على سلّم الطلاقة.</p>
+    <div class="hero-actions">
+      <a href="#" class="cta-btn">ابدأ تقييمك المجاني</a>
+      <a href="#journey" class="ghost-btn">شاهد كيف يعمل</a>
     </div>
-  `;
-}
+  </div>
 
-function getPhaseLabel(turnIndex, maxTurns, calibrationDone){
-  if(!calibrationDone) return { ar:'تحديد المستوى', en:'Calibrating' };
-  const pct = turnIndex / maxTurns;
-  if(pct < 0.35) return { ar:'بداية', en:'Warmup' };
-  if(pct < 0.7)  return { ar:'استكشاف', en:'Exploring' };
-  return { ar:'تعمق', en:'Deep Dive' };
-}
-
-function renderQuestion(){
-  const q = state.currentQuestion;
-  const total = state.maxTurns;
-  const pct = Math.round((state.turnIndex/total)*100);
-  const transcriptText = (state.finalText + (state.interim?(' '+state.interim):'')).trim();
-  const canGoNext = transcriptText.length>0 && !state.isRecording;
-  const phase = getPhaseLabel(state.turnIndex, total, state.calibrationDone);
-  const showTextFallback = !state.recognitionSupported || state.micDenied;
-
-  // Short-answer hint: show if stopped recording/typing, has some text, but very short
-  const wordCount = transcriptText.trim().split(/\s+/).filter(Boolean).length;
-  const showShortHint = !state.isRecording && wordCount > 0 && wordCount < 4;
-
-  const quickReplyHtml = state.quickReply ? `
-    <div class="quick-reply">
-      <span class="qr-dot"></span>
-      <span class="qr-text"><b>${state.quickReply.en}</b><br>${state.quickReply.ar}</span>
-    </div>
-  ` : '';
-
-  const calibrationNoteHtml = (!state.calibrationDone && state.turnIndex>=1) ? `
-    <div class="calibration-note">${ICON_TARGET} أول سؤالين نحدد فيها مستواك التقريبي، وبعدها الأسئلة تتكيّف بدقة أكثر.</div>
-  ` : '';
-
-  return `
-    <div class="progress-wrap">
-      <span class="phase-badge"><span class="phase-dot"></span>${phase.ar}</span>
-      <span>${pct}%</span>
-    </div>
-    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-    ${quickReplyHtml}
-    <div class="card">
-      <span class="qtag">${topicLabelAr(q.topicCategory)}</span>
-      ${q.img?`<img class="question-img" src="${q.img}" alt="question visual">`:''}
-      <p class="question-en">${q.en}</p>
-      <div class="question-ar-wrap">
-        <span class="ar-badge">AR</span>
-        <p class="question-ar">${q.ar}</p>
-      </div>
-      <button class="listen-btn" id="listenBtn">${ICON_SPEAKER} استمع للسؤال</button>
-
-      ${calibrationNoteHtml}
-      ${state.errorMsg ? `<div class="warn">${state.errorMsg}</div>` : ''}
-
-      ${showTextFallback ? `
-        <div class="fallback-note">
-          ${ICON_KEYBOARD}
-          <span style="font-family:var(--f-body);font-size:12.5px;color:var(--ink-muted);line-height:1.8;">${!state.recognitionSupported ? 'متصفحك لا يدعم التعرف الصوتي — اكتب إجابتك بالأسفل.' : 'ما قدرنا نوصل للميكروفون — اكتب إجابتك بالأسفل بدل التسجيل.'}</span>
-        </div>
-        <textarea id="textAnswer" class="text-fallback" placeholder="Write your answer in English here...">${state.finalText||''}</textarea>
-        ${state.recognitionSupported ? `<button class="listen-btn" id="retryMicBtn" style="margin-top:14px;">${ICON_MIC} جرب الميكروفون مرة ثانية</button>` : ''}
-      ` : `
-        <div class="rec-zone">
-          <button class="mic-btn ${state.isRecording?'recording':''}" id="micBtn">
-            <span class="ring"></span><span class="ring"></span><span class="ring"></span>
-            <span style="position:relative;z-index:2;display:flex;">${state.isRecording? ICON_STOP : ICON_MIC}</span>
-          </button>
-          <div class="mic-label">${state.isRecording? 'اضغط للإيقاف' : (transcriptText? 'اضغط لإعادة التسجيل' : 'اضغط وابدأ الكلام بالإنجليزي')}</div>
-          <div class="timer">${state.isRecording? formatTime(state.timerSeconds) : ''}</div>
-          ${state.isRecording ? `<div class="waveform" id="waveformMain"></div>` : ''}
-          <div class="live-transcript ${transcriptText? '' : 'empty'}">${transcriptText || 'سيظهر كلامك مكتوبًا هنا أثناء التسجيل...'}</div>
-          ${state.showSilencePrompt && state.isRecording ? `<div class="silence-prompt">خذ وقتك — قول أي شيء يجي ببالك عن الموضوع 😊</div>` : ''}
-        </div>
-      `}
-
-      ${showShortHint ? `
-        <div class="short-hint">
-          <span class="sh-icon">${ICON_BULB}</span>
-          جاوبت قصير — حاول تضيف جملة أو جملتين للحصول على تقييم أدق
-        </div>
-      ` : ''}
-
-      <div class="row-btns">
-        <button class="btn secondary" id="skipBtn">تخطي</button>
-        <button class="btn" id="nextBtn" ${canGoNext? '' : 'disabled'}>${state.turnIndex===total-1?'إنهاء وتحليل النتيجة':'التالي'}</button>
-      </div>
-    </div>
-  `;
-}
-
-function topicLabelAr(cat){
-  const map = {
-    intro_daily_life:'تعارف وحياة يومية',
-    describe_image:'وصف صورة',
-    opinion_reasoning:'رأي واستدلال',
-    narrative_experience:'سرد تجربة',
-    hypothetical_planning:'افتراضي وتخطيط',
-    argumentative_debate:'نقاش وتحدٍّ'
-  };
-  return map[cat] || 'محادثة';
-}
-
-function renderLoading(msg){
-  return `
-    <div class="card">
-      <div class="loading-wrap">
-        <div class="think-dots"><span></span><span></span><span></span></div>
-        <p>${msg}</p>
-      </div>
-    </div>
-  `;
-}
-
-function renderErrorScreen(){
-  return `
-    <div class="card">
-      <div class="warn">صار خطأ: ${state.errorMsg}</div>
-      <button class="btn" id="retryBtn">حاول مرة ثانية</button>
-      <button class="btn secondary" id="errorHomeBtn" style="margin-top:12px;">الرجوع للرئيسية</button>
-    </div>
-  `;
-}
-
-/* ===== History screen ===== */
-async function ensureHistoryLoaded(){
-  if(state.historyReports !== null || !state.user) return;
-  try{
-    const { data, error } = await supabaseClient
-      .from('reports')
-      .select('id, cefr_level, range_level, ielts_estimate, summary, created_at')
-      .eq('user_id', state.user.id)
-      .order('created_at', { ascending:false })
-      .limit(30);
-    state.historyReports = (!error && data) ? data : [];
-  }catch(e){ state.historyReports = []; }
-  render();
-}
-
-function renderHistory(){
-  if(state.historyReports === null){ ensureHistoryLoaded(); }
-  const rows = state.historyReports || [];
-  const listHtml = rows.length ? rows.map(r=>{
-    const d = new Date(r.created_at);
-    const dateStr = d.toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' });
-    return `
-      <button class="warmup-step history-row" data-report-id="${r.id}" style="justify-content:space-between;width:100%;border:none;cursor:pointer;text-align:right;">
-        <div style="display:flex;align-items:center;gap:11px;">
-          <span class="ws-num">${r.cefr_level||'—'}</span>
-          <span>${dateStr} · IELTS ${r.ielts_estimate||'—'}</span>
-        </div>
-        <span style="color:var(--ink-muted);">←</span>
-      </button>`;
-  }).join('') : `<p class="sub" style="margin:0;">ما عندك جلسات مكتملة بعد.</p>`;
-
-  return `
-    <div class="eyebrow">سجل جلساتك</div>
-    <h1>محاولاتك السابقة</h1>
-    <div class="card">
-      ${state.historyReports === null ? renderLoading('جارٍ تحميل السجل...') : listHtml}
-    </div>
-  `;
-}
-
-/* ===== Dashboard screen ===== */
-async function ensureProgressLoaded(){
-  if(state.progressSnapshots !== null || !state.user) return;
-  try{
-    const { data, error } = await supabaseClient
-      .from('progress_snapshots')
-      .select('cefr_level, date')
-      .eq('user_id', state.user.id)
-      .order('date', { ascending:true })
-      .limit(50);
-    state.progressSnapshots = (!error && data) ? data : [];
-  }catch(e){ state.progressSnapshots = []; }
-  render();
-}
-
-// Real SVG line chart for the progress dashboard (replaces the old stacked
-// bar list). Plots CEFR level (A1..C2, y-axis) against snapshot date
-// (x-axis, evenly spaced by order). Pure inline SVG — no chart library —
-// styled with the same brand gradient used elsewhere (violet → gold → coral).
-function buildProgressChartSvg(snaps){
-  const W = 600, H = 220;
-  const padL = 30, padR = 12, padT = 16, padB = 26;
-  const innerW = W - padL - padR;
-  const innerH = H - padT - padB;
-  const n = snaps.length;
-
-  const xFor = (i)=> n<=1 ? padL + innerW/2 : padL + (innerW * i/(n-1));
-  const yFor = (idx)=> padT + innerH * (5-idx)/5;
-
-  const points = snaps.map((s,i)=>{
-    const idx = LEVEL_INDEX[s.cefr_level] ?? 0;
-    return { x:xFor(i), y:yFor(idx), level:s.cefr_level, date:new Date(s.date) };
-  });
-
-  const linePath = points.map((p,i)=> (i===0?'M':'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
-  const baseline = (padT+innerH).toFixed(1);
-  const areaPath = n>1
-    ? `${linePath} L${points[points.length-1].x.toFixed(1)},${baseline} L${points[0].x.toFixed(1)},${baseline} Z`
-    : '';
-
-  const gridHtml = LEVELS.map((lv,idx)=>{
-    const y = yFor(idx);
-    return `<line class="grid-line" x1="${padL}" y1="${y.toFixed(1)}" x2="${W-padR}" y2="${y.toFixed(1)}"></line>
-      <text class="grid-label" x="${padL-6}" y="${(y+3).toFixed(1)}" text-anchor="end">${lv}</text>`;
-  }).join('');
-
-  // x-axis date labels — first / middle / last only, to avoid crowding on mobile
-  const labelIdxs = n<=1 ? [0] : (n===2 ? [0,1] : [0, Math.floor((n-1)/2), n-1]);
-  const uniqueIdxs = Array.from(new Set(labelIdxs));
-  const xLabelsHtml = uniqueIdxs.map(i=>{
-    const p = points[i];
-    const d = p.date.toLocaleDateString('ar-SA', { month:'short', day:'numeric' });
-    return `<text class="x-label" x="${p.x.toFixed(1)}" y="${H-8}" text-anchor="middle">${d}</text>`;
-  }).join('');
-
-  const dotsHtml = points.map(p=>{
-    const dateStr = p.date.toLocaleDateString('ar-SA', { year:'numeric', month:'short', day:'numeric' });
-    return `<circle class="chart-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5"><title>${p.level} · ${dateStr}</title></circle>`;
-  }).join('');
-
-  return `
-    <div class="chart-wrap">
-      <svg class="chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="منحنى تقدم المستوى عبر الوقت">
-        <defs>
-          <linearGradient id="chartLineGradient" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" style="stop-color:var(--violet-deep)"></stop>
-            <stop offset="50%" style="stop-color:var(--gold)"></stop>
-            <stop offset="100%" style="stop-color:var(--coral)"></stop>
-          </linearGradient>
-          <linearGradient id="chartAreaGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" style="stop-color:var(--gold)"></stop>
-            <stop offset="100%" style="stop-color:var(--gold);stop-opacity:0"></stop>
-          </linearGradient>
-        </defs>
-        ${gridHtml}
-        ${areaPath ? `<path class="chart-area" d="${areaPath}"></path>` : ''}
-        ${n>1 ? `<path class="chart-line" d="${linePath}"></path>` : ''}
-        ${dotsHtml}
-        ${xLabelsHtml}
+  <div class="breath-wrap">
+    <div class="breath-ring r1"></div>
+    <div class="breath-ring r2"></div>
+    <div class="breath-core">
+      <svg viewBox="0 0 100 40">
+        <path d="M0 20 Q10 4 20 20 T40 20 T60 20 T80 20 T100 20" />
       </svg>
     </div>
-  `;
-}
+    <div class="cefr-chip c1">مستواك الحالي: B1</div>
+    <div class="cefr-chip c2">+٤ نقاط هذا الأسبوع</div>
+  </div>
+</section>
 
-function renderDashboard(){
-  if(state.progressSnapshots === null){ ensureProgressLoaded(); }
-  const snaps = state.progressSnapshots || [];
-  const chartHtml = snaps.length
-    ? buildProgressChartSvg(snaps)
-    : `<p class="sub" style="margin:0;">ما عندك بيانات تقدم بعد — كمّل أول جلسة عشان يبدأ يتكوّن المنحنى.</p>`;
-  const latestHtml = snaps.length ? `
-    <div class="ielts-chip chart-latest">آخر مستوى مسجّل · ${snaps[snaps.length-1].cefr_level}</div>
-  ` : '';
+<div class="strip">
+  <div class="strip-track">
+    <span>محادثة صوتية حيّة</span><span>·</span>
+    <span>تقييم CEFR دقيق</span><span>·</span>
+    <span>تعليقات فورية</span><span>·</span>
+    <span>خطة تعلّم شخصية</span><span>·</span>
+    <span>واجهة عربية بالكامل</span><span>·</span>
+    <span>محادثة صوتية حيّة</span><span>·</span>
+    <span>تقييم CEFR دقيق</span><span>·</span>
+    <span>تعليقات فورية</span><span>·</span>
+    <span>خطة تعلّم شخصية</span><span>·</span>
+    <span>واجهة عربية بالكامل</span><span>·</span>
+  </div>
+</div>
 
-  return `
-    <div class="eyebrow">لوحة المتابعة</div>
-    <h1>تقدمك عبر الوقت</h1>
-    <div class="card">
-      ${state.progressSnapshots === null ? renderLoading('جارٍ تحميل بيانات التقدم...') : chartHtml}
-      ${state.progressSnapshots !== null ? latestHtml : ''}
+<section id="journey">
+  <div class="journey-head reveal">
+    <div class="eyebrow">الرحلة</div>
+    <h2>ستّة مستويات، طريق واحد واضح</h2>
+    <p>كل محادثة تقربك خطوة، من أولى الجمل المترددة إلى طلاقة تناقش بها أي فكرة. فولش يرسم لك أين أنت الآن، وأين تتّجه.</p>
+  </div>
+
+  <div class="dunes reveal">
+    <svg viewBox="0 0 1000 260" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="duneGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#3C6255" stop-opacity="0.16"/>
+          <stop offset="100%" stop-color="#3C6255" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+
+      <path class="dune-fill" d="M1000 230 L940 230 Q900 220 860 190 Q800 145 740 190 Q700 215 640 195 Q580 160 520 195 Q470 220 420 175 Q370 120 310 175 Q270 210 210 190 Q150 160 90 200 Q50 220 0 210 L0 260 L1000 260 Z"/>
+      <path class="dune-path" d="M1000 230 L940 230 Q900 220 860 190 Q800 145 740 190 Q700 215 640 195 Q580 160 520 195 Q470 220 420 175 Q370 120 310 175 Q270 210 210 190 Q150 160 90 200 Q50 220 0 210"/>
+
+      <!-- level markers, right(start) to left(advanced) matching RTL reading -->
+      <g>
+        <circle cx="940" cy="230" r="4" fill="#AE602C"/>
+        <text x="940" y="252" text-anchor="middle" class="level-label">A1</text>
+        <text x="940" y="212" text-anchor="middle" class="level-tag">البداية</text>
+      </g>
+      <g>
+        <circle cx="740" cy="190" r="4" fill="#AE602C"/>
+        <text x="740" y="212" text-anchor="middle" class="level-label">A2</text>
+      </g>
+      <g>
+        <circle cx="520" cy="195" r="4" fill="#AE602C"/>
+        <text x="520" y="217" text-anchor="middle" class="level-label">B1</text>
+      </g>
+      <g>
+        <circle cx="310" cy="175" r="4" fill="#AE602C"/>
+        <text x="310" y="197" text-anchor="middle" class="level-label">B2</text>
+      </g>
+      <g>
+        <circle cx="90" cy="200" r="4" fill="#3C6255"/>
+        <text x="90" y="222" text-anchor="middle" class="level-label">C1</text>
+      </g>
+      <g>
+        <circle cx="10" cy="209" r="5" fill="#3C6255"/>
+        <text x="10" y="180" text-anchor="middle" class="level-label">C2</text>
+        <text x="10" y="228" text-anchor="middle" class="level-tag">إتقان</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<section id="features">
+  <div class="journey-head reveal">
+    <div class="eyebrow">كيف يعمل فولش</div>
+    <h2>ثلاث خطوات هادئة، لا اختبار مرهق</h2>
+  </div>
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-num">01</div>
+      <h3>تحدّث بطبيعتك</h3>
+      <p>محادثة صوتية حرة حول مواضيع يومية، بلا أسئلة اختيار من متعدد ولا ضغط الوقت.</p>
     </div>
-  `;
-}
-
-/* ===== Settings screen ===== */
-function renderSettings(){
-  return `
-    <div class="eyebrow">إعدادات الحساب</div>
-    <h1>حسابك</h1>
-    <div class="card">
-      <p class="sub" style="margin-bottom:6px;">البريد الإلكتروني</p>
-      <p style="font-family:var(--f-semibold);color:var(--ink);margin:0 0 20px;">${state.user ? state.user.email : '—'}</p>
-      <button class="btn secondary" id="settingsLogoutBtn">تسجيل خروج</button>
+    <div class="feature-card">
+      <div class="feature-num">02</div>
+      <h3>تحليل فوري لمستواك</h3>
+      <p>الذكاء الاصطناعي يقيّم النطق والطلاقة والمفردات، ويحدد موقعك على معايير CEFR بدقة.</p>
     </div>
-  `;
-}
-
-/* ===== Learning plan screen ===== */
-async function ensurePlanLoaded(report){
-  if(state.currentPlan || state.planLoading) return;
-  state.planLoading = true;
-  state.planError = '';
-  render();
-  try{
-    const resp = await fetch('/api/plan', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ report })
-    });
-    const parsed = await resp.json();
-    if(!resp.ok) throw new Error(parsed.error || 'Server error while generating the plan.');
-    state.currentPlan = parsed;
-    // best-effort save — never blocks the screen
-    if(state.user){
-      try{
-        await supabaseClient.from('learning_plans').insert({
-          user_id: state.user.id,
-          weekly_goals: parsed.weeklyGoals || null,
-          suggested_exercises: parsed.suggestedExercises || null
-        });
-      }catch(e){}
-    }
-  }catch(err){
-    state.planError = (err && err.message) ? err.message : 'خطأ غير معروف';
-  }
-  state.planLoading = false;
-  render();
-}
-
-function renderPlan(){
-  if(!state.result) return renderErrorScreen();
-  if(!state.currentPlan && !state.planLoading && !state.planError) ensurePlanLoaded(state.result);
-  if(state.planLoading) return renderLoading('جارٍ إعداد خطتك الأسبوعية...');
-  if(state.planError) return `<div class="card"><div class="warn">صار خطأ: ${state.planError}</div><button class="btn" id="retryPlanBtn">حاول مرة ثانية</button></div>`;
-
-  const goals = (state.currentPlan.weeklyGoals||[]).map(g=>`<li>${g}</li>`).join('');
-  const exercises = (state.currentPlan.suggestedExercises||[]).map(ex=>`
-    <div class="correction-row">
-      <div style="font-family:var(--f-semibold);font-size:13px;color:var(--ink);">${ex.title_ar}</div>
-      <div style="font-family:var(--f-body);font-size:12.5px;color:var(--ink-muted);line-height:1.8;">${ex.description_ar}</div>
-    </div>`).join('');
-
-  return `
-    <div class="eyebrow">خطتك الأسبوعية</div>
-    <h1>خطة التحسين الشخصية</h1>
-    <div class="card">
-      <div class="section-title"><span class="bar"></span>أهداف هذا الأسبوع</div>
-      <ul class="plain">${goals}</ul>
-      <div class="section-title"><span class="bar"></span>تمارين مقترحة</div>
-      ${exercises}
-      <button class="btn" id="planBackBtn" style="margin-top:22px;">رجوع للتقرير</button>
+    <div class="feature-card">
+      <div class="feature-num">03</div>
+      <h3>خطة تناسبك أنت</h3>
+      <p>توصيات تعلّم مبنية على نقاط ضعفك الفعلية، تتحدّث معك في كل جلسة جديدة.</p>
     </div>
-  `;
-}
+  </div>
+</section>
 
-function renderSignupOverlay(){
-  const isSignup = state.overlayMode === 'signup';
-  return `
-    <div class="overlay-backdrop" id="overlayBackdrop">
-      <div class="card overlay-card">
-        <div class="eyebrow">${isSignup ? 'احفظ نتيجتك' : 'سجل الدخول'}</div>
-        <h1 style="font-size:22px;">${isSignup ? 'سجل عشان تحفظ تقدمك' : 'سجل الدخول لحسابك'}</h1>
-        <p class="sub" style="margin-bottom:18px;">${isSignup ? 'أنشئ حساب بسيط عشان نحفظ نتيجتك ونتابع تطورك بمحاولات جاية — أو تقدر تتخطى وتشوف نتيجتك الحين.' : 'سجل دخولك لحسابك الحالي.'}</p>
-        ${state.overlayError ? `<div class="warn">${state.overlayError}</div>` : ''}
-        <div class="auth-fields">
-          <input id="overlayEmail" type="email" class="auth-input" placeholder="البريد الإلكتروني" value="${state.overlayEmail||''}">
-          ${isSignup ? `<input id="overlayPhone" type="tel" class="auth-input" placeholder="رقم الجوال (اختياري)" value="${state.overlayPhone||''}">` : ''}
-          <input id="overlayPassword" type="password" class="auth-input" placeholder="كلمة المرور" value="${state.overlayPassword||''}">
-        </div>
-        <button class="btn" id="overlaySubmitBtn" style="margin-top:18px;" ${state.overlayLoading?'disabled':''}>${state.overlayLoading ? 'جارٍ التحميل...' : (isSignup ? 'إنشاء الحساب' : 'تسجيل الدخول')}</button>
-        <button class="btn secondary" id="overlayToggleBtn" style="margin-top:10px;">${isSignup ? 'لديك حساب؟ سجل الدخول' : 'ليس لديك حساب؟ أنشئه'}</button>
-        <button class="btn secondary" id="overlaySkipBtn" style="margin-top:10px;border:none;color:var(--muted-on-dark);">تخطي وعرض نتيجتي</button>
+<section id="voice">
+  <div class="voice-panel reveal">
+    <div>
+      <div class="eyebrow">الاستماع الحيّ</div>
+      <h2>فولش يسمع كل تردد، وكل تحسّن</h2>
+      <p>خلف كل محادثة، نموذج ذكاء اصطناعي يتابع نبرتك ووتيرتك ليقيس تقدمك بدقة، لا بالتخمين.</p>
+
+      <div class="stats">
+        <div class="stat"><b>٦</b><span>مستويات CEFR مغطاة بالكامل</span></div>
+        <div class="stat"><b>٨٩٪</b><span>دقة مطابقة مع تقييم بشري</span></div>
+        <div class="stat"><b>‎<3</b><span>دقائق للحصول على تقييمك الأول</span></div>
       </div>
     </div>
-  `;
-}
 
-function renderResults(){
-  const r = state.result;
-  const idx = LEVEL_INDEX[r.level] ?? 2;
-  const angle = (idx*30+15-90);
-  const strengths = (r.strengths_ar||[]).map(s=>`<li>${s}</li>`).join('');
-  const weaknesses = (r.weaknesses_ar||[]).map(s=>`<li>${s}</li>`).join('');
-  const corrections = (r.corrections||[]).map(c=>`
-    <div class="correction-row">
-      <div class="orig">${c.original}</div>
-      <div class="fixed">✓ ${c.corrected}</div>
-    </div>`).join('');
-  const categories = (r.categoryScores||[]).map(c=>`
-    <div class="cat-row">
-      <div class="cat-top"><span>${c.name_ar}</span><span class="cat-score">${c.score}/100</span></div>
-      <div class="cat-track"><div class="cat-fill" style="width:${c.score}%"></div></div>
-      <div class="cat-note">${c.note_ar||''}</div>
-    </div>`).join('');
-
-  const displayedLevel = r.rangeLevel || r.level;
-  const showOverlay = !state.user && !state.signupDismissed;
-  const historical = !!state.viewingHistoricalReport;
-
-  return `
-    <div class="eyebrow">${historical ? 'تقرير محفوظ' : 'نتيجة التقييم'}</div>
-    ${historical ? `<button class="listen-btn" id="backToHistoryBtn" style="margin-bottom:16px;">→ الرجوع للسجل</button>` : ''}
-    <div class="card">
-      <div class="gauge-wrap">
-        <div class="gauge"><div class="needle" id="resultNeedle" data-angle="${angle}"></div></div>
-        <div class="gauge-labels"><span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span></div>
-        <div class="level-big">${displayedLevel}</div>
-        <div class="level-name">${r.levelName_ar || LEVEL_AR[r.level] || ''}</div>
-        <div class="ielts-chip">تقدير IELTS تقريبي · ${r.ieltsEstimate || '—'}</div>
-      </div>
-
-      ${r.lowConfidence ? `<div class="confidence-note">النتيجة تقريبية وتفاوتت إجاباتك بين مستويات متقاربة — ${state.extraRoundOffered ? 'ننصحك بجلسة ثانية لاحقًا لدقة أعلى.' : 'تقدر تسوي جولة إضافية الحين لرفع الدقة.'}</div>` : ''}
-
-      <div class="summary-box">${r.summary_ar || ''}</div>
-
-      <div class="section-title"><span class="bar"></span>التفصيل حسب ٤ فئات</div>
-      ${categories}
-
-      <div class="section-title"><span class="bar"></span>نقاط قوتك</div>
-      <ul class="plain">${strengths}</ul>
-
-      <div class="section-title"><span class="bar"></span>تحتاج تشتغل عليها</div>
-      <ul class="plain">${weaknesses}</ul>
-
-      ${corrections? `<div class="section-title"><span class="bar"></span>أمثلة من إجاباتك مع التصحيح</div>${corrections}`:''}
-
-      <div class="section-title"><span class="bar"></span>توصية</div>
-      <div class="summary-box">${r.recommendation_ar || ''}</div>
-
-      <div class="row-btns" style="margin-top:24px;">
-        ${(!historical && !state.extraRoundOffered) ? `<button class="btn secondary" id="extraRoundBtn">جولة إضافية لدقة أعلى</button>` : ''}
-        <button class="btn" id="restartBtn">${historical ? 'اختبار جديد' : 'إعادة الاختبار'}</button>
-      </div>
-      <button class="btn secondary" id="planBtn" style="margin-top:12px;">خطة التحسين الشخصية</button>
+    <div class="wave" aria-hidden="true">
+      <span style="height:40%; animation-delay:0s"></span>
+      <span style="height:70%; animation-delay:.15s"></span>
+      <span style="height:100%; animation-delay:.3s"></span>
+      <span style="height:55%; animation-delay:.45s"></span>
+      <span style="height:85%; animation-delay:.6s"></span>
+      <span style="height:35%; animation-delay:.75s"></span>
+      <span style="height:65%; animation-delay:.9s"></span>
+      <span style="height:95%; animation-delay:1.05s"></span>
+      <span style="height:50%; animation-delay:1.2s"></span>
+      <span style="height:75%; animation-delay:1.35s"></span>
+      <span style="height:40%; animation-delay:1.5s"></span>
+      <span style="height:60%; animation-delay:1.65s"></span>
     </div>
-    <p class="footer-note">التقييم يعتمد على تحليل نصّي لمحادثة قصيرة (بدون تحليل نطق صوتي حقيقي) — للحصول على تقييم رسمي معتمد يُفضّل اختبار مثل IELTS أو TOEFL.</p>
-    ${showOverlay ? renderSignupOverlay() : ''}
-  `;
-}
+  </div>
+</section>
 
-function formatTime(s){
-  const m = Math.floor(s/60).toString().padStart(2,'0');
-  const sec = (s%60).toString().padStart(2,'0');
-  return `${m}:${sec}`;
-}
+<section class="final-cta reveal">
+  <div class="eyebrow" style="justify-content:center;">ابدأ اليوم</div>
+  <h2>مستواك الحقيقي بالإنجليزية، خلال محادثة واحدة</h2>
+  <p>لا تسجيل معقّد، لا انتظار. تحدّث لدقائق واحصل على صورة واضحة عن مكانك، وما ينقصك للوصول أبعد.</p>
+  <a href="#" class="cta-btn">ابدأ تقييمك المجاني الآن</a>
+</section>
 
-function speak(text){
-  if(!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US';
-  u.rate = 0.95;
-  window.speechSynthesis.speak(u);
-}
+<footer>
+  <div>فولش © ٢٠٢٦</div>
+  <div>تعلّم يتنفّس معك</div>
+</footer>
 
-/* ===== Live waveform (Web Audio API) — Phase 4 ===== */
-function startWaveform(stream){
-  try{
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if(!AC || !stream) return;
-    state.audioCtx = new AC();
-    const source = state.audioCtx.createMediaStreamSource(stream);
-    state.analyser = state.audioCtx.createAnalyser();
-    state.analyser.fftSize = 64;
-    source.connect(state.analyser);
-    const dataArray = new Uint8Array(state.analyser.frequencyBinCount);
-    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const tick = ()=>{
-      if(!state.analyser) return;
-      state.analyser.getByteFrequencyData(dataArray);
-      const bars = state.waveformBars.length;
-      const step = Math.floor(dataArray.length/bars) || 1;
-      for(let i=0;i<bars;i++){
-        const v = dataArray[i*step] || 0;
-        state.waveformBars[i] = reduceMotion ? 8 : Math.max(4, Math.round((v/255)*40));
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('in-view');
       }
-      drawWaveformBars();
-      state.waveformRAF = requestAnimationFrame(tick);
-    };
-    tick();
-  }catch(e){ /* mic-level waveform is a nicety, never blocks the flow */ }
-}
-function stopWaveform(){
-  if(state.waveformRAF){ cancelAnimationFrame(state.waveformRAF); state.waveformRAF=null; }
-  if(state.audioCtx){ try{ state.audioCtx.close(); }catch(e){} state.audioCtx=null; }
-  state.analyser = null;
-  state.waveformBars = new Array(28).fill(4);
-}
-function drawWaveformBars(){
-  ['waveformMain','waveformWarmup'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(!el) return;
-    if(el.childElementCount !== state.waveformBars.length){
-      el.innerHTML = state.waveformBars.map(()=>'<span class="bar"></span>').join('');
-    }
-    const bars = el.children;
-    for(let i=0;i<bars.length;i++){ bars[i].style.height = state.waveformBars[i]+'px'; }
-  });
-}
-
-function resetQuestionState(){
-  state.isRecording = false;
-  state.interim = '';
-  state.finalText = '';
-  state.timerSeconds = 0;
-  state.errorMsg = '';
-  state.showSilencePrompt = false;
-  state.lastSpeechTime = 0;
-  if(state.timerHandle){ clearInterval(state.timerHandle); state.timerHandle=null; }
-  if(state.silenceHandle){ clearInterval(state.silenceHandle); state.silenceHandle=null; }
-}
-
-function startRecording(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR){ render(); return; }
-  try{
-    const rec = new SR();
-    rec.lang = 'en-US';
-    rec.continuous = true;
-    rec.interimResults = true;
-    rec.onresult = (e)=>{
-      let finalChunk = '';
-      let interimChunk = '';
-      for(let i=e.resultIndex;i<e.results.length;i++){
-        const t = e.results[i][0].transcript;
-        if(e.results[i].isFinal) finalChunk += t + ' ';
-        else interimChunk += t;
-      }
-      if(finalChunk) state.finalText = (state.finalText + ' ' + finalChunk).trim();
-      state.interim = interimChunk;
-      // reset silence clock whenever speech arrives
-      state.lastSpeechTime = Date.now();
-      state.showSilencePrompt = false;
-      render();
-    };
-    rec.onerror = (e)=>{
-      if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){
-        // Phase 2: clear alternative path — fall back to a text answer instead of a dead end
-        state.micDenied = true;
-        state.errorMsg = 'تم رفض إذن الميكروفون. تقدر تفعّل الصلاحية من إعدادات المتصفح لاحقًا، وبالوقت الحالي تكتب إجابتك بدل التسجيل.';
-      } else if(e.error === 'no-speech'){
-        // ignore
-      } else {
-        state.errorMsg = 'صار خطأ بالتسجيل الصوتي (' + e.error + '). جرب مرة ثانية أو اكتب إجابتك.';
-      }
-      stopRecordingInternal();
-      render();
-    };
-    rec.onend = ()=>{
-      if(state.isRecording){
-        state.isRecording = false;
-        if(state.timerHandle){ clearInterval(state.timerHandle); state.timerHandle=null; }
-        if(state.silenceHandle){ clearInterval(state.silenceHandle); state.silenceHandle=null; }
-        stopWaveform();
-        render();
-      }
-    };
-    state.recognition = rec;
-    state.isRecording = true;
-    state.timerSeconds = 0;
-    state.lastSpeechTime = Date.now();
-    state.showSilencePrompt = false;
-    state.timerHandle = setInterval(()=>{ state.timerSeconds++; render(); }, 1000);
-    // Silence detection: encourage after 8 seconds of no new speech (only if no text yet)
-    state.silenceHandle = setInterval(()=>{
-      if(state.isRecording && !state.finalText && !state.interim){
-        if(Date.now() - state.lastSpeechTime > 8000){
-          state.showSilencePrompt = true;
-          render();
-        }
-      }
-    }, 1000);
-    rec.start();
-    render();
-    // Web Audio API waveform runs alongside SpeechRecognition, on its own mic stream
-    if(!IS_IOS && navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
-      navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
-        state._micStream = stream;
-        startWaveform(stream);
-      }).catch(()=>{});
-    }
-  }catch(err){
-    state.errorMsg = 'ما قدرنا نبدأ التسجيل. حاول مرة ثانية أو اكتب إجابتك.';
-    render();
-  }
-}
-
-function stopRecordingInternal(){
-  state.isRecording = false;
-  if(state.timerHandle){ clearInterval(state.timerHandle); state.timerHandle=null; }
-  if(state.silenceHandle){ clearInterval(state.silenceHandle); state.silenceHandle=null; }
-  state.showSilencePrompt = false;
-  if(state.recognition){
-    try{ state.recognition.stop(); }catch(e){}
-  }
-  stopWaveform();
-  if(state._micStream){ try{ state._micStream.getTracks().forEach(t=>t.stop()); }catch(e){} state._micStream=null; }
-}
-
-function stopRecording(){
-  stopRecordingInternal();
-  render();
-}
-
-function startWarmupRecording(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR){ state.warmupDone = true; render(); return; }
-  try{
-    const rec = new SR();
-    rec.lang = 'en-US';
-    rec.continuous = true;
-    rec.interimResults = true;
-    rec.onresult = (e)=>{
-      let finalChunk='', interimChunk='';
-      for(let i=e.resultIndex;i<e.results.length;i++){
-        const t=e.results[i][0].transcript;
-        if(e.results[i].isFinal) finalChunk += t+' ';
-        else interimChunk += t;
-      }
-      if(finalChunk) state.warmupText = (state.warmupText+' '+finalChunk).trim();
-      state.warmupInterim = interimChunk;
-      render();
-    };
-    rec.onerror = (e)=>{
-      if(e.error === 'not-allowed' || e.error === 'service-not-allowed'){
-        // Phase 2: clear alternative path — skip mic entirely and use text answers
-        state.micDenied = true;
-        state.warmupDone = true;
-      } else if(e.error!=='no-speech'){
-        state.warmupDone=true; // allow proceeding on other errors
-      }
-      stopWarmupRecording();
-    };
-    rec.onend = ()=>{
-      if(state.warmupRecording){ stopWarmupRecording(); }
-    };
-    state.warmupRecognition = rec;
-    state.warmupRecording = true;
-    state.warmupCounter = 0;
-    state.warmupText = '';
-    state.warmupInterim = '';
-    // Auto-stop after 5 seconds
-    state.warmupCounterHandle = setInterval(()=>{
-      state.warmupCounter++;
-      if(state.warmupCounter >= 5){
-        clearInterval(state.warmupCounterHandle);
-        state.warmupCounterHandle = null;
-        stopWarmupRecording();
-        state.warmupDone = true;
-        render();
-      } else {
-        render();
-      }
-    }, 1000);
-    rec.start();
-    render();
-    if(!IS_IOS && navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
-      navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
-        state._micStream = stream;
-        startWaveform(stream);
-      }).catch(()=>{});
-    }
-  }catch(err){
-    state.warmupDone = true;
-    render();
-  }
-}
-
-function stopWarmupRecording(){
-  state.warmupRecording = false;
-  if(state.warmupCounterHandle){ clearInterval(state.warmupCounterHandle); state.warmupCounterHandle=null; }
-  if(state.warmupRecognition){ try{ state.warmupRecognition.stop(); }catch(e){} }
-  stopWaveform();
-  if(state._micStream){ try{ state._micStream.getTracks().forEach(t=>t.stop()); }catch(e){} state._micStream=null; }
-  if(state.warmupText || state.warmupInterim) state.warmupDone = true;
-  render();
-}
-
-async function initAuth(){
-  // Silent background session check — never blocks or gates the UI.
-  // Guests go straight into the flow; if a session already exists we just
-  // reflect it (logout button, and no signup overlay after the test).
-  try{
-    const { data:{ session } } = await supabaseClient.auth.getSession();
-    state.user = session ? session.user : null;
-  }catch(e){
-    state.user = null;
-  }
-  if(state.user) loadLastSessionTopics();
-  supabaseClient.auth.onAuthStateChange((event, session)=>{
-    state.user = session ? session.user : null;
-    if(state.user) loadLastSessionTopics();
-    render();
-  });
-  // Resolve the initial URL now that we know whether the visitor is logged
-  // in — this is what makes /dashboard, /history, /settings, and
-  // /report/:id work as real, reloadable, shareable links.
-  suppressRouting = true;
-  routeFromPath(location.pathname, true);
-  suppressRouting = false;
-}
-
-// Phase 6: fetch the topic categories from this user's most recent saved
-// report, so the next session can steer its opening question away from
-// repeating the same topic. Soft/best-effort — never blocks the UI.
-async function loadLastSessionTopics(){
-  if(!state.user) { state.lastSessionTopics = []; return; }
-  try{
-    const { data, error } = await supabaseClient
-      .from('reports')
-      .select('topic_categories')
-      .eq('user_id', state.user.id)
-      .order('created_at', { ascending:false })
-      .limit(1);
-    if(!error && data && data[0] && Array.isArray(data[0].topic_categories)){
-      state.lastSessionTopics = data[0].topic_categories;
-    } else {
-      state.lastSessionTopics = [];
-    }
-  }catch(e){
-    state.lastSessionTopics = [];
-  }
-}
-
-// Create a DB-backed session row when the test actually starts (logged-in
-// users only — guests keep working exactly as before via localStorage).
-async function createSessionRecord(){
-  state.currentSessionId = null;
-  if(!state.user) return;
-  try{
-    const { data, error } = await supabaseClient
-      .from('sessions')
-      .insert({ user_id: state.user.id, status:'in_progress' })
-      .select('id')
-      .single();
-    if(!error && data) state.currentSessionId = data.id;
-  }catch(e){ /* non-critical — session just won't be trackable in history */ }
-}
-
-// Persist each turn as it's answered (best-effort, never blocks the flow).
-async function saveTurnRecord(turnIndex, q, answer, turnCefrEstimate){
-  if(!state.user || !state.currentSessionId) return;
-  try{
-    await supabaseClient.from('turns').insert({
-      session_id: state.currentSessionId,
-      turn_index: turnIndex,
-      question_en: q.en, question_ar: q.ar,
-      topic_category: q.topicCategory || null,
-      answer, turn_cefr_estimate: turnCefrEstimate || null
     });
-  }catch(e){}
-}
+  }, {threshold:.2});
 
-// Mark the session completed + drop a progress snapshot for the dashboard.
-async function completeSessionRecord(finalLevel){
-  if(!state.user || !state.currentSessionId) return;
-  try{
-    await supabaseClient.from('sessions')
-      .update({ status:'completed', completed_at:new Date().toISOString() })
-      .eq('id', state.currentSessionId);
-    await supabaseClient.from('progress_snapshots').insert({
-      user_id: state.user.id, session_id: state.currentSessionId, cefr_level: finalLevel
-    });
-  }catch(e){}
-}
-
-// Phase 6 / Phase 3 data model: persist the finished report for logged-in
-// users (reports table) — both for their own history and so the NEXT
-// session can avoid repeating this session's opening topic categories.
-// Best-effort: a failed save should never interrupt the results screen.
-// On success, records the new report's id in state.result.reportId so the
-// results screen's URL can immediately become a real, shareable /report/:id.
-async function saveReportToSupabase(result){
-  if(!state.user) return;
-  try{
-    const topics = Array.from(new Set(state.history.map(h=>h.topicCategory).filter(Boolean)));
-    const { data, error } = await supabaseClient.from('reports').insert({
-      user_id: state.user.id,
-      session_id: state.currentSessionId || null,
-      cefr_level: result.level || null,
-      range_level: result.rangeLevel || null,
-      ielts_estimate: result.ieltsEstimate || null,
-      category_scores: result.categoryScores || null,
-      strengths: result.strengths_ar || null,
-      weaknesses: result.weaknesses_ar || null,
-      corrections: result.corrections || null,
-      summary: result.summary_ar || null,
-      recommendation: result.recommendation_ar || null,
-      topic_categories: topics
-    }).select('id').single();
-    if(!error && data && state.screen === 'results'){
-      state.result.reportId = data.id;
-      syncUrl(true); // upgrade the URL from /report to /report/:id in place
-    }
-  }catch(e){ /* non-critical — never block or interrupt the results screen */ }
-}
-
-async function handleOverlaySignup(){
-  if(!state.overlayEmail || !state.overlayPassword){
-    state.overlayError = 'الرجاء تعبئة الإيميل وكلمة المرور.';
-    render();
-    return;
-  }
-  state.overlayError = '';
-  state.overlayLoading = true;
-  render();
-  const { data, error } = await supabaseClient.auth.signUp({
-    email: state.overlayEmail,
-    password: state.overlayPassword,
-    options: { data: { phone: state.overlayPhone || null } }
-  });
-  state.overlayLoading = false;
-  if(error){
-    state.overlayError = error.message;
-    render();
-    return;
-  }
-  if(data.session){
-    state.user = data.user;
-    state.signupDismissed = true; // signed up successfully — overlay is done
-  } else {
-    state.overlayError = 'تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتأكيد الحساب ثم سجل الدخول.';
-    state.overlayMode = 'login';
-  }
-  render();
-}
-
-async function handleOverlayLogin(){
-  if(!state.overlayEmail || !state.overlayPassword){
-    state.overlayError = 'الرجاء تعبئة الإيميل وكلمة المرور.';
-    render();
-    return;
-  }
-  state.overlayError = '';
-  state.overlayLoading = true;
-  render();
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: state.overlayEmail,
-    password: state.overlayPassword
-  });
-  state.overlayLoading = false;
-  if(error){
-    state.overlayError = error.message;
-    render();
-    return;
-  }
-  state.user = data.user;
-  state.signupDismissed = true;
-  render();
-}
-
-async function handleLogout(){
-  await supabaseClient.auth.signOut();
-  state.user = null;
-  render();
-}
-
-function attachHandlers(){
-  const overlayEmailInput = document.getElementById('overlayEmail');
-  if(overlayEmailInput) overlayEmailInput.oninput = (e)=>{ state.overlayEmail = e.target.value; };
-
-  const overlayPhoneInput = document.getElementById('overlayPhone');
-  if(overlayPhoneInput) overlayPhoneInput.oninput = (e)=>{ state.overlayPhone = e.target.value; };
-
-  const overlayPasswordInput = document.getElementById('overlayPassword');
-  if(overlayPasswordInput) overlayPasswordInput.oninput = (e)=>{ state.overlayPassword = e.target.value; };
-
-  const overlaySubmitBtn = document.getElementById('overlaySubmitBtn');
-  if(overlaySubmitBtn) overlaySubmitBtn.onclick = ()=>{
-    if(state.overlayMode === 'signup') handleOverlaySignup(); else handleOverlayLogin();
-  };
-
-  const overlayToggleBtn = document.getElementById('overlayToggleBtn');
-  if(overlayToggleBtn) overlayToggleBtn.onclick = ()=>{
-    state.overlayMode = state.overlayMode === 'signup' ? 'login' : 'signup';
-    state.overlayError = '';
-    render();
-  };
-
-  const overlaySkipBtn = document.getElementById('overlaySkipBtn');
-  if(overlaySkipBtn) overlaySkipBtn.onclick = ()=>{
-    state.signupDismissed = true;
-    render();
-  };
-
-  const logoutBtn = document.getElementById('logoutBtn');
-  if(logoutBtn) logoutBtn.onclick = handleLogout;
-
-  const settingsLogoutBtn = document.getElementById('settingsLogoutBtn');
-  if(settingsLogoutBtn) settingsLogoutBtn.onclick = handleLogout;
-
-  const navDashboard = document.getElementById('navDashboard');
-  if(navDashboard) navDashboard.onclick = ()=> goTo('dashboard');
-
-  const navHistory = document.getElementById('navHistory');
-  if(navHistory) navHistory.onclick = ()=> goTo('history');
-
-  const navSettings = document.getElementById('navSettings');
-  if(navSettings) navSettings.onclick = ()=> goTo('settings');
-
-  const planBtn = document.getElementById('planBtn');
-  if(planBtn) planBtn.onclick = ()=> goTo('plan');
-
-  const planBackBtn = document.getElementById('planBackBtn');
-  if(planBackBtn) planBackBtn.onclick = ()=> goTo('results');
-
-  const backToHistoryBtn = document.getElementById('backToHistoryBtn');
-  if(backToHistoryBtn) backToHistoryBtn.onclick = ()=> goTo('history');
-
-  const errorHomeBtn = document.getElementById('errorHomeBtn');
-  if(errorHomeBtn) errorHomeBtn.onclick = ()=>{ state.errorMsg=''; goTo('intro'); };
-
-  document.querySelectorAll('.history-row').forEach(el=>{
-    el.onclick = ()=>{
-      const id = el.getAttribute('data-report-id');
-      if(id) loadReportById(id, false);
-    };
-  });
-
-  const retryPlanBtn = document.getElementById('retryPlanBtn');
-  if(retryPlanBtn) retryPlanBtn.onclick = ()=>{ state.planError=''; render(); };
-
-  const startBtn = document.getElementById('startBtn');
-  if(startBtn) startBtn.onclick = ()=>{
-    // Go to warmup screen first (unless mic not supported)
-    state.warmupDone = false;
-    state.warmupText = '';
-    state.warmupInterim = '';
-    state.warmupRecording = false;
-    goTo('warmup');
-  };
-
-  const resumeBtn = document.getElementById('resumeBtn');
-  if(resumeBtn) resumeBtn.onclick = ()=>{
-    const saved = loadSession();
-    if(!saved){ clearSession(); render(); return; }
-    state.history = saved.history || [];
-    state.turnLevels = saved.turnLevels || [];
-    state.turnIndex = saved.turnIndex || 0;
-    state.maxTurns = saved.maxTurns || MAX_TURNS_DEFAULT;
-    state.currentLevelIndex = saved.currentLevelIndex ?? 2;
-    state.directionHistory = saved.directionHistory || [];
-    state.currentQuestion = saved.currentQuestion || INTRO_QUESTION;
-    state.imagePointer = saved.imagePointer || 0;
-    state.extraRoundOffered = saved.extraRoundOffered || false;
-    state.calibrationEstimates = saved.calibrationEstimates || [];
-    state.calibrationDone = saved.calibrationDone || false;
-    clearSession();
-    resetQuestionState();
-    goTo('question');
-    speak(state.currentQuestion.en);
-  };
-
-  const discardBtn = document.getElementById('discardBtn');
-  if(discardBtn) discardBtn.onclick = ()=>{ clearSession(); render(); };
-
-  const warmupMicBtn = document.getElementById('warmupMicBtn');
-  if(warmupMicBtn) warmupMicBtn.onclick = ()=>{
-    if(state.warmupRecording){ stopWarmupRecording(); }
-    else { startWarmupRecording(); }
-  };
-
-  const retryMicWarmupBtn = document.getElementById('retryMicWarmupBtn');
-  if(retryMicWarmupBtn) retryMicWarmupBtn.onclick = ()=>{
-    state.micDenied = false;
-    state.warmupDone = false;
-    render();
-  };
-
-  const warmupNextBtn = document.getElementById('warmupNextBtn');
-  if(warmupNextBtn) warmupNextBtn.onclick = ()=>{
-    if(state.warmupRecording) stopWarmupRecording();
-    state.turnIndex = 0;
-    state.currentQuestion = INTRO_QUESTION;
-    resetQuestionState();
-    goTo('question');
-    speak(INTRO_QUESTION.en);
-    createSessionRecord(); // fire-and-forget — logged-in users only
-  };
-
-  const listenBtn = document.getElementById('listenBtn');
-  if(listenBtn) listenBtn.onclick = ()=> speak(state.currentQuestion.en);
-
-  const micBtn = document.getElementById('micBtn');
-  if(micBtn) micBtn.onclick = ()=>{
-    if(state.isRecording){ stopRecording(); }
-    else {
-      state.finalText=''; state.interim=''; state.errorMsg='';
-      startRecording();
-    }
-  };
-
-  const textAnswer = document.getElementById('textAnswer');
-  if(textAnswer){
-    textAnswer.oninput = (e)=>{
-      state.finalText = e.target.value;
-      const nextBtn = document.getElementById('nextBtn');
-      if(nextBtn) nextBtn.disabled = state.finalText.trim().length===0;
-    };
-  }
-
-  const retryMicBtn = document.getElementById('retryMicBtn');
-  if(retryMicBtn) retryMicBtn.onclick = ()=>{
-    state.micDenied = false;
-    state.errorMsg = '';
-    render();
-  };
-
-  const skipBtn = document.getElementById('skipBtn');
-  if(skipBtn) skipBtn.onclick = ()=> advance('(no answer given)');
-
-  const nextBtn = document.getElementById('nextBtn');
-  if(nextBtn) nextBtn.onclick = ()=>{
-    const answer = (state.finalText||'').trim() || '(no answer given)';
-    advance(answer);
-  };
-
-  const restartBtn = document.getElementById('restartBtn');
-  if(restartBtn) restartBtn.onclick = ()=>{
-    clearSession();
-    state = {
-      screen:'intro', turnIndex:0, maxTurns:MAX_TURNS_DEFAULT, currentLevelIndex:2,
-      directionHistory:[], turnLevels:[], history:[], currentQuestion:INTRO_QUESTION,
-      imagePointer:0, quickReply:null,
-      recognitionSupported: state.recognitionSupported,
-      micDenied:false,
-      isRecording:false, interim:'', finalText:'', timerSeconds:0, timerHandle:null,
-      silenceHandle:null, lastSpeechTime:0, showSilencePrompt:false,
-      recognition:null, result:null, extraRoundOffered:false, pendingAction:null, errorMsg:'',
-      calibrationEstimates:[], calibrationDone:false,
-      warmupDone:false, warmupText:'', warmupInterim:'', warmupRecording:false,
-      warmupCounter:0, warmupCounterHandle:null, warmupRecognition:null,
-      audioCtx:null, analyser:null, waveformRAF:null, waveformBars:new Array(28).fill(4),
-      user: state.user,
-      signupDismissed:false, overlayMode:'signup', overlayEmail:'', overlayPhone:'', overlayPassword:'', overlayError:'', overlayLoading:false,
-      currentSessionId:null, historyReports:null, progressSnapshots:null,
-      currentPlan:null, planLoading:false, planError:'',
-      reportLoading:false, reportError:'', viewingHistoricalReport:false, pendingDeepLink:null
-    };
-    syncUrl(false);
-    render();
-  };
-
-  const extraRoundBtn = document.getElementById('extraRoundBtn');
-  if(extraRoundBtn) extraRoundBtn.onclick = ()=>{
-    state.extraRoundOffered = true;
-    state.maxTurns += EXTRA_ROUND_TURNS;
-    state.pendingAction = 'turn';
-    goTo('loading-turn');
-    fetchNextTurn();
-  };
-
-  const retryBtn = document.getElementById('retryBtn');
-  if(retryBtn) retryBtn.onclick = ()=>{
-    if(state.pendingAction === 'analyze'){
-      goTo('loading-final');
-      runFinalAnalysis();
-    } else {
-      goTo('loading-turn');
-      fetchNextTurn();
-    }
-  };
-
-  // Level gauge — animate the needle in exactly once on entry (Phase 4)
-  const resultNeedle = document.getElementById('resultNeedle');
-  if(resultNeedle){
-    const angle = resultNeedle.getAttribute('data-angle');
-    requestAnimationFrame(()=>{
-      requestAnimationFrame(()=>{ resultNeedle.style.transform = `rotate(${angle}deg)`; });
-    });
-  }
-}
-
-function advance(answer){
-  const q = state.currentQuestion;
-  state.history.push({
-    question:q.en, question_ar:q.ar, type:q.type||'talk', topicCategory:q.topicCategory||'intro_daily_life', answer
-  });
-  saveTurnRecord(state.turnIndex, q, answer, (state.turnLevels||[])[state.turnLevels.length-1]);
-  window.speechSynthesis && window.speechSynthesis.cancel();
-  stopRecordingInternal();
-
-  if(state.turnIndex >= state.maxTurns - 1){
-    state.pendingAction = 'analyze';
-    goTo('loading-final');
-    runFinalAnalysis();
-  } else {
-    state.pendingAction = 'turn';
-    goTo('loading-turn');
-    fetchNextTurn();
-  }
-}
-
-function applyDirectionSignal(direction){
-  if(direction !== 'harder' && direction !== 'easier'){
-    state.directionHistory = [];
-    return;
-  }
-  state.directionHistory.push(direction);
-  if(state.directionHistory.length >= 2){
-    const lastTwo = state.directionHistory.slice(-2);
-    if(lastTwo[0] === lastTwo[1]){
-      state.currentLevelIndex = Math.max(0, Math.min(5,
-        state.currentLevelIndex + (direction === 'harder' ? 1 : -1)
-      ));
-      state.directionHistory = [];
-    }
-  }
-}
-
-// Phase 2: apply the first CALIBRATION_TURNS estimates directly as the
-// starting level (fast, decisive), instead of the slow two-in-a-row rule.
-function applyCalibration(turnCefrEstimate){
-  state.calibrationEstimates.push(turnCefrEstimate);
-  if(state.calibrationEstimates.length >= CALIBRATION_TURNS){
-    const idxs = state.calibrationEstimates.map(l => LEVEL_INDEX[l] ?? 2);
-    const avg = Math.round(idxs.reduce((a,b)=>a+b,0) / idxs.length);
-    state.currentLevelIndex = Math.max(0, Math.min(5, avg));
-    state.calibrationDone = true;
-    state.directionHistory = [];
-  }
-}
-
-async function fetchNextTurn(){
-  try{
-    const turnNumber = state.turnIndex + 1; // the turn we're about to fetch a question for
-    const isCalibration = !state.calibrationDone && turnNumber <= CALIBRATION_TURNS;
-
-    // Phase 6: only steer away from the LAST session's topics on the opening
-    // turns of THIS session — later turns already vary naturally within-session.
-    const avoidTopics = (turnNumber <= CALIBRATION_TURNS) ? state.lastSessionTopics : [];
-
-    const resp = await fetch('/api/turn', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        history: state.history,
-        currentLevelIndex: state.currentLevelIndex,
-        turnNumber: turnNumber,
-        maxTurns: state.maxTurns,
-        isCalibration: isCalibration,
-        avoidTopics: avoidTopics
-      })
-    });
-    const parsed = await resp.json();
-    if(!resp.ok){
-      throw new Error(parsed.error || 'Server error while generating the next question.');
-    }
-
-    if(parsed.turnCefrEstimate) state.turnLevels.push(parsed.turnCefrEstimate);
-
-    if(isCalibration){
-      if(parsed.turnCefrEstimate) applyCalibration(parsed.turnCefrEstimate);
-    } else if(parsed.direction){
-      applyDirectionSignal(parsed.direction);
-    }
-
-    state.turnIndex++;
-    state.quickReply = { en: parsed.quickReplyEn||'', ar: parsed.quickReplyAr||'' };
-
-    if(IMAGE_TURN_POSITIONS.includes(state.turnIndex) && state.imagePointer < IMAGE_BANK.length){
-      const img = IMAGE_BANK[state.imagePointer++];
-      state.currentQuestion = { en:img.en, ar:img.ar, img:img.img, type:'image', topicCategory:'describe_image' };
-    } else if(parsed.nextQuestion){
-      state.currentQuestion = {
-        en: parsed.nextQuestion.en, ar: parsed.nextQuestion.ar,
-        type: parsed.nextQuestion.type || 'talk', topicCategory: parsed.nextQuestion.topicCategory
-      };
-    }
-
-    resetQuestionState();
-    goTo('question');
-    speak(state.currentQuestion.en);
-  }catch(err){
-    saveSession(); // preserve progress on network failure
-    state.errorMsg = (err && err.message) ? err.message : 'خطأ غير معروف';
-    state.pendingAction = 'turn';
-    goTo('error');
-  }
-}
-
-async function runFinalAnalysis(){
-  try{
-    const resp = await fetch('/api/analyze', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ history: state.history, turnLevels: state.turnLevels })
-    });
-    const parsed = await resp.json();
-    if(!resp.ok){
-      throw new Error(parsed.error || 'Server error while evaluating your answers.');
-    }
-    clearSession(); // analysis done — no need to keep the saved session
-    state.result = parsed;
-    state.viewingHistoricalReport = false;
-    goTo('results');
-    saveReportToSupabase(parsed); // fire-and-forget — never blocks the results screen
-    completeSessionRecord(parsed.level);
-  }catch(err){
-    saveSession(); // preserve progress on network failure
-    state.errorMsg = (err && err.message) ? err.message : 'خطأ غير معروف';
-    state.pendingAction = 'analyze';
-    goTo('error');
-  }
-}
-
-render();
-initAuth();
+  document.querySelectorAll('.reveal, .feature-card, .dune-path, .dune-fill').forEach(el=>io.observe(el));
 </script>
+
 </body>
 </html>
