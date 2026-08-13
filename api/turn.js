@@ -11,7 +11,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  if (!checkRateLimit(req)) {
+  if (!(await checkRateLimit(req))) {
     res.status(429).json({ error: 'عدد الطلبات كثير جدًا خلال وقت قصير. حاول مرة ثانية بعد دقيقة.' });
     return;
   }
