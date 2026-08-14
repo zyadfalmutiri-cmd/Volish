@@ -106,7 +106,12 @@ Limit "corrections" to at most 3 items. Keep every string concise.`;
       systemPrompt,
       userText: 'Full interview transcript:\n\n' + transcript,
       generationConfig: {
-        maxOutputTokens: 1000,
+        // NOTE: on thinking-enabled Gemini models, internal "thinking" tokens
+        // are drawn from this same budget. A tight limit here can let the
+        // model burn the whole budget thinking and leave nothing for the
+        // actual JSON output, which truncates the response and breaks
+        // JSON.parse below. Keep this generous for a 4-category report.
+        maxOutputTokens: 2500,
         responseMimeType: 'application/json',
         thinkingConfig: { thinkingLevel: 'low' }
       }
@@ -117,15 +122,24 @@ Limit "corrections" to at most 3 items. Keep every string concise.`;
       return;
     }
 
-    const textOut = (data.candidates && data.candidates[0] && data.candidates[0].content &&
-      data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
-      data.candidates[0].content.parts[0].text) || '';
+    const candidate = data.candidates && data.candidates[0];
+    const textOut = (candidate && candidate.content &&
+      candidate.content.parts && candidate.content.parts[0] &&
+      candidate.content.parts[0].text) || '';
     const clean = textOut.replace(/```json/g, '').replace(/```/g, '').trim();
 
     let parsed;
     try {
       parsed = JSON.parse(clean);
     } catch (parseErr) {
+      // Log enough context to diagnose in Vercel logs without exposing
+      // internals to the client (e.g. finishReason === 'MAX_TOKENS' means
+      // the response got cut off — raise maxOutputTokens further).
+      console.error('analyze.js: failed to parse Gemini JSON', {
+        finishReason: candidate && candidate.finishReason,
+        textLength: textOut.length,
+        textPreview: textOut.slice(0, 300)
+      });
       res.status(502).json({ error: 'صار خطأ بمعالجة رد نظام الذكاء الاصطناعي. حاول مرة ثانية.' });
       return;
     }
