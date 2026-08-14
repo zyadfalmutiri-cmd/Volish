@@ -4,6 +4,7 @@
 // Requires GEMINI_API_KEY env var (Google AI Studio, free tier).
 
 const { checkRateLimit } = require('../lib/rateLimit');
+const { callGeminiWithRetry } = require('../lib/geminiCall');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -11,7 +12,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  if (!checkRateLimit(req)) {
+  if (!(await checkRateLimit(req))) {
     res.status(429).json({ error: 'عدد الطلبات كثير جدًا خلال وقت قصير. حاول مرة ثانية بعد دقيقة.' });
     return;
   }
@@ -99,29 +100,20 @@ Respond with ONLY valid JSON (no markdown fences, no preamble, no explanation ou
 }
 Limit "corrections" to at most 3 items. Keep every string concise.`;
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          contents: [
-            { role: 'user', parts: [{ text: 'Full interview transcript:\n\n' + transcript }] }
-          ],
-          generationConfig: {
-            maxOutputTokens: 1000,
-            responseMimeType: 'application/json',
-            thinkingConfig: { thinkingLevel: 'low' }
-          }
-        })
+    const { ok, status, data } = await callGeminiWithRetry({
+      apiKey,
+      model,
+      systemPrompt,
+      userText: 'Full interview transcript:\n\n' + transcript,
+      generationConfig: {
+        maxOutputTokens: 1000,
+        responseMimeType: 'application/json',
+        thinkingConfig: { thinkingLevel: 'low' }
       }
-    );
+    });
 
-    const data = await geminiRes.json();
-
-    if (!geminiRes.ok) {
-      res.status(geminiRes.status).json({ error: (data && data.error && data.error.message) || 'Gemini API error' });
+    if (!ok) {
+      res.status(status).json({ error: (data && data.error && data.error.message) || 'Gemini API error' });
       return;
     }
 
