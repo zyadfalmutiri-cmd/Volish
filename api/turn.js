@@ -101,7 +101,12 @@ Respond with ONLY valid JSON (no markdown fences, no preamble, no explanation ou
       systemPrompt,
       userText: 'Interview transcript so far:\n\n' + transcript,
       generationConfig: {
-        maxOutputTokens: 500,
+        // NOTE: on thinking-enabled Gemini models, internal "thinking" tokens
+        // are drawn from this same budget. A tight limit here can let the
+        // model burn the whole budget thinking and leave nothing for the
+        // actual JSON output, which truncates the response and breaks
+        // JSON.parse below. Keep this generous even for a small per-turn reply.
+        maxOutputTokens: 1200,
         responseMimeType: 'application/json',
         thinkingConfig: { thinkingLevel: 'low' }
       }
@@ -112,15 +117,21 @@ Respond with ONLY valid JSON (no markdown fences, no preamble, no explanation ou
       return;
     }
 
-    const textOut = (data.candidates && data.candidates[0] && data.candidates[0].content &&
-      data.candidates[0].content.parts && data.candidates[0].content.parts[0] &&
-      data.candidates[0].content.parts[0].text) || '';
+    const candidate = data.candidates && data.candidates[0];
+    const textOut = (candidate && candidate.content &&
+      candidate.content.parts && candidate.content.parts[0] &&
+      candidate.content.parts[0].text) || '';
     const clean = textOut.replace(/```json/g, '').replace(/```/g, '').trim();
 
     let parsed;
     try {
       parsed = JSON.parse(clean);
     } catch (parseErr) {
+      console.error('turn.js: failed to parse Gemini JSON', {
+        finishReason: candidate && candidate.finishReason,
+        textLength: textOut.length,
+        textPreview: textOut.slice(0, 300)
+      });
       res.status(502).json({ error: 'صار خطأ بمعالجة رد نظام الذكاء الاصطناعي. حاول مرة ثانية.' });
       return;
     }
