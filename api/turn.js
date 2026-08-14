@@ -4,6 +4,7 @@
 // Requires GEMINI_API_KEY env var (Google AI Studio, free tier).
 
 const { checkRateLimit } = require('../lib/rateLimit');
+const { callGeminiWithRetry } = require('../lib/geminiCall');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -94,29 +95,20 @@ Respond with ONLY valid JSON (no markdown fences, no preamble, no explanation ou
   "nextQuestion": ${isLastTurn ? 'null' : '{"en": "the next question in English", "ar": "Gulf Arabic translation of the question", "type": "talk", "topicCategory": "one of the categories above"}'}
 }`;
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-          contents: [
-            { role: 'user', parts: [{ text: 'Interview transcript so far:\n\n' + transcript }] }
-          ],
-          generationConfig: {
-            maxOutputTokens: 500,
-            responseMimeType: 'application/json',
-            thinkingConfig: { thinkingLevel: 'low' }
-          }
-        })
+    const { ok, status, data } = await callGeminiWithRetry({
+      apiKey,
+      model,
+      systemPrompt,
+      userText: 'Interview transcript so far:\n\n' + transcript,
+      generationConfig: {
+        maxOutputTokens: 500,
+        responseMimeType: 'application/json',
+        thinkingConfig: { thinkingLevel: 'low' }
       }
-    );
+    });
 
-    const data = await geminiRes.json();
-
-    if (!geminiRes.ok) {
-      res.status(geminiRes.status).json({ error: (data && data.error && data.error.message) || 'Gemini API error' });
+    if (!ok) {
+      res.status(status).json({ error: (data && data.error && data.error.message) || 'Gemini API error' });
       return;
     }
 
