@@ -4,7 +4,26 @@
 // Requires GEMINI_API_KEY env var (Google AI Studio, free tier).
 
 const { checkRateLimit } = require('../lib/rateLimit');
-const { callGeminiWithRetry } = require('../lib/geminiCall');
+const { callGeminiWithRetry, parseGeminiJson } = require('../lib/geminiCall');
+
+const FOCUS_VALUES = ['grammar', 'vocabulary', 'fluency', 'listening_comprehension'];
+
+// تحقق سطحي من شكل رد الذكاء الاصطناعي بعد نجاح JSON.parse — عشان لو رجّع
+// JSON صحيح تقنيًا لكن ناقص حقل متوقّع، نرجّع خطأ عربي واضح للفرونت إند
+// بدل ما نرسل كائن ناقص يطيح الواجهة.
+function validatePlanShape(parsed) {
+  if (!parsed || typeof parsed !== 'object') return 'root is not an object';
+  if (!Array.isArray(parsed.weeklyGoals) || parsed.weeklyGoals.some(g => typeof g !== 'string')) {
+    return 'weeklyGoals must be an array of strings';
+  }
+  if (!Array.isArray(parsed.suggestedExercises)) return 'suggestedExercises must be an array';
+  for (const ex of parsed.suggestedExercises) {
+    if (!ex || typeof ex.title_ar !== 'string' || typeof ex.description_ar !== 'string' || !FOCUS_VALUES.includes(ex.focus)) {
+      return 'malformed suggestedExercises item';
+    }
+  }
+  return null; // صحيح
+}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -12,7 +31,17 @@ module.exports = async (req, res) => {
     return;
   }
 
-  if (!(await checkRateLimit(req))) {
+  // الرايت ليمتر نفسه fail-open داخليًا (يسمح بالطلب لو صار خطأ شبكة/Supabase
+  // بالاستدعاء)، لكن لفّيناه هنا كمان بـ try/catch احتياطي عشان أي استثناء
+  // غير متوقع ما يطيح الفنكشن كاملة بخطأ Vercel خام بدل رسالة الخطأ العربية.
+  let rateLimitOk = true;
+  try {
+    rateLimitOk = await checkRateLimit(req);
+  } catch (rlErr) {
+    console.error('plan.js: checkRateLimit threw unexpectedly, failing open', rlErr);
+    rateLimitOk = true;
+  }
+  if (!rateLimitOk) {
     res.status(429).json({ error: 'عدد الطلبات كثير جدًا خلال وقت قصير. حاول مرة ثانية بعد دقيقة.' });
     return;
   }
@@ -70,6 +99,9 @@ Limit "suggestedExercises" to at most 5 items. Be concrete and specific to this 
         // JSON.parse below. Keep this generous for a multi-exercise plan.
         maxOutputTokens: 1500,
         responseMimeType: 'application/json',
+        // القيمة هنا مجرد "نية" افتراضية — lib/geminiCall.js يستبدلها تلقائيًا
+        // بالشكل الصح (thinkingLevel أو thinkingBudget) حسب عائلة كل موديل
+        // فعليًا يُجرَّب بسلسلة الـfallback.
         thinkingConfig: { thinkingLevel: 'low' }
       }
     });
@@ -79,19 +111,24 @@ Limit "suggestedExercises" to at most 5 items. Be concrete and specific to this 
       return;
     }
 
-    const candidate = data.candidates && data.candidates[0];
-    const textOut = (candidate && candidate.content &&
-      candidate.content.parts && candidate.content.parts[0] &&
-      candidate.content.parts[0].text) || '';
-    const clean = textOut.replace(/```json/g, '').replace(/```/g, '').trim();
-
-    let parsed;
+    let parsed, candidate, textOut;
     try {
-      parsed = JSON.parse(clean);
+      ({ parsed, candidate, textOut } = parseGeminiJson(data));
     } catch (parseErr) {
+      const c = data.candidates && data.candidates[0];
       console.error('plan.js: failed to parse Gemini JSON', {
+        finishReason: c && c.finishReason,
+        error: parseErr.message
+      });
+      res.status(502).json({ error: 'صار خطأ بمعالجة رد نظام الذكاء الاصطناعي. حاول مرة ثانية.' });
+      return;
+    }
+
+    const shapeError = validatePlanShape(parsed);
+    if (shapeError) {
+      console.error('plan.js: Gemini JSON has unexpected shape', {
         finishReason: candidate && candidate.finishReason,
-        textLength: textOut.length,
+        shapeError,
         textPreview: textOut.slice(0, 300)
       });
       res.status(502).json({ error: 'صار خطأ بمعالجة رد نظام الذكاء الاصطناعي. حاول مرة ثانية.' });
