@@ -4,7 +4,31 @@
 // Requires GEMINI_API_KEY env var (Google AI Studio, free tier).
 
 const { checkRateLimit } = require('../lib/rateLimit');
-const { callGeminiWithRetry } = require('../lib/geminiCall');
+const { callGeminiWithRetry, parseGeminiJson } = require('../lib/geminiCall');
+
+const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+const DIRECTIONS = ['harder', 'same', 'easier'];
+
+// تحقق سطحي من شكل رد الذكاء الاصطناعي بعد نجاح JSON.parse — عشان لو رجّع
+// JSON صحيح تقنيًا لكن ناقص حقل متوقّع، نرجّع خطأ عربي واضح للفرونت إند
+// بدل ما نرسل كائن ناقص يطيح الواجهة أو منطق التكيّف بالفرونت إند.
+function validateTurnShape(parsed) {
+  if (!parsed || typeof parsed !== 'object') return 'root is not an object';
+  if (!LEVELS.includes(parsed.turnCefrEstimate)) return 'invalid turnCefrEstimate';
+  if (!DIRECTIONS.includes(parsed.direction)) return 'invalid direction';
+  if (typeof parsed.quickReplyEn !== 'string') return 'missing quickReplyEn';
+  if (typeof parsed.quickReplyAr !== 'string') return 'missing quickReplyAr';
+  if (typeof parsed.isFinal !== 'boolean') return 'missing isFinal';
+  if (parsed.isFinal) {
+    if (parsed.nextQuestion !== null && parsed.nextQuestion !== undefined) return 'nextQuestion must be null when isFinal is true';
+  } else {
+    const q = parsed.nextQuestion;
+    if (!q || typeof q.en !== 'string' || typeof q.ar !== 'string' || typeof q.type !== 'string') {
+      return 'malformed nextQuestion';
+    }
+  }
+  return null; // صحيح
+}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -12,7 +36,17 @@ module.exports = async (req, res) => {
     return;
   }
 
-  if (!(await checkRateLimit(req))) {
+  // الرايت ليمتر نفسه fail-open داخليًا (يسمح بالطلب لو صار خطأ شبكة/Supabase
+  // بالاستدعاء)، لكن لفّيناه هنا كمان بـ try/catch احتياطي عشان أي استثناء
+  // غير متوقع ما يطيح الفنكشن كاملة بخطأ Vercel خام بدل رسالة الخطأ العربية.
+  let rateLimitOk = true;
+  try {
+    rateLimitOk = await checkRateLimit(req);
+  } catch (rlErr) {
+    console.error('turn.js: checkRateLimit threw unexpectedly, failing open', rlErr);
+    rateLimitOk = true;
+  }
+  if (!rateLimitOk) {
     res.status(429).json({ error: 'عدد الطلبات كثير جدًا خلال وقت قصير. حاول مرة ثانية بعد دقيقة.' });
     return;
   }
@@ -43,7 +77,6 @@ module.exports = async (req, res) => {
       return;
     }
 
-    const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
     const approxLevel = LEVELS[Math.max(0, Math.min(5, currentLevelIndex ?? 2))];
     const isLastTurn = (turnNumber >= (maxTurns || 9));
 
@@ -108,6 +141,9 @@ Respond with ONLY valid JSON (no markdown fences, no preamble, no explanation ou
         // JSON.parse below. Keep this generous even for a small per-turn reply.
         maxOutputTokens: 1200,
         responseMimeType: 'application/json',
+        // القيمة هنا مجرد "نية" افتراضية — lib/geminiCall.js يستبدلها تلقائيًا
+        // بالشكل الصح (thinkingLevel أو thinkingBudget) حسب عائلة كل موديل
+        // فعليًا يُجرَّب بسلسلة الـfallback.
         thinkingConfig: { thinkingLevel: 'low' }
       }
     });
@@ -117,19 +153,24 @@ Respond with ONLY valid JSON (no markdown fences, no preamble, no explanation ou
       return;
     }
 
-    const candidate = data.candidates && data.candidates[0];
-    const textOut = (candidate && candidate.content &&
-      candidate.content.parts && candidate.content.parts[0] &&
-      candidate.content.parts[0].text) || '';
-    const clean = textOut.replace(/```json/g, '').replace(/```/g, '').trim();
-
-    let parsed;
+    let parsed, candidate, textOut;
     try {
-      parsed = JSON.parse(clean);
+      ({ parsed, candidate, textOut } = parseGeminiJson(data));
     } catch (parseErr) {
+      const c = data.candidates && data.candidates[0];
       console.error('turn.js: failed to parse Gemini JSON', {
+        finishReason: c && c.finishReason,
+        error: parseErr.message
+      });
+      res.status(502).json({ error: 'صار خطأ بمعالجة رد نظام الذكاء الاصطناعي. حاول مرة ثانية.' });
+      return;
+    }
+
+    const shapeError = validateTurnShape(parsed);
+    if (shapeError) {
+      console.error('turn.js: Gemini JSON has unexpected shape', {
         finishReason: candidate && candidate.finishReason,
-        textLength: textOut.length,
+        shapeError,
         textPreview: textOut.slice(0, 300)
       });
       res.status(502).json({ error: 'صار خطأ بمعالجة رد نظام الذكاء الاصطناعي. حاول مرة ثانية.' });
