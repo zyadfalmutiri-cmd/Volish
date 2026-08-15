@@ -4,7 +4,28 @@
 // Requires GEMINI_API_KEY env var (Google AI Studio, free tier).
 
 const { checkRateLimit } = require('../lib/rateLimit');
-const { callGeminiWithRetry } = require('../lib/geminiCall');
+const { callGeminiWithRetry, parseGeminiJson } = require('../lib/geminiCall');
+
+const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+
+// تحقق سطحي من شكل رد الذكاء الاصطناعي بعد نجاح JSON.parse — عشان لو رجّع
+// JSON صحيح تقنيًا لكن ناقص حقل متوقّع، نرجّع خطأ عربي واضح للفرونت إند
+// بدل ما نرسل كائن ناقص يطيح الواجهة.
+function validateAnalyzeShape(parsed) {
+  if (!parsed || typeof parsed !== 'object') return 'root is not an object';
+  if (typeof parsed.summary_ar !== 'string' || !parsed.summary_ar.trim()) return 'missing summary_ar';
+  if (!Array.isArray(parsed.categoryScores) || parsed.categoryScores.length !== 4) return 'categoryScores must be an array of 4 items';
+  for (const c of parsed.categoryScores) {
+    if (!c || typeof c.name_ar !== 'string' || typeof c.score !== 'number' || typeof c.note_ar !== 'string') {
+      return 'malformed categoryScores item';
+    }
+  }
+  if (!Array.isArray(parsed.strengths_ar)) return 'strengths_ar must be an array';
+  if (!Array.isArray(parsed.weaknesses_ar)) return 'weaknesses_ar must be an array';
+  if (!Array.isArray(parsed.corrections)) return 'corrections must be an array';
+  if (typeof parsed.recommendation_ar !== 'string' || !parsed.recommendation_ar.trim()) return 'missing recommendation_ar';
+  return null; // صحيح
+}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -12,7 +33,18 @@ module.exports = async (req, res) => {
     return;
   }
 
-  if (!(await checkRateLimit(req))) {
+  // الرايت ليمتر نفسه fail-open داخليًا (يسمح بالطلب لو صار خطأ شبكة/Supabase
+  // بالاستدعاء)، لكن لفّيناه هنا كمان بـ try/catch احتياطي عشان أي استثناء
+  // غير متوقع (مثلاً بفحص Origin header نفسه) ما يطيح الفنكشن كاملة بخطأ
+  // Vercel خام بدل رسالة الخطأ العربية.
+  let rateLimitOk = true;
+  try {
+    rateLimitOk = await checkRateLimit(req);
+  } catch (rlErr) {
+    console.error('analyze.js: checkRateLimit threw unexpectedly, failing open', rlErr);
+    rateLimitOk = true;
+  }
+  if (!rateLimitOk) {
     res.status(429).json({ error: 'عدد الطلبات كثير جدًا خلال وقت قصير. حاول مرة ثانية بعد دقيقة.' });
     return;
   }
@@ -32,7 +64,6 @@ module.exports = async (req, res) => {
     B2: '6.0–6.5', C1: '7.0–8.0', C2: '8.5–9.0'
   };
   const LEVEL_AR = { A1: 'مبتدئ', A2: 'مبتدئ متقدم', B1: 'متوسط', B2: 'متوسط متقدم', C1: 'متقدم', C2: 'محترف' };
-  const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 
   try {
     const { history, turnLevels } = req.body || {};
@@ -52,6 +83,12 @@ module.exports = async (req, res) => {
 
     // ---- Deterministic CEFR calculation: median of the last up-to-5 per-turn
     // levels (never an average), so a single stray answer can't skew the result.
+    //
+    // ⚠️ ملاحظة معروفة (غير مصلَحة بعد — راجع "يحتاج تحقق" بتقرير المخاطر):
+    // turnLevels يوصل هنا من req.body مباشرة بدون تحقق من جلسة محفوظة
+    // بالسيرفر. إصلاحها الكامل يحتاج تصميم جلسة (session) بـSupabase تخزن
+    // turnCefrEstimate من كل سؤال وقت صيره فعليًا بـapi/turn.js، وهذا
+    // يحتاج قرار تصميم (schema + auth) قبل ما يُطبَّق.
     const validLevels = (turnLevels || []).filter(l => LEVELS.includes(l));
     const usedLevels = validLevels.slice(-5);
     const indices = usedLevels.map(l => LEVELS.indexOf(l)).sort((a, b) => a - b);
@@ -113,6 +150,9 @@ Limit "corrections" to at most 3 items. Keep every string concise.`;
         // JSON.parse below. Keep this generous for a 4-category report.
         maxOutputTokens: 2500,
         responseMimeType: 'application/json',
+        // القيمة هنا مجرد "نية" افتراضية — lib/geminiCall.js يستبدلها تلقائيًا
+        // بالشكل الصح (thinkingLevel أو thinkingBudget) حسب عائلة كل موديل
+        // فعليًا يُجرَّب بسلسلة الـfallback.
         thinkingConfig: { thinkingLevel: 'low' }
       }
     });
@@ -122,22 +162,27 @@ Limit "corrections" to at most 3 items. Keep every string concise.`;
       return;
     }
 
-    const candidate = data.candidates && data.candidates[0];
-    const textOut = (candidate && candidate.content &&
-      candidate.content.parts && candidate.content.parts[0] &&
-      candidate.content.parts[0].text) || '';
-    const clean = textOut.replace(/```json/g, '').replace(/```/g, '').trim();
-
-    let parsed;
+    let parsed, candidate, textOut;
     try {
-      parsed = JSON.parse(clean);
+      ({ parsed, candidate, textOut } = parseGeminiJson(data));
     } catch (parseErr) {
       // Log enough context to diagnose in Vercel logs without exposing
       // internals to the client (e.g. finishReason === 'MAX_TOKENS' means
       // the response got cut off — raise maxOutputTokens further).
+      const c = data.candidates && data.candidates[0];
       console.error('analyze.js: failed to parse Gemini JSON', {
+        finishReason: c && c.finishReason,
+        error: parseErr.message
+      });
+      res.status(502).json({ error: 'صار خطأ بمعالجة رد نظام الذكاء الاصطناعي. حاول مرة ثانية.' });
+      return;
+    }
+
+    const shapeError = validateAnalyzeShape(parsed);
+    if (shapeError) {
+      console.error('analyze.js: Gemini JSON has unexpected shape', {
         finishReason: candidate && candidate.finishReason,
-        textLength: textOut.length,
+        shapeError,
         textPreview: textOut.slice(0, 300)
       });
       res.status(502).json({ error: 'صار خطأ بمعالجة رد نظام الذكاء الاصطناعي. حاول مرة ثانية.' });
