@@ -273,15 +273,21 @@ module.exports = async (req, res) => {
     }
     session.last_direction = result.direction;
 
-    if (result.isFinal) {
+        if (result.isFinal) {
       const report = await runAnalyze(session);
       session.status = 'completed';
       session.pending_question = null;
       await sbUpsert(session);
+      const shareText = encodeURIComponent('قيّمت مستواي بالإنجليزي المحكي بهذا البوت 🎯 جربه انت بعد!');
+      const shareUrl = `https://t.me/share/url?url=https://t.me/Volishbot&text=${shareText}`;
       await tgSend(chatId, formatReport(report), {
-        inline_keyboard: [[{ text: '🌐 زور الموقع', url: WEBSITE_URL }]]
+        inline_keyboard: [
+          [{ text: '🌐 زور الموقع', url: WEBSITE_URL }],
+          [{ text: '🔄 شارك مع صديق', url: shareUrl }]
+        ]
       });
     } else {
+
       session.pending_question = result.nextQuestion;
       await sbUpsert(session);
       await tgSend(chatId, `${result.quickReplyAr}\n\n${result.nextQuestion.ar}\n${result.nextQuestion.en}`);
