@@ -4,6 +4,7 @@ const { callGeminiWithRetry, parseGeminiJson } = require('../lib/geminiCall');
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 const MAX_TURNS = 9;
 const VOICE_BUCKET = 'telegram-voices';
+const WEBSITE_URL = 'https://volish.vercel.app';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -59,11 +60,13 @@ async function sbUploadVoice(chatId, messageId, buffer) {
 }
 
 // ---------- Telegram API ----------
-async function tgSend(chatId, text) {
+async function tgSend(chatId, text, replyMarkup) {
+  const body = { chat_id: chatId, text };
+  if (replyMarkup) body.reply_markup = replyMarkup;
   await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text })
+    body: JSON.stringify(body)
   });
 }
 
@@ -275,7 +278,9 @@ module.exports = async (req, res) => {
       session.status = 'completed';
       session.pending_question = null;
       await sbUpsert(session);
-      await tgSend(chatId, formatReport(report));
+      await tgSend(chatId, formatReport(report), {
+        inline_keyboard: [[{ text: '🌐 زور الموقع', url: WEBSITE_URL }]]
+      });
     } else {
       session.pending_question = result.nextQuestion;
       await sbUpsert(session);
