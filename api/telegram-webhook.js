@@ -1,13 +1,9 @@
 // api/telegram-webhook.js
-// Telegram bot webhook — نفس منطق التقييم التكيّفي بـ api/turn.js و
-// api/analyze.js، لكن مباشرة داخل نفس الدالة (بدون HTTP call لـ/api/turn)
-// عشان ما يصطدم بحد rate limit اللي بـ lib/rateLimit.js (محسوب حسب IP،
-// وكل مستخدمين البوت راح يشاركون نفس IP لو استدعينا عبر HTTP عادي).
-
 const { callGeminiWithRetry, parseGeminiJson } = require('../lib/geminiCall');
 
 const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 const MAX_TURNS = 9;
+const VOICE_BUCKET = 'telegram-voices';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -48,6 +44,20 @@ async function sbUpsert(session) {
   });
 }
 
+async function sbUploadVoice(chatId, messageId, buffer) {
+  const path = `${chatId}/${messageId}.ogg`;
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${VOICE_BUCKET}/${path}`, {
+    method: 'POST',
+    headers: {
+      apikey: SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${SERVICE_ROLE_KEY}`,
+      'Content-Type': 'audio/ogg'
+    },
+    body: buffer
+  });
+  return res.ok ? path : null;
+}
+
 // ---------- Telegram API ----------
 async function tgSend(chatId, text) {
   await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -63,12 +73,8 @@ async function tgGetFileUrl(fileId) {
   return `https://api.telegram.org/file/bot${BOT_TOKEN}/${data.result.file_path}`;
 }
 
-// ---------- تحويل الصوت لنص عبر Gemini (يدعم صوت مباشرة كـ input) ----------
-async function transcribeVoice(fileUrl) {
-  const audioRes = await fetch(fileUrl);
-  const buf = Buffer.from(await audioRes.arrayBuffer());
-  const base64Audio = buf.toString('base64');
-
+// ---------- تحويل الصوت لنص عبر Gemini ----------
+async function transcribeVoice(base64Audio) {
   const geminiRes = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
     {
@@ -191,6 +197,15 @@ function formatReport(r) {
   return `🎯 النتيجة: ${r.level} (${r.levelName_ar})\n📊 تقدير IELTS: ${r.ieltsEstimate}\n\n${r.summary_ar}\n\n${cats}\n\n✅ نقاط القوة:\n${r.strengths_ar.map(s => '• ' + s).join('\n')}\n\n📌 تحتاج تحسين:\n${r.weaknesses_ar.map(s => '• ' + s).join('\n')}\n\n💡 التوصية: ${r.recommendation_ar}\n\nابدأ جلسة جديدة بأي وقت بـ /start`;
 }
 
+function freshSession(chatId, from) {
+  return {
+    chat_id: chatId, history: [], pending_question: OPENING_QUESTION,
+    current_level_index: 2, turn_number: 0, turn_levels: [],
+    last_direction: null, direction_streak: 0, status: 'in_progress',
+    username: from?.username || null, first_name: from?.first_name || null, last_name: from?.last_name || null
+  };
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(200).send('ok');
 
@@ -204,32 +219,29 @@ module.exports = async (req, res) => {
     const chatId = message.chat.id;
 
     if (message.text === '/start') {
-      await sbUpsert({
-        chat_id: chatId, history: [], pending_question: OPENING_QUESTION,
-        current_level_index: 2, turn_number: 0, turn_levels: [],
-        last_direction: null, direction_streak: 0, status: 'in_progress'
-      });
+      const session = freshSession(chatId, message.from);
+      await sbUpsert(session);
       await tgSend(chatId, `${OPENING_QUESTION.ar}\n\n${OPENING_QUESTION.en}`);
       return res.status(200).end();
     }
 
     let session = await sbGet(chatId);
     if (!session || session.status !== 'in_progress') {
-      session = {
-        chat_id: chatId, history: [], pending_question: OPENING_QUESTION,
-        current_level_index: 2, turn_number: 0, turn_levels: [],
-        last_direction: null, direction_streak: 0, status: 'in_progress'
-      };
+      session = freshSession(chatId, message.from);
       await sbUpsert(session);
       await tgSend(chatId, `${OPENING_QUESTION.ar}\n\n${OPENING_QUESTION.en}`);
       return res.status(200).end();
     }
 
     let answerText;
+    let audioPath = null;
     if (message.voice) {
       await tgSend(chatId, '🎙️ ثانية أسمع...');
       const fileUrl = await tgGetFileUrl(message.voice.file_id);
-      answerText = await transcribeVoice(fileUrl);
+      const audioRes = await fetch(fileUrl);
+      const buf = Buffer.from(await audioRes.arrayBuffer());
+      audioPath = await sbUploadVoice(chatId, message.message_id, buf);
+      answerText = await transcribeVoice(buf.toString('base64'));
     } else if (message.text) {
       answerText = message.text;
     } else {
@@ -238,14 +250,12 @@ module.exports = async (req, res) => {
     }
 
     const q = session.pending_question;
-    session.history.push({ type: q.type, topicCategory: q.topicCategory, question: q.en, answer: answerText });
+    session.history.push({ type: q.type, topicCategory: q.topicCategory, question: q.en, answer: answerText, audioPath });
     session.turn_number += 1;
 
     const result = await runTurn(session);
     session.turn_levels.push(result.turnCefrEstimate);
 
-    // تصعيب/تسهيل تقريبي: يحتاج إشارتين متتاليتين بنفس الاتجاه (مو مطابق
-    // 100% لمنطق الفرونت إند الأصلي لـVolish، تقدر تظبطه لاحقًا لو تبي).
     if (session.turn_number > 2) {
       if (result.direction === session.last_direction && result.direction !== 'same') {
         session.direction_streak += 1;
@@ -275,6 +285,6 @@ module.exports = async (req, res) => {
     return res.status(200).end();
   } catch (err) {
     console.error('telegram-webhook error', err);
-    return res.status(200).end(); // نرد 200 دايمًا عشان تيليجرام ما يعيد إرسال نفس الأبديت
+    return res.status(200).end();
   }
 };
